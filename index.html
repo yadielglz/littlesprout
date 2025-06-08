@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link id="favicon" rel="icon" href="">
@@ -59,6 +60,7 @@
         .ticker-move { display: inline-block; animation: marquee 30s linear infinite; }
         .ticker-item { display: inline-block; padding: 0 2rem; }
         .icon-scroll-container { -ms-overflow-style: none; scrollbar-width: none; }
+        #qr-reader { border: 2px solid rgb(var(--border-color-val)); border-radius: 8px; }
     </style>
 </head>
 <body class="transition-colors duration-300">
@@ -134,6 +136,11 @@
                       </div>
                  </button>
                  <input type="file" id="import-file-input" class="hidden" accept=".csv" onchange="importData(event)">
+                 <button onclick="showQRScanner()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
+                    <div class="flex items-center w-full"><i class="fas fa-camera text-pink-500 text-2xl mr-4"></i>
+                        <div><span class="font-semibold text-sm">Scan QR Code</span><span class="block text-xs text-secondary mt-1">Import data by scanning a QR code from another device.</span></div>
+                    </div>
+               </button>
              </div>
              <button onclick="hideModal('backup-options-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors mt-6">Close</button>
          </div>
@@ -143,12 +150,21 @@
          <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
              <h2 class="text-xl font-bold mb-4">Scan to Transfer</h2>
              <div id="qrcode-container" class="p-4 bg-white rounded-lg flex justify-center items-center">
-                  <div id="qrcode"></div>
+                  <div id="qrcode" class="w-[256px] h-[256px]"></div>
              </div>
              <p class="text-secondary my-4 text-sm">Open LittleSprout on another device and scan this code from the "Backup & Restore" menu to transfer data.</p>
              <button onclick="hideModal('qr-code-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">Close</button>
          </div>
      </div>
+
+     <div id="qr-scanner-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <h2 class="text-xl font-bold mb-4">Scan QR Code</h2>
+            <div id="qr-reader" class="w-full aspect-square"></div>
+            <p class="text-secondary my-4 text-sm">Point your camera at a LittleSprout QR code to import data.</p>
+            <button onclick="hideQRScanner()" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">Cancel</button>
+        </div>
+    </div>
 
      <div id="activity-log-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
          <div class="p-4 md:p-6 flex-shrink-0">
@@ -388,7 +404,6 @@
 
     <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-lg opacity-0 transition-opacity duration-500">
         <header class="flex justify-between items-center mb-4 p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 dark:from-slate-800 dark:to-indigo-900 shadow-lg text-white">
-            <!-- This div is for spacing, to keep the title centered -->
             <div class="w-8"></div>
             <div class="text-center">
                 <h1 id="header-title" class="text-2xl sm:text-3xl font-bold"></h1>
@@ -445,7 +460,7 @@
         let allMemories = {}, inventory = {}, customActivities = [];
         let activeTimer = null, confirmCallback = null;
         let activeForm = null, timeInterval, reminderInterval;
-        let qrcodeInstance = null;
+        let qrScanner = null;
         let weightChartInstance = null, heightChartInstance = null;
         const { jsPDF } = window.jspdf;
         
@@ -490,14 +505,13 @@
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => { 
             drawLogo();
-            $('#version-info').textContent = `v3.0 - ${new Date('2025-06-08').toLocaleDateString()}`;
+            $('#version-info').textContent = `v3.1 - ${new Date('2025-06-08').toLocaleDateString()}`;
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             document.documentElement.classList.toggle('dark', isDarkMode);
             updateThemeButton(isDarkMode);
 
             $('#confirm-modal-yes').addEventListener('click', () => { if (typeof confirmCallback === 'function') { confirmCallback(); } hideModal('confirm-modal'); confirmCallback = null; });
             $('#confirm-modal-no').addEventListener('click', () => { hideModal('confirm-modal'); confirmCallback = null; });
-            qrcodeInstance = new QRCode($('#qrcode'), { width: 200, height: 200, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
             
             populateCustomIconPicker();
             setTimeout(() => { 
@@ -536,7 +550,6 @@
             allReminders = JSON.parse(localStorage.getItem('allReminders')) || {};
             activeTimer = JSON.parse(localStorage.getItem('activeTimer'));
             
-            // Load new data
             allMemories = JSON.parse(localStorage.getItem('allMemories')) || {};
             inventory = JSON.parse(localStorage.getItem('inventory')) || {};
             customActivities = JSON.parse(localStorage.getItem('customActivities')) || [];
@@ -550,7 +563,6 @@
             localStorage.setItem('allReminders', JSON.stringify(allReminders));
             localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
             
-            // Save new data
             localStorage.setItem('allMemories', JSON.stringify(allMemories));
             localStorage.setItem('inventory', JSON.stringify(inventory));
             localStorage.setItem('customActivities', JSON.stringify(customActivities));
@@ -593,7 +605,7 @@
             renderActivityLibrary();
             appContainer.classList.remove('opacity-0'); 
             startDateTime(); 
-            fetchWeather(); 
+            getLocation(); 
             renderReminders(); 
             updateActiveTimerDisplay();
             analyzeSleepPatterns();
@@ -1053,24 +1065,36 @@
         }
         
         function startDateTime() { if(timeInterval) clearInterval(timeInterval); if(reminderInterval) clearInterval(reminderInterval); const mainTimeEl = $('#main-time-display'), mainAmpmEl = $('#main-ampm-display'), mainDateEl = $('#main-date-display'), panelDateEl = $('#panel-date-display'); timeInterval = setInterval(() => { const now = new Date(); const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); const dateString = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); mainTimeEl.textContent = timeString.slice(0, -3); mainAmpmEl.textContent = timeString.slice(-2); mainDateEl.textContent = dateString; if(panelDateEl) panelDateEl.textContent = `${dateString} | ${timeString}`; }, 1000); reminderInterval = setInterval(checkReminders, 5000); }
-        async function fetchWeather() { 
+        async function fetchWeather(lat, lon) { 
             const outlookSection = $('#outlook-section'); 
             const weatherPanel = $('#weather-display-panel');
             const mainWeather = $('#main-weather-display');
+            
+            const url = lat && lon ? `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=auto` : 'https://wttr.in/?format=j1';
+            
             try { 
-                const res = await fetch('https://wttr.in/?format=j1'); 
+                const res = await fetch(url);
                 if (!res.ok) throw new Error('Weather service not available'); 
-                const data = await res.json(); 
-                const currentCondition = data.current_condition[0]; 
-                const temp = parseInt(currentCondition.temp_F);
-                const weatherHTML = `<i class="fas fa-map-marker-alt mr-1"></i> ${data.nearest_area[0].areaName[0].value} | <i class="fas fa-cloud-sun ml-2 mr-1"></i> ${temp}°F, ${currentCondition.weatherDesc[0].value}`;
+                const data = await res.json();
+                
+                let temp, weatherDesc, locationName;
+
+                if (lat && lon) {
+                    temp = Math.round(data.current_weather.temperature);
+                    weatherDesc = getWeatherDescription(data.current_weather.weathercode);
+                    locationName = "Your Location"; // Generic name for privacy
+                } else { // Fallback to wttr.in
+                    temp = parseInt(data.current_condition[0].temp_F);
+                    weatherDesc = data.current_condition[0].weatherDesc[0].value;
+                    locationName = data.nearest_area[0].areaName[0].value;
+                }
+                
+                const weatherHTML = `<i class="fas fa-map-marker-alt mr-1"></i> ${locationName} | <i class="fas fa-cloud-sun ml-2 mr-1"></i> ${temp}°F, ${weatherDesc}`;
                 
                 mainWeather.innerHTML = weatherHTML;
                 weatherPanel.innerHTML = weatherHTML;
                 
-                renderForecast(data.weather);
                 updateDynamicSuggestion(temp);
-
                 outlookSection.classList.remove('hidden'); 
             } catch (error) { 
                 console.error("Weather Error:", error);
@@ -1081,18 +1105,19 @@
             }
         }
 
-        function renderForecast(forecastData) {
-            const container = $('#forecast-display');
-            container.innerHTML = '';
-            for(let i = 0; i < 3; i++) {
-                const day = forecastData[i];
-                const date = new Date(day.date);
-                const dayName = i === 0 ? "Today" : date.toLocaleDateString(undefined, { weekday: 'short' });
-                container.innerHTML += `<div class="p-2 bg-primary rounded-lg">
-                    <p class="font-bold">${dayName}</p>
-                    <p>${day.avgtempF}°F</p>
-                    <p class="text-xs text-secondary">${day.hourly[4].weatherDesc[0].value}</p>
-                </div>`;
+        function getWeatherDescription(code) {
+             const codes = {0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle", 61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain", 80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers", 95: "Thunderstorm"};
+             return codes[code] || "Unknown";
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => fetchWeather(position.coords.latitude, position.coords.longitude),
+                    () => fetchWeather() // Fallback if user denies location
+                );
+            } else {
+                fetchWeather(); // Fallback for old browsers
             }
         }
         
@@ -1258,7 +1283,7 @@
             if (!file) return;
 
             const description = prompt("Enter a short description for this memory:");
-            if(description === null) return; // User cancelled
+            if(description === null) return; 
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1275,7 +1300,7 @@
                 showToast('Memory saved!', 'success');
             };
             reader.readAsDataURL(file);
-            fileInput.value = ''; // Reset input
+            fileInput.value = ''; 
         }
         
         // Inventory
@@ -1437,7 +1462,54 @@
             hideModal('custom-activity-modal');
             showToast('Custom activity created!', 'success');
         }
+
+        // QR Code generation and scanning
+        function showQRBackup() {
+            const packedData = packDataForTransport();
+            if (packedData) {
+                const url = `${window.location.origin}${window.location.pathname}?backup=${packedData}`;
+                const qr = qrcode(0, 'H');
+                qr.addData(url);
+                qr.make();
+                $('#qrcode').innerHTML = qr.createImgTag(6, 8); // (cellSize, margin)
+                hideModal('backup-options-modal');
+                showModal('qr-code-modal');
+            }
+        }
         
+        function showQRScanner() {
+            hideModal('backup-options-modal');
+            showModal('qr-scanner-modal');
+            qrScanner = new Html5Qrcode("qr-reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            qrScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure);
+        }
+
+        function hideQRScanner() {
+            if (qrScanner) {
+                qrScanner.stop().catch(err => console.error("Failed to stop scanner", err));
+                qrScanner = null;
+            }
+            hideModal('qr-scanner-modal');
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            hideQRScanner();
+            const urlParams = new URLSearchParams(new URL(decodedText).search);
+            const backupData = urlParams.get('backup');
+            if (backupData) {
+                showConfirmation("Backup data found in QR code. Do you want to restore it? This will overwrite ALL current data.", () => {
+                    restoreDataFromPack(backupData);
+                });
+            } else {
+                showToast('Invalid QR code scanned.', 'error');
+            }
+        }
+
+        function onScanFailure(error) {
+            // This function is called frequently, so we don't want to log every failure.
+        }
+
     </script>
 </body>
 </html>
