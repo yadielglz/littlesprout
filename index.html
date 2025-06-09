@@ -136,6 +136,11 @@
                       </div>
                  </button>
                  <input type="file" id="import-file-input" class="hidden" accept=".csv" onchange="importData(event)">
+                 <button onclick="exportDataToFile()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
+                    <div class="flex items-center w-full"><i class="fas fa-save text-blue-500 text-2xl mr-4"></i>
+                        <div><span class="font-semibold text-sm">Save as File</span><span class="block text-xs text-secondary mt-1">Download a .csv backup file to your device.</span></div>
+                    </div>
+                </button>
                  <button onclick="showQRScanner()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
                     <div class="flex items-center w-full"><i class="fas fa-camera text-pink-500 text-2xl mr-4"></i>
                         <div><span class="font-semibold text-sm">Scan QR Code</span><span class="block text-xs text-secondary mt-1">Import data by scanning a QR code from another device.</span></div>
@@ -368,6 +373,7 @@
                      <div id="panel-date-time" class="text-secondary text-sm mt-1"></div>
                  </div>
                  <div class="flex items-center gap-4">
+                    <button id="fullscreen-button" onclick="toggleFullScreen()" class="text-secondary hover:text-primary"><i class="fas fa-expand"></i></button>
                     <button id="theme-toggle-button" onclick="toggleDarkMode()" class="text-secondary hover:text-primary"></button>
                     <button onclick="toggleSettingsPanel()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
                  </div>
@@ -505,7 +511,7 @@
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => { 
             drawLogo();
-            $('#version-info').textContent = `v3.1 - ${new Date('2025-06-08').toLocaleDateString()}`;
+            $('#version-info').textContent = `v3.2 - ${new Date('2025-06-08').toLocaleDateString()}`;
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             document.documentElement.classList.toggle('dark', isDarkMode);
             updateThemeButton(isDarkMode);
@@ -1082,8 +1088,8 @@
                 if (lat && lon) {
                     temp = Math.round(data.current_weather.temperature);
                     weatherDesc = getWeatherDescription(data.current_weather.weathercode);
-                    locationName = "Your Location"; // Generic name for privacy
-                } else { // Fallback to wttr.in
+                    locationName = "Your Location"; 
+                } else { 
                     temp = parseInt(data.current_condition[0].temp_F);
                     weatherDesc = data.current_condition[0].weatherDesc[0].value;
                     locationName = data.nearest_area[0].areaName[0].value;
@@ -1114,10 +1120,10 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => fetchWeather(position.coords.latitude, position.coords.longitude),
-                    () => fetchWeather() // Fallback if user denies location
+                    () => fetchWeather() 
                 );
             } else {
-                fetchWeather(); // Fallback for old browsers
+                fetchWeather(); 
             }
         }
         
@@ -1463,53 +1469,58 @@
             showToast('Custom activity created!', 'success');
         }
 
-        // QR Code generation and scanning
-        function showQRBackup() {
+        // QR Code and File Export/Import
+        function exportDataToFile() {
             const packedData = packDataForTransport();
-            if (packedData) {
-                const url = `${window.location.origin}${window.location.pathname}?backup=${packedData}`;
-                const qr = qrcode(0, 'H');
-                qr.addData(url);
-                qr.make();
-                $('#qrcode').innerHTML = qr.createImgTag(6, 8); // (cellSize, margin)
-                hideModal('backup-options-modal');
-                showModal('qr-code-modal');
+            if(!packedData) return;
+
+            const logs = allLogs[currentProfileId] || [];
+            if(logs.length === 0) {
+                showToast("No log data to export.", "info");
+                return;
             }
-        }
-        
-        function showQRScanner() {
-            hideModal('backup-options-modal');
-            showModal('qr-scanner-modal');
-            qrScanner = new Html5Qrcode("qr-reader");
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            qrScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure);
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID,Baby Name,Date,Type,Details,Amount,Duration,Timestamp,Notes\n";
+
+            const profile = getCurrentProfile();
+            logs.forEach(log => {
+                const row = [
+                    log.id,
+                    profile.babyName,
+                    new Date(log.timestamp).toLocaleDateString(),
+                    log.type,
+                    `"${log.details || ''}"`,
+                    log.rawAmount || '',
+                    log.rawDuration || '',
+                    log.timestamp.toISOString(),
+                    `"${log.notes || ''}"`
+                ].join(",");
+                csvContent += row + "\r\n";
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `littlesprout_backup_${profile.babyName}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Backup file downloaded.", "success");
         }
 
-        function hideQRScanner() {
-            if (qrScanner) {
-                qrScanner.stop().catch(err => console.error("Failed to stop scanner", err));
-                qrScanner = null;
-            }
-            hideModal('qr-scanner-modal');
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            hideQRScanner();
-            const urlParams = new URLSearchParams(new URL(decodedText).search);
-            const backupData = urlParams.get('backup');
-            if (backupData) {
-                showConfirmation("Backup data found in QR code. Do you want to restore it? This will overwrite ALL current data.", () => {
-                    restoreDataFromPack(backupData);
-                });
+        // Fullscreen
+        function toggleFullScreen() {
+            const btn = $('#fullscreen-button i');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                btn.className = "fas fa-compress";
             } else {
-                showToast('Invalid QR code scanned.', 'error');
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    btn.className = "fas fa-expand";
+                }
             }
         }
-
-        function onScanFailure(error) {
-            // This function is called frequently, so we don't want to log every failure.
-        }
-
     </script>
 </body>
 </html>
