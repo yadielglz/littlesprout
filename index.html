@@ -411,6 +411,14 @@
                  <div id="recent-memories-container" class="grid grid-cols-3 gap-2 text-xs"></div>
                  <button onclick="showModal('memories-modal'); renderMemories();" class="text-sm text-indigo-500 hover:underline mt-4">View all memories</button>
             </div>
+            <div id="sleep-analysis-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-indigo-300 dark:border-indigo-500 hidden animate-fadeIn">
+                <h3 class="font-bold text-primary mb-2">Sleep Outlook</h3>
+                <div id="sleep-analysis-content" class="text-primary text-sm space-y-1"></div>
+            </div>
+            <div id="recent-milestones-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-yellow-300 dark:border-yellow-500 hidden animate-fadeIn">
+                 <h3 class="font-bold text-primary mb-2">Recent Milestones</h3>
+                 <div id="recent-milestones-container" class="space-y-2 text-sm"></div>
+            </div>
         </main>
         <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white py-2 px-4 rounded-lg shadow-xl transition-all duration-300 opacity-0 -translate-y-20 z-[100]"></div>
     </div>
@@ -470,7 +478,7 @@
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             animateLogo();
-            $('#version-info').textContent = `v4.9 Local - ${new Date('2025-06-10').toLocaleDateString()}`;
+            $('#version-info').textContent = `v5.0 Local - ${new Date('2025-06-10').toLocaleDateString()}`;
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             document.documentElement.classList.toggle('dark', isDarkMode);
             updateThemeButton(isDarkMode);
@@ -585,6 +593,8 @@
             populateCustomIconPicker();
             renderReminders();
             renderRecentMemories();
+            renderRecentMilestones();
+            analyzeSleepPatterns();
             updateActiveTimerDisplay();
             appContainer.classList.remove('opacity-0');
             startDateTime();
@@ -608,8 +618,8 @@
         function showConfirmation(message, callback) { $('#confirm-modal-text').textContent = message; confirmCallback = callback; showModal('confirm-modal'); }
 
         // --- LOGGING & EDITING ---
-        function addEntry(entryData) { if (!allLogs[currentProfileId]) allLogs[currentProfileId] = []; allLogs[currentProfileId].push({ id: Date.now(), ...entryData }); saveData(); renderLog(); updateLastLogDisplay(); renderRecentMemories(); showToast(`${entryData.type.charAt(0).toUpperCase() + entryData.type.slice(1)} logged!`, 'success'); }
-        function deleteEntry(id) { showConfirmation('Are you sure you want to delete this entry?', () => { if (!allLogs[currentProfileId]) return; allLogs[currentProfileId] = allLogs[currentProfileId].filter(e => e.id !== id); saveData(); renderLog(); updateLastLogDisplay(); renderRecentMemories(); showToast('Entry deleted.', 'info'); }); }
+        function addEntry(entryData) { if (!allLogs[currentProfileId]) allLogs[currentProfileId] = []; allLogs[currentProfileId].push({ id: Date.now(), ...entryData }); saveData(); renderLog(); updateLastLogDisplay(); renderRecentMemories(); renderRecentMilestones(); analyzeSleepPatterns(); showToast(`${entryData.type.charAt(0).toUpperCase() + entryData.type.slice(1)} logged!`, 'success'); }
+        function deleteEntry(id) { showConfirmation('Are you sure you want to delete this entry?', () => { if (!allLogs[currentProfileId]) return; const entryType = allLogs[currentProfileId].find(e => e.id === id)?.type; allLogs[currentProfileId] = allLogs[currentProfileId].filter(e => e.id !== id); saveData(); renderLog(); updateLastLogDisplay(); renderRecentMemories(); if (entryType === 'milestone') renderRecentMilestones(); if (entryType === 'sleep' || entryType === 'nap') analyzeSleepPatterns(); showToast('Entry deleted.', 'info'); }); }
         function addFeed() { const f = formDisplayArea; const amount = parseFloat($('.amount', f).value); if(isNaN(amount) || amount <= 0) { showToast("Invalid amount", "error"); return; }; const entry = { type: 'feed', icon: 'fas fa-utensils', color: 'blue-500', details: `${$('.type', f).value} - ${amount} oz`, rawAmount: amount, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }; addEntry(entry); showForm(null); if ($('#deduct-formula', f).checked && $('.type', f).value === 'Formula') { updateInventory('formula', -1); } }
         function addSleep(type) { const f = formDisplayArea; const start = new Date($('.start-time', f).value), end = new Date($('.end-time', f).value); if (!start.getTime() || !end.getTime() || start >= end) { showToast("Invalid time range.", "error"); return; } const duration = Math.round((end - start) / 60000); const hours = Math.floor(duration / 60); const minutes = duration % 60; const entry = { type, icon: 'fas fa-moon', color: 'indigo-500', details: `Duration: ${hours}h ${minutes}m`, rawDuration: duration, timestamp: start, notes: $('.notes', f).value }; addEntry(entry); showForm(null); }
         function addDiaper() { const f = formDisplayArea; const entry = { type: 'diaper', icon: 'fas fa-baby', color: 'amber-500', details: $('.type', f).value, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }; addEntry(entry); showForm(null); if ($('#deduct-diaper', f).checked) { updateInventory('diapers', -1); } }
@@ -698,6 +708,10 @@
         // First Run Import
         function restoreFromFirstRunCode() { const code = $('#first-run-backup-code').value.trim(); if (!code) { showToast("Please paste your backup code.", "error"); return; } restoreDataFromPack(code); }
         function startFirstRunQRScanner() { $('#first-run-qr-reader').classList.remove('hidden'); firstRunQrScanner = new Html5Qrcode("first-run-qr-reader"); const config = { fps: 10, qrbox: { width: 250, height: 250 } }; firstRunQrScanner.start({ facingMode: "environment" }, config, (decodedText) => { if(firstRunQrScanner.isScanning) { firstRunQrScanner.stop(); } hideModal('first-run-import-modal'); restoreDataFromPack(decodedText); }, (errorMessage) => {}).catch((err) => { showToast("Could not start QR scanner.", "error"); }); }
+        // Sleep Analysis & Recent Milestones
+        function analyzeSleepPatterns() { const section=$('#sleep-analysis-section'),content=$('#sleep-analysis-content'),logs=(allLogs[currentProfileId]||[]).filter(log=>log.type==='sleep'||log.type==='nap').sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));if(logs.length<3){section.classList.add('hidden');return}const wakeWindows=[];for(let i=1;i<logs.length;i++){const sleepEnd=new Date(logs[i-1].timestamp).getTime()+(logs[i-1].rawDuration*6e4),nextSleepStart=new Date(logs[i].timestamp).getTime(),windowMs=nextSleepStart-sleepEnd;if(windowMs>0&&windowMs<12*60*60*1e3)wakeWindows.push(windowMs)}if(wakeWindows.length<2){section.classList.add('hidden');return}const avgWakeWindowMs=wakeWindows.reduce((a,b)=>a+b,0)/wakeWindows.length,avgWakeWindowHours=(avgWakeWindowMs/36e5).toFixed(1),lastSleep=logs[logs.length-1],lastSleepEnd=new Date(lastSleep.timestamp).getTime()+(lastSleep.rawDuration*6e4),nextNapTime=new Date(lastSleepEnd+avgWakeWindowMs);content.innerHTML=`<p>Avg. wake window: <strong>${avgWakeWindowHours} hours</strong>.</p><p class="mt-1">Next nap may be around <strong>${nextNapTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</strong>.</p>`;section.classList.remove('hidden')}
+        function renderRecentMilestones() { const container=$('#recent-milestones-container'),section=$('#recent-milestones-section'),milestoneLogs=(allLogs[currentProfileId]||[]).filter(log=>log.type==='milestone').sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).slice(0,3);if(milestoneLogs.length===0){section.classList.add('hidden');return}section.classList.remove('hidden');container.innerHTML=milestoneLogs.map(log=>`<div class="bg-primary p-2 rounded-lg text-primary text-center"><i class="fas fa-trophy text-yellow-500 mr-2"></i><span>${log.details.replace('Achieved: ','')}</span><p class="text-xs text-secondary">${new Date(log.timestamp).toLocaleDateString()}</p></div>`).join('')}
+
 
         // Expose functions to global scope for onclick handlers
         window.saveBabyInfo = saveBabyInfo; window.acknowledgeDisclaimer = acknowledgeDisclaimer; window.toggleSettingsPanel = toggleSettingsPanel; window.toggleDarkMode = toggleDarkMode; window.showForm = showForm; window.addFeed = addFeed; window.addSleep = addSleep; window.addDiaper = addDiaper; window.addMeasurement = addMeasurement; window.deleteEntry = deleteEntry; window.clearLogWithConfirmation = clearLogWithConfirmation; window.showModal = showModal; window.hideModal = hideModal; window.exportDataToFile = exportDataToFile; window.importData = importData; window.triggerImport = triggerImport; window.generatePDF = generatePDF; window.showCharts = showCharts; window.hideCharts = hideCharts; window.renderMemories = renderMemories; window.addMemory = addMemory; window.deleteMemory = deleteMemory; window.showInventoryModal = showInventoryModal; window.saveInventory = saveInventory; window.copyBackupToClipboard=copyBackupToClipboard; window.showQRBackup=showQRBackup; window.emailMagicLink=emailMagicLink; window.showQRScanner=showQRScanner; window.hideQRScanner=hideQRScanner; window.showSetupForNewProfile = showSetupForNewProfile; window.switchProfile = switchProfile; window.deleteCurrentProfile = deleteCurrentProfile; window.generateDailySummary = generateDailySummary; window.shareSummary = shareSummary; window.showCustomActivityModal = showCustomActivityModal; window.addCustomActivity = addCustomActivity; window.selectCustomIcon = selectCustomIcon; window.logCustomActivity=logCustomActivity; window.addMilestone=addMilestone; window.addMedication=addMedication; window.addTemperature=addTemperature; window.addVaccine=addVaccine; window.setReminder=setReminder; window.deleteReminder=deleteReminder; window.startTimer=startTimer; window.stopTimer=stopTimer; window.showEditLogModal = showEditLogModal; window.saveLogEdit=saveLogEdit; window.restoreFromFirstRunCode=restoreFromFirstRunCode; window.startFirstRunQRScanner=startFirstRunQRScanner; window.addTummyTime = addTummyTime;
