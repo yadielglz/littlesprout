@@ -58,14 +58,23 @@
         .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
         .ticker-wrap { width: 100%; overflow: hidden; white-space: nowrap; }
         .ticker-move { display: inline-block; animation: marquee 40s linear infinite; }
+        
+        /* New Splash Screen Animations */
+        #splash-title, #splash-subtitle { opacity: 0; transition: opacity 0.8s ease-in-out; }
+        .dot-pulse { animation: pulse 1.5s infinite ease-in-out; }
     </style>
 </head>
 <body class="transition-colors duration-300">
     
     <div id="splash-screen" class="fixed inset-0 bg-primary flex flex-col items-center justify-center z-[100] transition-opacity duration-1000 ease-in-out">
         <canvas id="logo-canvas" width="150" height="150" class="mb-4"></canvas>
-        <h1 class="text-5xl font-bold text-primary" style="animation: pulse 2.5s infinite ease-in-out;">LittleSprout</h1>
-        <p class="text-secondary mt-2">Your baby's little moments, treasured.</p>
+        <h1 id="splash-title" class="text-5xl font-bold text-primary">LittleSprout</h1>
+        <p id="splash-subtitle" class="text-secondary mt-2">Your baby's little moments, treasured.</p>
+        <div id="splash-loader" class="flex space-x-2 mt-8 opacity-0 transition-opacity duration-800">
+            <div class="w-3 h-3 bg-indigo-300 rounded-full dot-pulse"></div>
+            <div class="w-3 h-3 bg-indigo-300 rounded-full dot-pulse" style="animation-delay: 0.2s;"></div>
+            <div class="w-3 h-3 bg-indigo-300 rounded-full dot-pulse" style="animation-delay: 0.4s;"></div>
+        </div>
     </div>
 
     <!-- Modals -->
@@ -460,8 +469,8 @@
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            drawLogo();
-            $('#version-info').textContent = `v4.8 Local - ${new Date('2025-06-10').toLocaleDateString()}`;
+            animateLogo();
+            $('#version-info').textContent = `v4.9 Local - ${new Date('2025-06-10').toLocaleDateString()}`;
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             document.documentElement.classList.toggle('dark', isDarkMode);
             updateThemeButton(isDarkMode);
@@ -469,10 +478,11 @@
             $('#confirm-modal-yes').addEventListener('click', () => { if (typeof confirmCallback === 'function') { confirmCallback(); } hideModal('confirm-modal'); confirmCallback = null; });
             $('#confirm-modal-no').addEventListener('click', () => { hideModal('confirm-modal'); confirmCallback = null; });
             
+            // This timeout controls the total splash screen duration
             setTimeout(() => {
                 splashScreen.classList.add('opacity-0', 'pointer-events-none');
                 checkForMagicLink();
-            }, 2500);
+            }, 3500); 
         });
         
         function checkForMagicLink() {
@@ -582,7 +592,8 @@
         }
 
         // --- UI & UX ---
-        function drawLogo() { const canvas=$('#logo-canvas'),favicon=$('#favicon');if(canvas.getContext){const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);ctx.beginPath();ctx.arc(w/2,h/2,w/2-10,0,Math.PI*2);ctx.fillStyle='#F0F5FF';ctx.fill();ctx.beginPath();ctx.moveTo(w/2,h*0.8);ctx.bezierCurveTo(w/2-10,h*0.7,w/2-10,h*0.4,w/2,h*0.3);ctx.bezierCurveTo(w/2+10,h*0.4,w/2+10,h*0.7,w/2,h*0.8);ctx.fillStyle='#A1DD70';ctx.fill();ctx.beginPath();ctx.moveTo(w/2-2,h*0.45);ctx.bezierCurveTo(w*0.2,h*0.4,w*0.25,h*0.15,w*0.4,h*0.3);ctx.fillStyle='#8BC34A';ctx.fill();ctx.beginPath();ctx.moveTo(w/2+2,h*0.45);ctx.bezierCurveTo(w*0.8,h*0.4,w*0.75,h*0.15,w*0.6,h*0.3);ctx.fillStyle='#A1DD70';ctx.fill();favicon.href=canvas.toDataURL('image/png')}}
+        function animateLogo() { const canvas = $('#logo-canvas'); if (!canvas.getContext) return; const ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height; let progress = 0; const animationDuration = 1500; let startTime = null; function draw(p) { ctx.clearRect(0, 0, w, h); ctx.beginPath(); ctx.arc(w / 2, h / 2, w / 2 - 10, 0, Math.PI * 2); ctx.fillStyle = document.documentElement.classList.contains('dark') ? '#0F172A' : '#F0F5FF'; ctx.fill(); const stemProgress = Math.min(1, p / 0.4); const stemHeight = h * 0.5 * stemProgress; ctx.beginPath(); ctx.moveTo(w / 2, h * 0.8); ctx.lineTo(w / 2, h * 0.8 - stemHeight); ctx.strokeStyle = '#A1DD70'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.stroke(); if (p > 0.4) { const leafProgress = (p - 0.4) / 0.6; ctx.save(); ctx.translate(w / 2, h * 0.8 - stemHeight); ctx.lineWidth = 6; ctx.strokeStyle = '#8BC34A'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-w * 0.3 * leafProgress, -h * 0.1 * leafProgress, -w * 0.1 * leafProgress, -h * 0.3 * leafProgress); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(w * 0.3 * leafProgress, -h * 0.1 * leafProgress, w * 0.1 * leafProgress, -h * 0.3 * leafProgress); ctx.stroke(); ctx.restore(); } } function step(timestamp) { if (!startTime) startTime = timestamp; const elapsed = timestamp - startTime; progress = Math.min(elapsed / animationDuration, 1); draw(progress); if (progress < 1) { requestAnimationFrame(step); } else { $('#splash-title').style.opacity = 1; $('#splash-subtitle').style.opacity = 1; $('#splash-loader').style.opacity = 1; favicon.href = canvas.toDataURL('image/png'); } } requestAnimationFrame(step); }
+        function drawLogo() { const canvas = $('#logo-canvas'),favicon = $('#favicon'); if (canvas.getContext) { const ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height; ctx.clearRect(0, 0, w, h); ctx.beginPath(); ctx.arc(w / 2, h / 2, w / 2 - 10, 0, Math.PI * 2); ctx.fillStyle = '#F0F5FF'; ctx.fill(); ctx.beginPath(); ctx.moveTo(w / 2, h * 0.8); ctx.bezierCurveTo(w / 2 - 10, h * 0.7, w / 2 - 10, h * 0.4, w / 2, h * 0.3); ctx.bezierCurveTo(w / 2 + 10, h * 0.4, w / 2 + 10, h * 0.7, w / 2, h * 0.8); ctx.fillStyle = '#A1DD70'; ctx.fill(); ctx.beginPath(); ctx.moveTo(w/2 - 2, h * 0.45); ctx.bezierCurveTo(w*0.2, h*0.4, w*0.25, h*0.15, w*0.4, h*0.3); ctx.fillStyle = '#8BC34A'; ctx.fill(); ctx.beginPath(); ctx.moveTo(w/2 + 2, h * 0.45); ctx.bezierCurveTo(w*0.8, h*0.4, w*0.75, h*0.15, w*0.6, h*0.3); ctx.fillStyle = '#A1DD70'; ctx.fill(); favicon.href = canvas.toDataURL('image/png')}}
         function updateHeader() { const profile = babyProfiles.find(p=>p.id==currentProfileId); if (!profile) return; $('#header-title').textContent = `Hello, ${profile.userName}!`; $('#header-subtitle').textContent = `${profile.babyName} is ${calculatePreciseAge(profile.dob)}`; }
         function calculatePreciseAge(dobString) {const dob=new Date(dobString),today=new Date();if(dob>today)return"not born yet!";let years=today.getFullYear()-dob.getFullYear(),months=today.getMonth()-dob.getMonth(),days=today.getDate()-dob.getDate();if(days<0){months--;days+=new Date(today.getFullYear(),today.getMonth(),0).getDate()}if(months<0){years--;months+=12}if(years>=2)return`${years} years old`;if(years>0)return`${years} year${years>1?'s':''} & ${months} month${months>1?'s':''} old`;const totalDays=Math.floor((today-dob)/(1e3*60*60*24));if(totalDays<7)return`${totalDays} day${totalDays!==1?'s':''} old`;const weeks=Math.floor(totalDays/7);if(months<1)return`${weeks} week${weeks>1?'s':''} old`;return`${months} month${months>1?'s':''} old`}
         function calculateAgeMonths(dobString) { const dob = new Date(dobString), today = new Date(); let months = (today.getFullYear() - dob.getFullYear()) * 12 - dob.getMonth() + today.getMonth(); if (today.getDate() < dob.getDate()) months--; return months < 0 ? 0 : months; }
