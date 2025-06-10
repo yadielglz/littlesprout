@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -53,19 +53,14 @@
         .input-bg { background-color: rgba(var(--input-bg-val), 1); }
 
         #log-container::-webkit-scrollbar, .icon-scroll-container::-webkit-scrollbar, .modal-content-scroll::-webkit-scrollbar { display: none; }
-        .dot { transition: transform .3s ease-in-out; }
-        input:checked ~ .dot { transform: translateX(1.5rem); }
-
-        .ticker-wrap { width: 100%; overflow: hidden; white-space: nowrap; }
-        .ticker-move { display: inline-block; animation: marquee 30s linear infinite; }
-        .ticker-item { display: inline-block; padding: 0 2rem; }
         .icon-scroll-container { -ms-overflow-style: none; scrollbar-width: none; }
         #qr-reader { border: 2px solid rgb(var(--border-color-val)); border-radius: 8px; }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
 <body class="transition-colors duration-300">
     
-    <div id="splash-screen" class="fixed inset-0 bg-primary flex flex-col items-center justify-center z-50 transition-opacity duration-1000 ease-in-out">
+    <div id="splash-screen" class="fixed inset-0 bg-primary flex flex-col items-center justify-center z-[100] transition-opacity duration-1000 ease-in-out">
         <canvas id="logo-canvas" width="150" height="150" class="mb-4"></canvas>
         <h1 class="text-5xl font-bold text-primary" style="animation: pulse 2.5s infinite ease-in-out;">LittleSprout</h1>
         <p class="text-secondary mt-2">Your baby's little moments, treasured.</p>
@@ -73,7 +68,7 @@
 
     <!-- Modals -->
     <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
             <h2 id="setup-title" class="text-2xl font-bold mb-2">Welcome!</h2>
             <p id="setup-subtitle" class="text-secondary mb-6">Let's get you and your little one set up.</p>
             <div class="space-y-4">
@@ -86,236 +81,72 @@
     </div>
 
     <div id="disclaimer-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
-            <i class="fas fa-shield-halved text-4xl text-blue-500 mb-4"></i>
-            <h2 class="text-2xl font-bold mb-2">Your Data, Your Device</h2>
-            <p class="text-secondary mb-6">Just so you know, LittleSprout saves all your precious data directly on this device. We don't store it online, which means it's 100% private to you! Please remember to use the 'Backup/Restore' feature regularly to prevent any accidental data loss.</p>
+        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md text-center animate-fadeIn">
+            <i class="fas fa-database text-4xl text-blue-500 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">Your Data, Synced</h2>
+            <p class="text-secondary mb-6">Great news! LittleSprout now securely backs up your data online using Firebase. This means your data is safe and can be accessed if you log in on other devices. All data remains private to your account.</p>
             <button onclick="acknowledgeDisclaimer()" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors mt-4">I Understand!</button>
         </div>
     </div>
-
-    <div id="summary-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
-             <h2 class="text-2xl font-bold mb-4">Last 24-Hour Report</h2>
-             <div id="summary-content" class="text-left space-y-2 mb-6"></div>
-             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                 <button onclick="addSummaryToLog()" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">Add to Log</button>
-                 <button onclick="shareSummary('clipboard')" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">Share</button>
-                 <button onclick="shareSummary('email')" class="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors">Email</button>
-             </div>
-             <button onclick="hideModal('summary-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors mt-4">Close</button>
-        </div>
-    </div>
-
+    
      <div id="backup-options-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-         <div class="panel-bg text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg text-center">
-             <div class="flex justify-between items-center mb-4">
-                 <h2 class="text-2xl font-bold">Backup & Restore</h2>
-                 <button onclick="hideModal('backup-options-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
-             </div>
-             <p class="text-secondary mb-6">Choose a method to save or transfer your data. All data is processed on your device for privacy.</p>
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <button onclick="copyBackupToClipboard()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
-                     <div class="flex items-center w-full"><i class="fas fa-clipboard text-blue-500 text-2xl mr-4"></i>
-                         <div><span class="font-semibold text-sm">Copy to Clipboard</span><span class="block text-xs text-secondary mt-1">Copies data as text to paste into a notes app or email.</span></div>
-                     </div>
-                 </button>
-                 <button onclick="showQRBackup()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
-                     <div class="flex items-center w-full"><i class="fas fa-qrcode text-purple-500 text-2xl mr-4"></i>
-                         <div><span class="font-semibold text-sm">Show QR Code</span><span class="block text-xs text-secondary mt-1">Transfer data to another device by scanning a code.</span></div>
-                     </div>
-                 </button>
-                 <button onclick="emailMagicLink()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
-                     <div class="flex items-center w-full"><i class="fas fa-link text-orange-500 text-2xl mr-4"></i>
-                         <div><span class="font-semibold text-sm">Email Magic Link</span><span class="block text-xs text-secondary mt-1">Send a restore link to your email.</span></div>
-                     </div>
-                 </button>
-                 <button onclick="triggerImport()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
-                      <div class="flex items-center w-full"><i class="fas fa-upload text-teal-500 text-2xl mr-4"></i>
-                          <div><span class="font-semibold text-sm">Import from File</span><span class="block text-xs text-secondary mt-1">Restore from a .csv file.</span></div>
-                      </div>
-                 </button>
-                 <input type="file" id="import-file-input" class="hidden" accept=".csv" onchange="importData(event)">
-                 <button onclick="exportDataToFile()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
-                    <div class="flex items-center w-full"><i class="fas fa-save text-blue-500 text-2xl mr-4"></i>
-                        <div><span class="font-semibold text-sm">Save as File</span><span class="block text-xs text-secondary mt-1">Download a .csv backup file to your device.</span></div>
+        <div class="panel-bg text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center animate-fadeIn">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Export & Import</h2>
+                <button onclick="hideModal('backup-options-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-secondary mb-6">Export your log data to a CSV file for your records or import data from another source.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <button onclick="exportDataToFile('csv')" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
+                    <div class="flex items-center w-full"><i class="fas fa-file-csv text-green-500 text-2xl mr-4"></i>
+                        <div><span class="font-semibold text-sm">Export to CSV</span><span class="block text-xs text-secondary mt-1">Save a .csv backup file to your device.</span></div>
                     </div>
                 </button>
-                 <button onclick="showQRScanner()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
-                    <div class="flex items-center w-full"><i class="fas fa-camera text-pink-500 text-2xl mr-4"></i>
-                        <div><span class="font-semibold text-sm">Scan QR Code</span><span class="block text-xs text-secondary mt-1">Import data by scanning a QR code from another device.</span></div>
-                    </div>
-               </button>
-             </div>
-             <button onclick="hideModal('backup-options-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors mt-6">Close</button>
-         </div>
-     </div>
-    
-     <div id="qr-code-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-         <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-             <h2 class="text-xl font-bold mb-4">Scan to Transfer</h2>
-             <div id="qrcode-container" class="p-4 bg-white rounded-lg flex justify-center items-center">
-                  <div id="qrcode" class="w-[256px] h-[256px]"></div>
-             </div>
-             <p class="text-secondary my-4 text-sm">Open LittleSprout on another device and scan this code from the "Backup & Restore" menu to transfer data.</p>
-             <button onclick="hideModal('qr-code-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">Close</button>
-         </div>
-     </div>
-
-     <div id="qr-scanner-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md text-center">
-            <h2 class="text-xl font-bold mb-4">Scan QR Code</h2>
-            <div id="qr-reader" class="w-full aspect-square"></div>
-            <p class="text-secondary my-4 text-sm">Point your camera at a LittleSprout QR code to import data.</p>
-            <button onclick="hideQRScanner()" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors">Cancel</button>
-        </div>
+                <button onclick="triggerImport()" class="flex flex-col items-center justify-center p-4 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors text-left">
+                     <div class="flex items-center w-full"><i class="fas fa-upload text-teal-500 text-2xl mr-4"></i>
+                         <div><span class="font-semibold text-sm">Import from CSV</span><span class="block text-xs text-secondary mt-1">Restore from a .csv file.</span></div>
+                     </div>
+                </button>
+                <input type="file" id="import-file-input" class="hidden" accept=".csv" onchange="importData(event)">
+            </div>
+            <button onclick="hideModal('backup-options-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 transition-colors mt-6">Close</button>
+       </div>
     </div>
 
-     <div id="activity-log-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-         <div class="p-4 md:p-6 flex-shrink-0">
-             <div class="flex justify-between items-center mb-4">
-                 <h2 class="text-2xl font-bold">Activity Log</h2>
-                 <button onclick="hideModal('activity-log-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
-             </div>
-         </div>
-         <div id="log-container" class="flex-grow space-y-3 px-4 md:px-6 pr-2 overflow-y-auto mt-2 modal-content-scroll">
-             <p id="empty-log-msg" class="text-secondary text-center mt-8">No activities logged yet.</p>
-         </div>
-         <div class="p-4 md:p-6 pt-4 mt-2 border-t border-color flex-shrink-0">
-             <button onclick="clearLogWithConfirmation()" class="w-full bg-red-500 text-white font-bold py-2 px-3 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-trash"></i> Clear Log</button>
-         </div>
-     </div>
-    
-      <div id="activity-library-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-          <div class="p-4 md:p-6 flex-shrink-0">
-              <div class="flex justify-between items-center mb-4">
-                  <h2 class="text-2xl font-bold">Activity Library</h2>
-                  <button onclick="hideModal('activity-library-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
-              </div>
-               <p class="text-secondary text-sm">Log any activity for your baby from here.</p>
-          </div>
-          <div id="activity-library-container" class="flex-grow p-4 md:p-6 grid grid-cols-3 sm:grid-cols-4 gap-4 overflow-y-auto modal-content-scroll">
-              <!-- Activities rendered here -->
-          </div>
-           <div class="p-4 md:p-6 border-t border-color flex-shrink-0">
-                <button onclick="showCustomActivityModal()" class="w-full bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-plus"></i> Add Custom Activity</button>
-            </div>
-      </div>
-
-     <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-         <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm">
-             <div class="flex justify-between items-center mb-4">
-                 <h2 class="text-xl font-bold">Manage Profiles</h2>
-                 <button onclick="hideModal('profile-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
-             </div>
-             <div class="space-y-3">
-                  <select id="profile-switcher" onchange="switchProfile()" class="input-bg border-transparent rounded-md py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 w-full"></select>
-                  <button onclick="showSetupForNewProfile()" class="w-full bg-indigo-500 text-white font-bold p-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-plus"></i> Add New Profile</button>
-                  <button onclick="shareProfile()" class="w-full bg-green-500 text-white font-bold p-2 rounded-lg hover:bg-green-600 transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-share-alt"></i> Share Profile</button>
-                  <button onclick="deleteCurrentProfile()" class="w-full bg-red-500 text-white font-bold p-2 rounded-lg hover:bg-red-600 transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-trash-alt"></i> Delete Current Profile</button>
-             </div>
-         </div>
-     </div>
-
-     <div id="reminders-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-         <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
-             <div class="flex justify-between items-center mb-4">
-                 <h2 class="text-xl font-bold">Reminders</h2>
-                 <button onclick="hideModal('reminders-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
-             </div>
-             <div id="reminder-setup" class="flex flex-col gap-3 mb-4">
-                 <input type="text" id="reminder-text" class="input-bg border-transparent rounded-md py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 w-full" placeholder="e.g., Tummy time">
-                 <input type="datetime-local" id="reminder-time" class="input-bg border-transparent rounded-md py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 w-full">
-                 <select id="reminder-frequency" class="input-bg border-transparent rounded-md py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 w-full">
-                    <option value="none">Doesn't Repeat</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                 </select>
-                 <button onclick="setReminder()" class="bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors">Set Reminder</button>
-             </div>
-             <h3 class="text-sm font-bold text-secondary mb-2 border-t border-color pt-3">Active Reminders</h3>
-             <div id="reminders-list" class="mt-2 space-y-1 text-sm max-h-40 overflow-y-auto modal-content-scroll"></div>
-         </div>
-     </div>
-    
-     <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-         <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-             <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
-             <p id="confirm-modal-text" class="text-secondary mb-6"></p>
-             <div class="flex gap-4">
-                 <button id="confirm-modal-yes" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600">Yes, I'm Sure</button>
-                 <button id="confirm-modal-no" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button>
-             </div>
-         </div>
-     </div>
-
-     <div id="pdf-export-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">Export to PDF</h2>
-                <button onclick="hideModal('pdf-export-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <p class="text-secondary mb-4">Select a date range to generate a PDF report of the activity log. This is great for doctor visits!</p>
-            <div class="space-y-3">
-                <div>
-                    <label for="pdf-start-date" class="block text-sm font-medium text-secondary">Start Date</label>
-                    <input type="date" id="pdf-start-date" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3">
-                </div>
-                <div>
-                    <label for="pdf-end-date" class="block text-sm font-medium text-secondary">End Date</label>
-                    <input type="date" id="pdf-end-date" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3">
-                </div>
-            </div>
-            <div class="mt-6 flex gap-4">
-                <button onclick="generatePDF()" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600">Generate PDF</button>
-                <button onclick="hideModal('pdf-export-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button>
-            </div>
-        </div>
+    <div id="activity-log-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
+       <div class="p-4 md:p-6 flex-shrink-0">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-2xl font-bold">Activity Log</h2>
+               <button onclick="hideModal('activity-log-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
+           </div>
+       </div>
+       <div id="log-container" class="flex-grow space-y-3 px-4 md:px-6 pr-2 overflow-y-auto mt-2 modal-content-scroll">
+           <p id="empty-log-msg" class="text-secondary text-center mt-8">No activities logged yet.</p>
+       </div>
+       <div class="p-4 md:p-6 pt-4 mt-2 border-t border-color flex-shrink-0">
+           <button onclick="clearLogWithConfirmation()" class="w-full bg-red-500 text-white font-bold py-2 px-3 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-trash"></i> Clear Log</button>
+       </div>
     </div>
-    
-    <!-- Growth Charts Modal -->
-    <div id="charts-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col p-4 md:p-6">
-        <div class="flex-shrink-0">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Growth Charts</h2>
-                <button onclick="hideCharts()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-        </div>
-        <div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto modal-content-scroll">
-            <div>
-                <h3 class="text-lg font-semibold text-center mb-2">Weight Over Time (lbs)</h3>
-                <div class="p-4 input-bg rounded-lg">
-                    <canvas id="weight-chart"></canvas>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-lg font-semibold text-center mb-2">Height Over Time (in)</h3>
-                <div class="p-4 input-bg rounded-lg">
-                     <canvas id="height-chart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- NEW Modals -->
+
     <div id="memories-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
         <div class="p-4 md:p-6 flex-shrink-0">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Memories</h2>
                 <button onclick="hideModal('memories-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
             </div>
+             <p class="text-secondary text-sm">A visual timeline of your baby's best moments. Click the camera to add a new memory. Images over 1MB may not save.</p>
         </div>
         <div id="memories-container" class="flex-grow p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto modal-content-scroll">
             <p id="empty-memories-msg" class="col-span-full text-secondary text-center mt-8">No memories saved yet. Add one!</p>
         </div>
         <div class="p-4 md:p-6 border-t border-color flex-shrink-0">
-            <input type="file" id="memory-photo-input" class="hidden" accept="image/*" onchange="addMemory()">
-            <button onclick="$('#memory-photo-input').click()" class="w-full bg-pink-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-camera-retro"></i> Add New Memory</button>
+            <input type="file" id="memory-photo-input" class="hidden" accept="image/*" onchange="addMemory(event)">
+            <button onclick="document.getElementById('memory-photo-input').click()" class="w-full bg-pink-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-camera-retro"></i> Add New Memory</button>
         </div>
     </div>
     
     <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">Supplies Inventory</h2>
                 <button onclick="hideModal('inventory-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
@@ -323,10 +154,12 @@
             <div class="space-y-4">
                 <div>
                     <label for="diaper-count" class="block text-sm font-medium text-secondary">Diapers Left</label>
+                    <p class="text-xs text-secondary mb-1">Current: <span id="current-diapers">0</span></p>
                     <input type="number" id="diaper-count" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 50">
                 </div>
                 <div>
                     <label for="formula-count" class="block text-sm font-medium text-secondary">Formula Cans/Boxes Left</label>
+                     <p class="text-xs text-secondary mb-1">Current: <span id="current-formula">0</span></p>
                     <input type="number" id="formula-count" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 2">
                 </div>
             </div>
@@ -337,75 +170,48 @@
         </div>
     </div>
 
-    <div id="custom-activity-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
-            <h2 class="text-xl font-bold mb-4">Create Custom Activity</h2>
-            <div class="space-y-4">
-                <input type="text" id="custom-activity-name" class="input-bg border-transparent rounded-md py-2 px-3 w-full" placeholder="Activity Name (e.g., Park Visit)">
-                <p class="text-sm text-secondary">Choose an icon:</p>
-                <div id="custom-icon-picker" class="grid grid-cols-6 gap-2 text-xl max-h-40 overflow-y-auto modal-content-scroll p-2 bg-primary rounded-lg">
-                    <!-- Icons will be rendered here -->
-                </div>
-            </div>
-            <div class="mt-6 flex gap-4">
-                <button onclick="addCustomActivity()" class="w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-600">Create Activity</button>
-                <button onclick="hideModal('custom-activity-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button>
-            </div>
-        </div>
+    <!-- Other modals (confirm, pdf, charts, etc.) are assumed to be here and are collapsed for brevity -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[60] opacity-0 pointer-events-none transition-opacity duration-300"><div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center animate-fadeIn"><h2 class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-secondary mb-6"></p><div class="flex gap-4"><button id="confirm-modal-yes" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600">Yes</button><button id="confirm-modal-no" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button></div></div></div>
+    <div id="pdf-export-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"><div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Export to PDF</h2><button onclick="hideModal('pdf-export-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button></div><p class="text-secondary mb-4">Select a date range to generate a PDF report.</p><div class="space-y-3"><div><label for="pdf-start-date" class="block text-sm font-medium text-secondary">Start Date</label><input type="date" id="pdf-start-date" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label for="pdf-end-date" class="block text-sm font-medium text-secondary">End Date</label><input type="date" id="pdf-end-date" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div></div><div class="mt-6 flex gap-4"><button onclick="generatePDF()" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600">Generate PDF</button><button onclick="hideModal('pdf-export-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button></div></div></div>
+    <div id="charts-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col p-4 md:p-6"><div class="flex-shrink-0"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Growth Charts</h2><button onclick="hideCharts()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button></div></div><div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto modal-content-scroll"><div><h3 class="text-lg font-semibold text-center mb-2">Weight Over Time (lbs)</h3><div class="p-4 input-bg rounded-lg"><canvas id="weight-chart"></canvas></div></div><div><h3 class="text-lg font-semibold text-center mb-2">Height Over Time (in)</h3><div class="p-4 input-bg rounded-lg"><canvas id="height-chart"></canvas></div></div></div></div>
+
+    <div id="settings-panel" class="fixed inset-0 panel-bg text-primary z-40 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
+       <div class="p-4 md:p-6 flex-shrink-0">
+           <div class="flex justify-between items-start mb-4">
+               <div>
+                   <h2 class="text-2xl font-bold">Settings</h2>
+                   <div id="panel-date-time" class="text-secondary text-sm mt-1"></div>
+               </div>
+               <div class="flex items-center gap-4">
+                   <button id="theme-toggle-button" onclick="toggleDarkMode()" class="text-secondary hover:text-primary"></button>
+                   <button onclick="toggleSettingsPanel()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
+               </div>
+           </div>
+           <div id="weather-display-panel" class="text-secondary text-sm mb-2">Loading weather...</div>
+           <div class="border-t border-b border-color py-2 my-4">
+               <h3 class="text-sm font-bold text-secondary mb-1">Upcoming Milestones:</h3>
+               <div id="milestone-ticker-wrap" class="ticker-wrap text-sm text-primary">
+                   <div id="milestone-ticker" class="ticker-move"></div>
+               </div>
+           </div>
+       </div>
+
+       <div class="flex-grow p-4 md:p-6 overflow-y-auto modal-content-scroll">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <button onclick="showModal('activity-log-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-list-alt text-green-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Activity Log</span></button>
+                <button onclick="showCharts(); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-chart-line text-pink-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Growth Charts</span></button>
+                <button onclick="showModal('memories-modal'); renderMemories(); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-camera-retro text-pink-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Memories</span></button>
+                <button onclick="showInventoryModal(); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-boxes-stacked text-lime-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Supplies</span></button>
+                <button onclick="showModal('backup-options-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-file-export text-teal-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Export/Import</span></button>
+                <button onclick="showModal('pdf-export-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-file-pdf text-red-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Export PDF</span></button>
+           </div>
+       </div>
+       
+        <div class="p-4 md:p-6 mt-auto border-t border-color flex-shrink-0">
+            <div id="user-info" class="text-xs text-secondary/50 text-center w-full mb-2">Not signed in</div>
+            <div id="version-info" class="text-xs text-secondary/50 text-center w-full"></div>
+       </div>
     </div>
-    
-    <div id="edit-log-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
-            <h2 class="text-xl font-bold mb-4">Edit Log Entry</h2>
-            <div id="edit-log-form-container" class="space-y-4">
-                <!-- Dynamic edit form will be injected here -->
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Main Settings Panel -->
-     <div id="settings-panel" class="fixed inset-0 panel-bg text-primary z-40 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-         <div class="p-4 md:p-6 flex-shrink-0">
-             <div class="flex justify-between items-start mb-4">
-                 <div>
-                     <h2 class="text-2xl font-bold">Settings</h2>
-                     <div id="panel-date-time" class="text-secondary text-sm mt-1"></div>
-                 </div>
-                 <div class="flex items-center gap-4">
-                    <button id="fullscreen-button" onclick="toggleFullScreen()" class="text-secondary hover:text-primary"><i class="fas fa-expand"></i></button>
-                    <button id="theme-toggle-button" onclick="toggleDarkMode()" class="text-secondary hover:text-primary"></button>
-                    <button onclick="toggleSettingsPanel()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
-                 </div>
-             </div>
-             <div id="weather-display-panel" class="text-secondary text-sm mb-2">Loading weather...</div>
-             <div class="border-t border-b border-color py-2 my-4">
-                 <h3 class="text-sm font-bold text-secondary mb-1">Upcoming Milestones:</h3>
-                 <div id="milestone-ticker-wrap" class="ticker-wrap text-sm text-primary">
-                     <div id="milestone-ticker" class="ticker-move"></div>
-                 </div>
-             </div>
-         </div>
-
-         <div class="flex-grow p-4 md:p-6 overflow-y-auto modal-content-scroll">
-             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                 <button onclick="showModal('profile-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-users text-purple-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Profiles</span></button>
-                 <button onclick="showModal('activity-log-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-list-alt text-green-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Activity Log</span></button>
-                 <button onclick="showCharts(); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-chart-line text-pink-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Growth Charts</span></button>
-                 <button onclick="generateDailySummary()" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-chart-pie text-blue-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Tot Report</span></button>
-                 <button onclick="showModal('reminders-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-bell text-orange-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Reminders</span></button>
-                 <button onclick="showModal('memories-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-camera-retro text-pink-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Memories</span></button>
-                 <button onclick="showModal('inventory-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-boxes-stacked text-lime-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Supplies</span></button>
-                 <button onclick="showModal('backup-options-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-save text-teal-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Backup/Restore</span></button>
-                 <button onclick="showModal('pdf-export-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-file-pdf text-red-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Export PDF</span></button>
-                 <button onclick="showModal('activity-library-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-swatchbook text-cyan-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Activity Library</span></button>
-            </div>
-        </div>
-        
-         <div class="p-4 md:p-6 mt-auto border-t border-color flex-shrink-0">
-              <div id="version-info" class="text-xs text-secondary/50 text-center w-full"></div>
-         </div>
-     </div>
 
 
     <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-lg opacity-0 transition-opacity duration-500">
@@ -422,96 +228,74 @@
         <div id="main-clock-container" class="text-center mb-6"><div class="flex items-end justify-center"><span id="main-time-display" class="text-5xl sm:text-6xl font-bold text-primary leading-none"></span><span id="main-ampm-display" class="text-xl sm:text-2xl font-semibold text-secondary pb-1 ml-2"></span></div><span id="main-date-display" class="text-base sm:text-lg text-secondary"></span></div>
         <div id="last-activity-display" class="text-center text-sm text-secondary mb-6 h-5"></div>
         <main>
-             <div id="active-timer-display" class="hidden text-center text-lg text-primary mb-6 p-4 sm:p-6 rounded-2xl shadow-lg bg-secondary border-t-4 border-red-500 dark:border-red-500"></div>
-             <div id="log-buttons-container" class="bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500">
-                  <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-4">What are you logging?</h2>
-                  <div id="main-activity-buttons" class="icon-scroll-container flex items-center overflow-x-auto pb-4">
-                       <!-- Age-relevant activities will be rendered here -->
-                  </div>
-             </div>
-             <div id="form-display-area" class="hidden mt-4 bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500"></div>
-             
-             <div id="outlook-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-purple-300 dark:border-purple-500 hidden">
-                  <h3 class="font-bold text-primary mb-2">Today's Outlook</h3>
-                  <div id="main-weather-display" class="text-secondary text-sm mb-3"></div>
-                  <p id="outlook-suggestion" class="text-primary text-sm mb-4 p-3 bg-primary rounded-lg flex items-center justify-center gap-x-2"></p>
-                  <h4 class="font-bold text-sm text-primary mb-2">3-Day Forecast</h4>
-                  <div id="forecast-display" class="grid grid-cols-3 gap-2 text-xs"></div>
-             </div>
-             <div id="sleep-analysis-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-indigo-300 dark:border-indigo-500 hidden">
-                <h3 class="font-bold text-primary mb-2">Sleep Outlook</h3>
-                <div id="sleep-analysis-content" class="text-primary text-sm space-y-2"></div>
+            <div id="log-buttons-container" class="bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500">
+                 <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-4">What are you logging?</h2>
+                 <div id="main-activity-buttons" class="icon-scroll-container flex items-center overflow-x-auto pb-4">
+                     <!-- Age-relevant activities will be rendered here -->
+                 </div>
+            </div>
+            <div id="form-display-area" class="hidden mt-4 bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500 animate-fadeIn"></div>
+            
+            <div id="outlook-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-purple-300 dark:border-purple-500 hidden animate-fadeIn">
+                 <h3 class="font-bold text-primary mb-2">Today's Outlook</h3>
+                 <div id="main-weather-display" class="text-secondary text-sm mb-3"></div>
+                 <p id="outlook-suggestion" class="text-primary text-sm mb-4 p-3 bg-primary rounded-lg flex items-center justify-center gap-x-2"></p>
             </div>
         </main>
-        <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white py-2 px-4 rounded-lg shadow-xl transition-opacity duration-300 opacity-0 z-50"></div>
+        <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white py-2 px-4 rounded-lg shadow-xl transition-all duration-300 opacity-0 translate-y-10 z-[100]"></div>
     </div>
 
     <!-- Form Templates -->
     <template id="feed-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-utensils text-blue-500 mr-3"></i>New Feeding</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Type</label><select class="type mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"><option>Breast Milk</option><option>Formula</option></select></div><div><label class="block text-sm font-medium text-secondary">Amount (oz)</label><input type="number" class="amount mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 4"></div><div><label class="block text-sm font-medium text-secondary">Time</label><input type="datetime-local" class="time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div class="flex items-center"><input id="deduct-formula" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded"><label for="deduct-formula" class="ml-2 block text-sm text-secondary">Deduct from inventory</label></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Seemed extra hungry..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600" onclick="addFeed()">Add Feed</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="nap-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-bed text-purple-500 mr-3"></i>New Nap</h3><div class="space-y-4"><div class="text-center"><button class="w-full bg-purple-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-600" onclick="startTimer('nap')"><i class="fas fa-play mr-2"></i>Start Nap Timer</button></div><div class="text-center text-sm text-secondary my-2">OR</div><div><label class="block text-sm font-medium text-secondary">Start Time</label><input type="datetime-local" class="start-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">End Time</label><input type="datetime-local" class="end-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Woke up cranky..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-purple-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600" onclick="addNap()">Add Nap</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
+    <template id="sleep-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-moon text-indigo-500 mr-3"></i>New Sleep</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Start Time</label><input type="datetime-local" class="start-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">End Time</label><input type="datetime-local" class="end-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Slept through the night!"></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-600" onclick="addSleep('sleep')">Add Sleep</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
     <template id="diaper-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-baby text-amber-500 mr-3"></i>New Diaper</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Type</label><select class="type mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"><option>Wet</option><option>Dirty</option><option>Wet & Dirty</option></select></div><div><label class="block text-sm font-medium text-secondary">Time</label><input type="datetime-local" class="time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div class="flex items-center"><input id="deduct-diaper" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded"><label for="deduct-diaper" class="ml-2 block text-sm text-secondary">Deduct from inventory</label></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Color seems normal..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600" onclick="addDiaper()">Add Diaper</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="sleep-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-moon text-indigo-500 mr-3"></i>New Sleep</h3><div class="space-y-4"><div class="text-center"><button class="w-full bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-600" onclick="startTimer('sleep')"><i class="fas fa-play mr-2"></i>Start Sleep Timer</button></div><div class="text-center text-sm text-secondary my-2">OR</div><div><label class="block text-sm font-medium text-secondary">Start Time</label><input type="datetime-local" class="start-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">End Time</label><input type="datetime-local" class="end-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Slept through the night!"></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-600" onclick="addSleep()">Add Sleep</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="tummy-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-child-reaching text-lime-500 mr-3"></i>Tummy Time</h3><div class="space-y-4"><div class="text-center"><button class="w-full bg-lime-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-lime-600" onclick="startTimer('tummy')"><i class="fas fa-play mr-2"></i>Start Tummy Timer</button></div><div class="text-center text-sm text-secondary my-2">OR</div><div><label class="block text-sm font-medium text-secondary">Start Time</label><input type="datetime-local" class="start-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">End Time</label><input type="datetime-local" class="end-time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Baby lifted their head!"></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-lime-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-lime-600" onclick="addTummyTime()">Add Tummy Time</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="milestone-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-trophy text-yellow-500 mr-3"></i>New Milestone</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Milestone Achieved</label><select class="milestone-select mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></select></div><div><label class="block text-sm font-medium text-secondary">Date Achieved</label><input type="date" class="date mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., We were so proud!"></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600" onclick="addMilestone()">Log Milestone</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="weight-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-weight-scale text-red-500 mr-3"></i>New Weight</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Weight (lbs)</label><input type="number" step="0.1" class="amount mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 10.5"></div><div><label class="block text-sm font-medium text-secondary">Date</label><input type="date" class="date mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., At pediatrician's office..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600" onclick="addWeight()">Add Weight</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="height-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-ruler-vertical text-green-500 mr-3"></i>New Height</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Height (in)</label><input type="number" step="0.1" class="amount mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 21.5"></div><div><label class="block text-sm font-medium text-secondary">Date</label><input type="date" class="date mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Measured at home..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600" onclick="addHeight()">Add Height</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="medication-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-pills text-cyan-500 mr-3"></i>New Medication</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Medicine Name</label><input type="text" class="medicine mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., Infant Tylenol"></div><div><label class="block text-sm font-medium text-secondary">Dosage</label><input type="text" class="dosage mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 1.25 ml"></div><div><label class="block text-sm font-medium text-secondary">Time</label><input type="datetime-local" class="time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., For teething pain..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-cyan-600" onclick="addMedication()">Add Meds</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="temperature-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-thermometer text-orange-500 mr-3"></i>New Temperature</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Temperature (°F)</label><input type="number" step="0.1" class="amount mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 100.4"></div><div><label class="block text-sm font-medium text-secondary">Time</label><input type="datetime-local" class="time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Before giving medicine..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-600" onclick="addTemperature()">Add Temp</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="vaccine-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-syringe text-teal-500 mr-3"></i>New Vaccine</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Vaccine Name</label><input type="text" class="vaccine-name mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., DTaP (1st dose)"></div><div><label class="block text-sm font-medium text-secondary">Date Given</label><input type="date" class="date mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., A little fussy afterwards..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600" onclick="addVaccine()">Add Vaccine</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <template id="custom-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i id="custom-form-icon" class="fas fa-fw mr-3"></i><span id="custom-form-title"></span></h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Time</label><input type="datetime-local" class="time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="Add any details..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-sky-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-600" onclick="logCustomActivity()">Log Activity</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
-    <script>
-        // --- STATE & CONFIG ---
-        let babyProfiles = [], currentProfileId = null;
-        let allLogs = {}, allAchievedMilestones = {}, allReminders = {};
-        let allMemories = {}, inventory = {}, customActivities = [];
-        let activeTimer = null, confirmCallback = null;
-        let activeForm = null, timeInterval, reminderInterval;
-        let qrScanner = null;
+    <template id="weight-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-weight-scale text-red-500 mr-3"></i>New Weight</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Weight (lbs)</label><input type="number" step="0.1" class="amount mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 10.5"></div><div><label class="block text-sm font-medium text-secondary">Date</label><input type="date" class="date mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., At pediatrician's office..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600" onclick="addMeasurement('weight')">Add Weight</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
+    <template id="height-form-template"><h3 class="text-xl font-semibold mb-4 flex items-center text-primary"><i class="fas fa-fw fa-ruler-vertical text-green-500 mr-3"></i>New Height</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-secondary">Height (in)</label><input type="number" step="0.1" class="amount mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" placeholder="e.g., 21.5"></div><div><label class="block text-sm font-medium text-secondary">Date</label><input type="date" class="date mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label class="block text-sm font-medium text-secondary">Notes</label><textarea class="notes mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="2" placeholder="e.g., Measured at home..."></textarea></div><div class="grid grid-cols-2 gap-3 mt-2"><button class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600" onclick="addMeasurement('height')">Add Height</button><button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="showForm(null)">Cancel</button></div></div></template>
+    
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, writeBatch, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- GLOBAL STATE & CONFIG ---
+        let db, auth;
+        let userId = null;
+        let unsubscribeListeners = []; // To store unsubscribe functions for cleanup
+        
+        let babyProfile = null; // Single active profile
+        let logs = [];
+        let memories = [];
+        let inventory = { diapers: 0, formula: 0 };
+        
+        let confirmCallback = null;
+        let activeForm = null;
+        let timeInterval;
         let weightChartInstance = null, heightChartInstance = null;
         const { jsPDF } = window.jspdf;
         
-        // --- DOM ELEMENTS ---
+        // --- DOM ELEMENTS CACHE ---
         const $ = (selector, parent = document) => parent.querySelector(selector);
+        const $$ = (selector, parent = document) => parent.querySelectorAll(selector);
         const appContainer = $('#app-container'), settingsPanel = $('#settings-panel'), splashScreen = $('#splash-screen');
-        const summaryModal = $('#summary-modal');
         const logContainer = $('#log-container'), emptyLogMsg = $('#empty-log-msg');
         const formDisplayArea = $('#form-display-area');
 
-        // --- DATA ---
+        // --- DATA CONSTANTS ---
         const defaultActivities = [
-            { id: 'feed', name: 'Feed', icon: 'fas fa-utensils', color: 'blue-500', minAge: 0, maxAge: 24 },
-            { id: 'sleep', name: 'Sleep', icon: 'fas fa-moon', color: 'indigo-500', minAge: 0, maxAge: 48 },
-            { id: 'diaper', name: 'Diaper', icon: 'fas fa-baby', color: 'amber-500', minAge: 0, maxAge: 36 },
-            { id: 'tummy', name: 'Tummy Time', icon: 'fas fa-child-reaching', color: 'lime-500', minAge: 1, maxAge: 8 },
-            { id: 'nap', name: 'Nap', icon: 'fas fa-bed', color: 'purple-500', minAge: 0, maxAge: 48 },
-            { id: 'milestone', name: 'Milestone', icon: 'fas fa-trophy', color: 'yellow-500', minAge: 0, maxAge: 100 },
-            { id: 'weight', name: 'Weight', icon: 'fas fa-weight-scale', color: 'red-500', minAge: 0, maxAge: 100 },
-            { id: 'height', name: 'Height', icon: 'fas fa-ruler-vertical', color: 'green-500', minAge: 0, maxAge: 100 },
-            { id: 'medication', name: 'Meds', icon: 'fas fa-pills', color: 'cyan-500', minAge: 0, maxAge: 100 },
-            { id: 'temperature', name: 'Temp', icon: 'fas fa-thermometer', color: 'orange-500', minAge: 0, maxAge: 100 },
-            { id: 'vaccine', name: 'Vaccine', icon: 'fas fa-syringe', color: 'teal-500', minAge: 0, maxAge: 100 }
+            { id: 'feed', name: 'Feed', icon: 'fas fa-utensils', color: 'blue-500' },
+            { id: 'sleep', name: 'Sleep', icon: 'fas fa-moon', color: 'indigo-500' },
+            { id: 'diaper', name: 'Diaper', icon: 'fas fa-baby', color: 'amber-500' },
+            { id: 'weight', name: 'Weight', icon: 'fas fa-weight-scale', color: 'red-500' },
+            { id: 'height', name: 'Height', icon: 'fas fa-ruler-vertical', color: 'green-500' },
         ];
-
-        const milestones = [ { id: 'm2_smile', age: 2, text: "Smiles at people" }, { id: 'm2_coo', age: 2, text: "Coos, makes gurgling sounds" }, { id: 'm2_head', age: 2, text: "Can hold head up" }, { id: 'm4_babble', age: 4, text: "Babbles with expression" }, { id: 'm4_reach', age: 4, text: "Reaches for toy with one hand" }, { id: 'm4_tummy', age: 4, text: "Rolls over from tummy to back" }, { id: 'm6_sit', age: 6, text: "Sits without support" }, { id: 'm6_vowels', age: 6, text: "Responds to sounds by making sounds" }, { id: 'm6_curious', age: 6, text: "Looks around at things nearby" }, { id: 'm9_crawl', age: 9, text: "Crawls" }, { id: 'm9_stand', age: 9, text: "Pulls to stand, holding on" }, { id: 'm9_mama', age: 9, text: "Says 'mama' and 'baba'" }, { id: 'm12_wave', age: 12, text: "Tries to say words you say" }, { id: 'm12_steps', age: 12, text: "May take a few steps without holding on" }, { id: 'm12_copy', age: 12, text: "Copies gestures (like waving)" }, { id: 'm18_walk', age: 18, text: "Walks alone" }, { id: 'm18_utensils', age: 18, text: "Eats with a spoon" }, { id: 'm18_words', age: 18, text: "Says several single words" }, ];
-
-        const suggestions = [
-            { text: "It's a great day for a walk in the park!", icon: 'fa-tree', minTemp: 65, maxTemp: 80 },
-            { text: "Perfect for some tummy time on a blanket in the backyard.", icon: 'fa-child-reaching', minTemp: 70, maxAge: 7 },
-            { text: "A bit chilly! Cuddle up with a good book.", icon: 'fa-book-open-reader', maxTemp: 60 },
-            { text: "It's warm out! A lukewarm bath could be a fun activity.", icon: 'fa-bath', minTemp: 80 },
-            { text: "Sing some songs! They love the sound of your voice.", icon: 'fa-music', minAge: 3 },
-            { text: "Play peek-a-boo! It helps your baby understand object permanence.", icon: 'fa-hands-asl-interpreting', minAge: 6, maxAge: 18 },
-            { text: "A cloudy day is perfect for building a cozy fort indoors.", icon: 'fa-tent', maxTemp: 65 },
-            { text: "An early morning walk can be refreshing for both of you.", icon: 'fa-person-walking', minTemp: 75 },
-        ];
-        
-        const customIcons = ['fa-star', 'fa-heart', 'fa-smile', 'fa-gamepad', 'fa-book', 'fa-bath', 'fa-car', 'fa-tree', 'fa-music', 'fa-gift', 'fa-paint-brush', 'fa-paw'];
-
+        const milestones = [ { id: 'm2_smile', age: 2, text: "Smiles at people" }, { id: 'm4_babble', age: 4, text: "Babbles with expression" }, { id: 'm6_sit', age: 6, text: "Sits without support" }, { id: 'm9_crawl', age: 9, text: "Crawls" }, { id: 'm12_steps', age: 12, text: "May take a few steps" }, { id: 'm18_walk', age: 18, text: "Walks alone" }];
+        const suggestions = [ { text: "It's a great day for a walk in the park!", icon: 'fa-tree', minTemp: 65, maxTemp: 85 }, { text: "A bit chilly! Cuddle up with a good book.", icon: 'fa-book-open-reader', maxTemp: 60 }, { text: "It's warm out! A lukewarm bath could be fun.", icon: 'fa-bath', minTemp: 80 }];
 
         // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => { 
+        document.addEventListener('DOMContentLoaded', () => {
             drawLogo();
-            $('#version-info').textContent = `v3.2 - ${new Date('2025-06-08').toLocaleDateString()}`;
+            $('#version-info').textContent = `v4.0 - ${new Date('2025-06-09').toLocaleDateString()}`;
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             document.documentElement.classList.toggle('dark', isDarkMode);
             updateThemeButton(isDarkMode);
@@ -519,407 +303,305 @@
             $('#confirm-modal-yes').addEventListener('click', () => { if (typeof confirmCallback === 'function') { confirmCallback(); } hideModal('confirm-modal'); confirmCallback = null; });
             $('#confirm-modal-no').addEventListener('click', () => { hideModal('confirm-modal'); confirmCallback = null; });
             
-            populateCustomIconPicker();
-            setTimeout(() => { 
+            setupFirebase();
+
+            setTimeout(() => {
                 splashScreen.classList.add('opacity-0', 'pointer-events-none');
-                checkForMagicLink();
-            }, 2500); 
+            }, 2500);
         });
+        
+        async function setupFirebase() {
+            try {
+                // These will be provided by the environment
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        function checkForMagicLink() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const backupData = urlParams.get('backup');
-            if (backupData) {
-                showConfirmation("Backup data found in link. Do you want to restore it? This will overwrite ALL current data.", () => {
-                    restoreDataFromPack(backupData);
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        $('#user-info').textContent = `UID: ${userId.substring(0,10)}...`;
+                        await loadData();
+                    } else {
+                        // If no user, sign in
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    }
                 });
-            } else {
-                 loadAndInit();
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                showToast("Could not connect to the database.", "error");
             }
         }
         
-        function loadAndInit() {
-            loadData(); 
-            if (babyProfiles.length === 0) { 
-                showSetupForNewProfile(); 
-            } else { 
-                initializeApp(); 
-            } 
-        }
+        async function loadData() {
+            if (!userId) return;
 
-        function loadData() {
-            babyProfiles = JSON.parse(localStorage.getItem('babyProfiles')) || [];
-            currentProfileId = localStorage.getItem('currentProfileId') || (babyProfiles.length > 0 ? babyProfiles[0].id : null);
-            const loadedLogs = JSON.parse(localStorage.getItem('allLogs')) || {};
-            Object.keys(loadedLogs).forEach(profileId => { allLogs[profileId] = loadedLogs[profileId].map(e => ({...e, timestamp: new Date(e.timestamp)})); });
-            allAchievedMilestones = JSON.parse(localStorage.getItem('allAchievedMilestones')) || {};
-            allReminders = JSON.parse(localStorage.getItem('allReminders')) || {};
-            activeTimer = JSON.parse(localStorage.getItem('activeTimer'));
-            
-            allMemories = JSON.parse(localStorage.getItem('allMemories')) || {};
-            inventory = JSON.parse(localStorage.getItem('inventory')) || {};
-            customActivities = JSON.parse(localStorage.getItem('customActivities')) || [];
-        }
+            // Clean up previous listeners
+            unsubscribeListeners.forEach(unsub => unsub());
+            unsubscribeListeners = [];
 
-        function saveData() {
-            localStorage.setItem('babyProfiles', JSON.stringify(babyProfiles));
-            localStorage.setItem('currentProfileId', currentProfileId);
-            localStorage.setItem('allLogs', JSON.stringify(allLogs));
-            localStorage.setItem('allAchievedMilestones', JSON.stringify(allAchievedMilestones));
-            localStorage.setItem('allReminders', JSON.stringify(allReminders));
-            localStorage.setItem('activeTimer', JSON.stringify(activeTimer));
-            
-            localStorage.setItem('allMemories', JSON.stringify(allMemories));
-            localStorage.setItem('inventory', JSON.stringify(inventory));
-            localStorage.setItem('customActivities', JSON.stringify(customActivities));
-        }
+            // Fetch profile
+            const profileRef = doc(db, "artifacts", "baby-tracker", "users", userId);
+            const profileSnap = await getDoc(profileRef);
 
-        function saveBabyInfo() { 
-            const userName = $('#user-name').value.trim(); const babyName = $('#baby-name').value.trim(); const dob = $('#baby-dob').value; 
-            if (!userName || !babyName || !dob) { showToast("Please fill in all fields.", "error"); return; } 
-            
-            const newProfile = { id: Date.now(), userName, babyName, dob, shareId: `share_${Date.now()}` };
-            babyProfiles.push(newProfile);
-            currentProfileId = newProfile.id;
-            allLogs[currentProfileId] = [];
-            allAchievedMilestones[currentProfileId] = [];
-            allReminders[currentProfileId] = [];
-            allMemories[currentProfileId] = [];
-            inventory[currentProfileId] = { diapers: 0, formula: 0 };
+            if (profileSnap.exists()) {
+                babyProfile = { id: profileSnap.id, ...profileSnap.data() };
+                startApp();
+                
+                // Set up real-time listeners for subcollections
+                const logsQuery = query(collection(db, `artifacts/baby-tracker/users/${userId}/logs`));
+                const unsubLogs = onSnapshot(logsQuery, (snapshot) => {
+                    logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), timestamp: doc.data().timestamp.toDate() }));
+                    renderLog();
+                    updateLastLogDisplay();
+                }, (error) => console.error("Error listening to logs:", error));
+                
+                const memoriesQuery = query(collection(db, `artifacts/baby-tracker/users/${userId}/memories`));
+                const unsubMemories = onSnapshot(memoriesQuery, (snapshot) => {
+                    memories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // If memories modal is open, re-render it
+                    if(!$('#memories-modal').classList.contains('opacity-0')) {
+                        renderMemories();
+                    }
+                }, (error) => console.error("Error listening to memories:", error));
 
-            saveData();
-            hideModal('setup-modal'); 
-            
-            if (babyProfiles.length === 1 && !localStorage.getItem('disclaimerAcknowledged')) {
-                showModal('disclaimer-modal');
+                unsubscribeListeners.push(unsubLogs, unsubMemories);
+
             } else {
-                initializeApp();
+                showModal('setup-modal');
             }
         }
-        function acknowledgeDisclaimer() { localStorage.setItem('disclaimerAcknowledged', 'true'); hideModal('disclaimer-modal'); initializeApp(); }
         
-        function initializeApp() { 
-            if (!currentProfileId || !babyProfiles.find(p => p.id == currentProfileId)) {
-                if(babyProfiles.length > 0) { currentProfileId = babyProfiles[0].id; } else { showSetupForNewProfile(); return; }
+        async function saveBabyInfo() {
+            const userName = $('#user-name').value.trim();
+            const babyName = $('#baby-name').value.trim();
+            const dob = $('#baby-dob').value;
+            if (!userName || !babyName || !dob) { showToast("Please fill in all fields.", "error"); return; }
+            
+            const newProfile = { userName, babyName, dob };
+            const inventoryData = { diapers: 50, formula: 4 }; // Starting inventory
+            
+            try {
+                const profileRef = doc(db, "artifacts", "baby-tracker", "users", userId);
+                await setDoc(profileRef, newProfile);
+                
+                // Initialize inventory as well
+                const inventoryRef = doc(db, `artifacts/baby-tracker/users/${userId}/inventory`, "supplies");
+                await setDoc(inventoryRef, inventoryData);
+
+                babyProfile = { id: userId, ...newProfile };
+                inventory = inventoryData;
+
+                hideModal('setup-modal');
+                if (!localStorage.getItem('disclaimerAcknowledged')) {
+                    showModal('disclaimer-modal');
+                } else {
+                    startApp();
+                }
+            } catch (error) {
+                console.error("Error saving profile:", error);
+                showToast("Failed to save profile.", "error");
             }
-            updateHeader(); 
-            renderLog(); 
-            updateLastLogDisplay(); 
-            updateMilestoneTicker(); 
-            populateProfileSwitcher(); 
+        }
+        
+        function acknowledgeDisclaimer() { 
+            localStorage.setItem('disclaimerAcknowledged', 'true'); 
+            hideModal('disclaimer-modal'); 
+            startApp(); 
+        }
+
+        function startApp() {
+            if (!babyProfile) return;
+            updateHeader();
+            renderLog();
+            updateLastLogDisplay();
+            updateMilestoneTicker();
             renderActivityButtons();
-            renderActivityLibrary();
-            appContainer.classList.remove('opacity-0'); 
-            startDateTime(); 
-            getLocation(); 
-            renderReminders(); 
-            updateActiveTimerDisplay();
-            analyzeSleepPatterns();
+            appContainer.classList.remove('opacity-0');
+            startDateTime();
+            // Using a fixed location for weather for reliability in this version
+            fetchWeather(28.11, -81.62); // Haines City, FL
         }
 
         // --- UI & UX ---
-        function drawLogo() {
-            const canvas = $('#logo-canvas');
-            const favicon = $('#favicon');
-            if (canvas.getContext) {
-                const ctx = canvas.getContext('2d');
-                const w = canvas.width;
-                const h = canvas.height;
-                
-                ctx.clearRect(0, 0, w, h);
-                ctx.beginPath();
-                ctx.arc(w / 2, h / 2, w / 2 - 10, 0, Math.PI * 2);
-                ctx.fillStyle = '#F0F5FF'; 
-                ctx.fill();
-
-                ctx.beginPath();
-                ctx.moveTo(w / 2, h * 0.8);
-                ctx.bezierCurveTo(w / 2 - 10, h * 0.7, w / 2 - 10, h * 0.4, w / 2, h * 0.3);
-                ctx.bezierCurveTo(w / 2 + 10, h * 0.4, w / 2 + 10, h * 0.7, w / 2, h * 0.8);
-                ctx.fillStyle = '#A1DD70';
-                ctx.fill();
-
-                ctx.beginPath();
-                ctx.moveTo(w/2 - 2, h * 0.45);
-                ctx.bezierCurveTo(w*0.2, h*0.4, w*0.25, h*0.15, w*0.4, h*0.3);
-                ctx.fillStyle = '#8BC34A';
-                ctx.fill();
-
-                ctx.beginPath();
-                ctx.moveTo(w/2 + 2, h * 0.45);
-                ctx.bezierCurveTo(w*0.8, h*0.4, w*0.75, h*0.15, w*0.6, h*0.3);
-                ctx.fillStyle = '#A1DD70';
-                ctx.fill();
-                
-                favicon.href = canvas.toDataURL('image/png');
-            }
-        }
-        function updateHeader() { const profile = getCurrentProfile(); if (!profile) return; $('#header-title').textContent = `Hello, ${profile.userName}!`; $('#header-subtitle').textContent = `${profile.babyName} is ${calculatePreciseAge(profile.dob)}`; }
-        function calculatePreciseAge(dobString) { const dob = new Date(dobString); const today = new Date(); let ageInDays = Math.floor((today - dob) / (1000 * 60 * 60 * 24)); if (ageInDays < 0) ageInDays = 0; const years = Math.floor(ageInDays / 365.25); const months = Math.floor((ageInDays % 365.25) / 30.44); const weeks = Math.floor((ageInDays % 30.44) / 7); if (years > 0) return `${years} year${years > 1 ? 's' : ''} old`; if (months > 0) return `${months} month${months > 1 ? 's' : ''} & ${weeks} week${weeks > 1 ? 's' : ''} old`; if (weeks > 0) return `${weeks} week${weeks > 1 ? 's' : ''} old`; return `${ageInDays} day${ageInDays !== 1 ? 's' : ''} old`; }
-        function calculateAgeMonths(dobString) { const dob = new Date(dobString), today = new Date(); let months = (today.getFullYear() - dob.getFullYear()) * 12 - dob.getMonth() + today.getMonth(); if (today.getDate() < dob.getDate()) months--; return months < 0 ? 0 : months; }
+        function drawLogo() { /* ... unchanged ... */ const canvas=$('#logo-canvas'),favicon=$('#favicon');if(canvas.getContext){const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);ctx.beginPath();ctx.arc(w/2,h/2,w/2-10,0,Math.PI*2);ctx.fillStyle='#F0F5FF';ctx.fill();ctx.beginPath();ctx.moveTo(w/2,h*0.8);ctx.bezierCurveTo(w/2-10,h*0.7,w/2-10,h*0.4,w/2,h*0.3);ctx.bezierCurveTo(w/2+10,h*0.4,w/2+10,h*0.7,w/2,h*0.8);ctx.fillStyle='#A1DD70';ctx.fill();ctx.beginPath();ctx.moveTo(w/2-2,h*0.45);ctx.bezierCurveTo(w*0.2,h*0.4,w*0.25,h*0.15,w*0.4,h*0.3);ctx.fillStyle='#8BC34A';ctx.fill();ctx.beginPath();ctx.moveTo(w/2+2,h*0.45);ctx.bezierCurveTo(w*0.8,h*0.4,w*0.75,h*0.15,w*0.6,h*0.3);ctx.fillStyle='#A1DD70';ctx.fill();favicon.href=canvas.toDataURL('image/png')}}
         
+        function updateHeader() { if (!babyProfile) return; $('#header-title').textContent = `Hello, ${babyProfile.userName}!`; $('#header-subtitle').textContent = `${babyProfile.babyName} is ${calculatePreciseAge(babyProfile.dob)}`; }
+        
+        function calculatePreciseAge(dobString) {
+            const dob = new Date(dobString);
+            const today = new Date();
+            if (dob > today) return "not born yet!";
+
+            let years = today.getFullYear() - dob.getFullYear();
+            let months = today.getMonth() - dob.getMonth();
+            let days = today.getDate() - dob.getDate();
+
+            if (days < 0) {
+                months--;
+                days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            if (years >= 2) return `${years} years old`;
+            if (years > 0) return `${years} year${years > 1 ? 's' : ''} & ${months} month${months > 1 ? 's' : ''} old`;
+            
+            const totalDays = Math.floor((today - dob) / (1000 * 60 * 60 * 24));
+            if (totalDays < 7) return `${totalDays} day${totalDays !== 1 ? 's' : ''} old`;
+            
+            const weeks = Math.floor(totalDays / 7);
+            if (months < 1) return `${weeks} week${weeks > 1 ? 's' : ''} old`;
+
+            return `${months} month${months > 1 ? 's' : ''} old`;
+        }
+
+        function calculateAgeMonths(dobString) { const dob = new Date(dobString), today = new Date(); let months = (today.getFullYear() - dob.getFullYear()) * 12 - dob.getMonth() + today.getMonth(); if (today.getDate() < dob.getDate()) months--; return months < 0 ? 0 : months; }
+
         function renderActivityButtons() {
             const container = $('#main-activity-buttons');
-            const allActivities = [...defaultActivities, ...customActivities];
             container.innerHTML = '';
-            const profile = getCurrentProfile();
-            if (!profile) return;
-            const ageInMonths = calculateAgeMonths(profile.dob);
-            
-            const relevantActivities = allActivities.filter(act => !act.minAge || (ageInMonths >= act.minAge && ageInMonths < act.maxAge));
             let buttonsHTML = '<div class="flex space-x-4 px-2">';
-            relevantActivities.forEach(act => {
+            defaultActivities.forEach(act => {
                 buttonsHTML += `<button onclick="showForm('${act.id}')" class="flex-shrink-0 flex flex-col items-center justify-center h-20 w-20 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="${act.icon} text-${act.color} text-2xl mb-1"></i><span class="font-semibold text-xs text-center">${act.name}</span></button>`;
             });
             buttonsHTML += '</div>';
             container.innerHTML = buttonsHTML;
         }
 
-        function renderActivityLibrary() {
-            const container = $('#activity-library-container');
-            const allActivities = [...defaultActivities, ...customActivities];
-            container.innerHTML = '';
-            allActivities.forEach(act => {
-                const button = document.createElement('button');
-                button.className = 'flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors';
-                button.onclick = () => {
-                    hideModal('activity-library-modal');
-                    showForm(act.id);
-                };
-                button.innerHTML = `<i class="${act.icon} text-${act.color} text-2xl mb-2"></i><span class="font-semibold text-xs text-center">${act.name}</span>`;
-                container.appendChild(button);
-            });
-        }
-
-
-        function showForm(formType) { 
-            if (!formType) { 
-                formDisplayArea.innerHTML = ''; 
-                formDisplayArea.classList.add('hidden'); 
+        function showForm(formType) {
+            if (!formType) {
+                formDisplayArea.innerHTML = '';
+                formDisplayArea.classList.add('hidden');
                 $('#log-buttons-container').classList.remove('hidden');
-                activeForm = null; 
-                return; 
-            } 
-            activeForm = formType; 
-            const activity = [...defaultActivities, ...customActivities].find(a => a.id === formType);
-            const templateId = defaultActivities.some(a => a.id === formType) ? `${formType}-form-template` : 'custom-form-template';
-            const template = $(`#${templateId}`); 
-
-            formDisplayArea.innerHTML = template.innerHTML; 
-
-            if (templateId === 'custom-form-template') {
-                $('#custom-form-icon').className = `${activity.icon} text-${activity.color} text-xl mr-3`;
-                $('#custom-form-title').textContent = `Log ${activity.name}`;
+                activeForm = null;
+                return;
             }
-
+            activeForm = formType;
+            const template = $(`#${formType}-form-template`);
+            if(!template) {
+                console.error(`Template not found for ${formType}`);
+                return;
+            }
+            formDisplayArea.innerHTML = template.innerHTML;
             $('#log-buttons-container').classList.add('hidden');
-            formDisplayArea.classList.remove('hidden'); 
-            if (['milestone', 'weight', 'height', 'vaccine'].includes(formType)) { const dateInput = $('.date', formDisplayArea); if(dateInput) dateInput.valueAsDate = new Date(); } 
-            if (formType === 'milestone') { populateMilestoneOptions(); } 
-            else { setInitialTimeFor(formType); } 
+            formDisplayArea.classList.remove('hidden');
+            
+            if (['weight', 'height'].includes(formType)) {
+                const dateInput = $('.date', formDisplayArea);
+                if(dateInput) dateInput.valueAsDate = new Date();
+            } else {
+                setInitialTimeFor(formType);
+            }
         }
 
         function setInitialTimeFor(formType) { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); const nowString = now.toISOString().slice(0, 16); if ($('.time', formDisplayArea)) $('.time', formDisplayArea).value = nowString; if ($('.start-time', formDisplayArea)) $('.start-time', formDisplayArea).value = nowString; if ($('.end-time', formDisplayArea)) $('.end-time', formDisplayArea).value = nowString; }
-        function toggleSettingsPanel() { settingsPanel.classList.toggle('opacity-0'); settingsPanel.classList.toggle('pointer-events-none'); }
         
-        function toggleDarkMode() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', isDark);
-            updateThemeButton(isDark);
-        }
-
-        function updateThemeButton(isDark) {
-            const themeButton = $('#theme-toggle-button');
-            if (themeButton) {
-                if (isDark) {
-                    themeButton.innerHTML = '<i class="fas fa-sun text-yellow-500 text-2xl"></i>';
-                } else {
-                    themeButton.innerHTML = '<i class="fas fa-moon text-indigo-500 text-2xl"></i>';
-                }
-            }
-        }
-
+        function toggleSettingsPanel() { settingsPanel.classList.toggle('opacity-0'); settingsPanel.classList.toggle('pointer-events-none'); }
+        function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('darkMode', isDark); updateThemeButton(isDark); }
+        function updateThemeButton(isDark) { const themeButton = $('#theme-toggle-button'); if (themeButton) themeButton.innerHTML = isDark ? '<i class="fas fa-sun text-yellow-500 text-2xl"></i>' : '<i class="fas fa-moon text-indigo-500 text-2xl"></i>';}
         function showModal(modalId) { const modal = $(`#${modalId}`); if (modal) { modal.classList.remove('opacity-0', 'pointer-events-none'); } }
         function hideModal(modalId) { const modal = $(`#${modalId}`); if (modal) { modal.classList.add('opacity-0', 'pointer-events-none'); } }
         function showConfirmation(message, callback) { $('#confirm-modal-text').textContent = message; confirmCallback = callback; showModal('confirm-modal'); }
 
-        // --- PROFILE MANAGEMENT ---
-        function getCurrentProfile() { return babyProfiles.find(p => p.id == currentProfileId); }
-        function showSetupForNewProfile() { $('#setup-title').textContent = "Add New Profile"; $('#setup-subtitle').textContent = "Enter the details for the new baby."; $('#user-name').value = ''; $('#baby-name').value = ''; $('#baby-dob').value = ''; showModal('setup-modal'); }
-        function populateProfileSwitcher() { const switcher = $('#profile-switcher'); switcher.innerHTML = ''; babyProfiles.forEach(p => { const profileLogs = allLogs[p.id] || []; const lastWeight = [...profileLogs].filter(log => log.type === 'weight').sort((a, b) => b.timestamp - a.timestamp)[0]; const lastHeight = [...profileLogs].filter(log => log.type === 'height').sort((a, b) => b.timestamp - a.timestamp)[0]; let statsString = ''; if (lastWeight) statsString += ` W: ${lastWeight.rawAmount}lbs`; if (lastHeight) statsString += ` H: ${lastHeight.rawAmount}in`; if (statsString) statsString = ` (${statsString.trim()})`; switcher.innerHTML += `<option value="${p.id}" ${p.id == currentProfileId ? 'selected' : ''}>${p.babyName}${statsString}</option>`; });}
-        function switchProfile() { currentProfileId = $('#profile-switcher').value; saveData(); initializeApp();}
-        function deleteCurrentProfile() { if (babyProfiles.length <= 1) { showToast("You cannot delete the only profile.", "error"); return; } const profile = getCurrentProfile(); showConfirmation(`Are you sure you want to delete ${profile.babyName}'s profile? All data will be lost forever.`, () => { delete allLogs[profile.id]; delete allAchievedMilestones[profile.id]; delete allReminders[profile.id]; babyProfiles = babyProfiles.filter(p => p.id != profile.id); currentProfileId = babyProfiles[0].id; saveData(); initializeApp(); hideModal('profile-modal'); showToast('Profile deleted.', 'info'); });}
-
         // --- LOGGING ---
-        function addEntry(entryData) { if (!allLogs[currentProfileId]) allLogs[currentProfileId] = []; allLogs[currentProfileId].push({ id: Date.now(), ...entryData }); saveData(); renderLog(); updateLastLogDisplay(); analyzeSleepPatterns(); showToast(`${entryData.type.charAt(0).toUpperCase() + entryData.type.slice(1)} logged!`, 'success'); }
-        function deleteEntry(id) { showConfirmation('Are you sure you want to delete this entry?', () => { if (!allLogs[currentProfileId]) return; allLogs[currentProfileId] = allLogs[currentProfileId].filter(e => e.id !== id); saveData(); renderLog(); updateLastLogDisplay(); analyzeSleepPatterns(); showToast('Entry deleted.', 'info'); }); }
+        async function addEntry(entryData) {
+            try {
+                const logsCollection = collection(db, `artifacts/baby-tracker/users/${userId}/logs`);
+                await addDoc(logsCollection, entryData);
+                showToast(`${entryData.type.charAt(0).toUpperCase() + entryData.type.slice(1)} logged!`, 'success');
+            } catch (error) {
+                console.error("Error adding entry: ", error);
+                showToast("Failed to log entry.", "error");
+            }
+        }
+        
+        function deleteEntry(id) { showConfirmation('Are you sure you want to delete this entry?', async () => { try { await deleteDoc(doc(db, `artifacts/baby-tracker/users/${userId}/logs`, id)); showToast('Entry deleted.', 'info'); } catch(e) { console.error(e); showToast("Failed to delete entry", "error"); } }); }
+        
+        async function addFeed() { const f = formDisplayArea; const amount = parseFloat($('.amount', f).value); if(isNaN(amount) || amount <= 0) { showToast("Invalid amount", "error"); return; }; const entry = { type: 'feed', icon: 'fas fa-utensils', color: 'blue-500', details: `${$('.type', f).value} - ${amount} oz`, rawAmount: amount, timestamp: Timestamp.fromDate(new Date($('.time', f).value)), notes: $('.notes', f).value }; await addEntry(entry); showForm(null); if ($('#deduct-formula', f).checked && $('.type', f).value === 'Formula') { await updateInventory('formula', -1); } }
+        async function addSleep(type) { const f = formDisplayArea; const start = new Date($('.start-time', f).value), end = new Date($('.end-time', f).value); if (!start.getTime() || !end.getTime() || start >= end) { showToast("Invalid time range.", "error"); return; } const duration = Math.round((end - start) / 60000); const hours = Math.floor(duration / 60); const minutes = duration % 60; const entry = { type, icon: 'fas fa-moon', color: 'indigo-500', details: `Duration: ${hours}h ${minutes}m`, rawDuration: duration, timestamp: Timestamp.fromDate(start), notes: $('.notes', f).value }; await addEntry(entry); showForm(null); }
+        async function addDiaper() { const f = formDisplayArea; const entry = { type: 'diaper', icon: 'fas fa-baby', color: 'amber-500', details: $('.type', f).value, timestamp: Timestamp.fromDate(new Date($('.time', f).value)), notes: $('.notes', f).value }; await addEntry(entry); showForm(null); if ($('#deduct-diaper', f).checked) { await updateInventory('diapers', -1); } }
+        async function addMeasurement(type) { const f = formDisplayArea; const amount = parseFloat($('.amount', f).value); const date = $('.date',f).value; if(isNaN(amount) || amount <=0 || !date) { showToast("Invalid input", "error"); return; }; const unit = type === 'weight' ? 'lbs' : 'in'; const icon = type === 'weight' ? 'fas fa-weight-scale' : 'fas fa-ruler-vertical'; const color = type === 'weight' ? 'red-500' : 'green-500'; const entry = { type, icon, color, details: `${type.charAt(0).toUpperCase() + type.slice(1)}: ${amount} ${unit}`, rawAmount: amount, timestamp: Timestamp.fromDate(new Date(date)), notes: $('.notes', f).value }; await addEntry(entry); showForm(null); }
 
-        function addFeed() { const f = formDisplayArea; addEntry({ type: 'feed', icon: 'fas fa-utensils', color: 'blue-500', details: `${$('.type', f).value} - ${$('.amount', f).value} oz`, rawAmount: $('.amount', f).value, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }); showForm(null); if ($('#deduct-formula', f).checked && $('.type', f).value === 'Formula') { updateInventory('formula', -1); } }
-        function addNap() { const f = formDisplayArea; const start = new Date($('.start-time', f).value), end = new Date($('.end-time', f).value); if (!start.getTime() || !end.getTime() || start >= end) { showToast("Invalid nap time.", "error"); return; } const duration = Math.round((end - start) / 60000); addEntry({ type: 'nap', icon: 'fas fa-bed', color: 'purple-500', details: `Duration: ${duration} min`, rawDuration: duration, timestamp: start, notes: $('.notes', f).value }); showForm(null); }
-        function addDiaper() { const f = formDisplayArea; addEntry({ type: 'diaper', icon: 'fas fa-baby', color: 'amber-500', details: $('.type', f).value, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }); showForm(null); if ($('#deduct-diaper', f).checked) { updateInventory('diapers', -1); } }
-        function addSleep() { const f = formDisplayArea; const start = new Date($('.start-time', f).value), end = new Date($('.end-time', f).value); if (!start.getTime() || !end.getTime() || start >= end) { showToast("Invalid sleep time.", "error"); return; } const duration = Math.round((end - start) / 60000); const hours = Math.floor(duration / 60); const minutes = duration % 60; addEntry({ type: 'sleep', icon: 'fas fa-moon', color: 'indigo-500', details: `Duration: ${hours}h ${minutes}m`, rawDuration: duration, timestamp: start, notes: $('.notes', f).value }); showForm(null); }
-        function addTummyTime() { const f = formDisplayArea; const start = new Date($('.start-time', f).value), end = new Date($('.end-time', f).value); if (!start.getTime() || !end.getTime() || start >= end) { showToast("Invalid tummy time.", "error"); return; } const duration = Math.round((end - start) / 60000); addEntry({ type: 'tummy', icon: 'fas fa-child-reaching', color: 'lime-500', details: `Duration: ${duration} min`, rawDuration: duration, timestamp: start, notes: $('.notes', f).value }); showForm(null); }
-        function addMilestone() { const f = formDisplayArea; const milestoneId = $('.milestone-select', f).value; if (!milestoneId) { showToast("Please select a milestone.", "error"); return; } const milestone = milestones.find(m => m.id === milestoneId); if (!allAchievedMilestones[currentProfileId]) allAchievedMilestones[currentProfileId] = []; allAchievedMilestones[currentProfileId].push({ id: milestone.id, date: $('.date', f).value }); saveData(); addEntry({ type: 'milestone', icon: 'fas fa-trophy', color: 'yellow-500', details: `Achieved: ${milestone.text}`, timestamp: new Date($('.date', f).value), notes: $('.notes', f).value }); showForm(null); updateMilestoneTicker(); }
-        function addWeight() { const f = formDisplayArea; const amount = $('.amount', f).value; if (!amount) { showToast("Please enter weight.", "error"); return; } addEntry({ type: 'weight', icon: 'fas fa-weight-scale', color: 'red-500', details: `Weight: ${amount} lbs`, rawAmount: amount, timestamp: new Date($('.date', f).value), notes: $('.notes', f).value }); showForm(null); }
-        function addHeight() { const f = formDisplayArea; const amount = $('.amount', f).value; if (!amount) { showToast("Please enter height.", "error"); return; } addEntry({ type: 'height', icon: 'fas fa-ruler-vertical', color: 'green-500', details: `Height: ${amount} in`, rawAmount: amount, timestamp: new Date($('.date', f).value), notes: $('.notes', f).value }); showForm(null); }
-        function addMedication() { const f = formDisplayArea; const medicine = $('.medicine', f).value, dosage = $('.dosage', f).value; if (!medicine || !dosage) { showToast("Please enter medicine and dosage.", "error"); return; } addEntry({ type: 'medication', icon: 'fas fa-pills', color: 'cyan-500', details: `Meds: ${medicine} - ${dosage}`, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }); showForm(null); }
-        function addTemperature() { const f = formDisplayArea; const amount = $('.amount', f).value; if (!amount) { showToast("Please enter temperature.", "error"); return; } addEntry({ type: 'temperature', icon: 'fas fa-thermometer', color: 'orange-500', details: `Temp: ${amount}°F`, rawAmount: amount, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }); showForm(null); }
-        function addVaccine() { const f = formDisplayArea; const name = $('.vaccine-name', f).value; if (!name) { showToast("Please enter a vaccine name.", "error"); return; } addEntry({ type: 'vaccine', icon: 'fas fa-syringe', color: 'teal-500', details: `Vaccine: ${name}`, timestamp: new Date($('.date', f).value), notes: $('.notes', f).value }); showForm(null); }
-        function logCustomActivity() { const f = formDisplayArea; const activity = [...defaultActivities, ...customActivities].find(a => a.id === activeForm); addEntry({ type: 'custom', icon: activity.icon, color: activity.color, details: activity.name, timestamp: new Date($('.time', f).value), notes: $('.notes', f).value }); showForm(null); }
-
-        // --- RENDER & DATA ---
-        function renderLog() { const currentLogs = allLogs[currentProfileId] || []; logContainer.innerHTML = ''; emptyLogMsg.style.display = currentLogs.length === 0 ? 'block' : 'none'; logContainer.appendChild(emptyLogMsg); [...currentLogs].sort((a, b) => b.timestamp - a.timestamp).forEach(entry => { const logItem = document.createElement('div'); logItem.className = 'flex items-start p-3 bg-primary rounded-lg border border-color'; const time = new Date(entry.timestamp); const typeName = (entry.type === 'custom') ? entry.details : entry.type.charAt(0).toUpperCase() + entry.type.slice(1); const detailsText = (entry.type === 'custom') ? `Notes: ${entry.notes || ''}` : entry.details; logItem.innerHTML = `<div class="flex-shrink-0 w-10 h-10 rounded-full bg-${entry.color}/10 flex items-center justify-center mr-4"><i class="${entry.icon} text-${entry.color}"></i></div><div class="flex-grow"><p class="font-semibold text-primary">${typeName}</p><p class="text-sm text-secondary">${time.toLocaleDateString()} at ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>${entry.notes && entry.type !== 'custom' ? `<p class="text-xs italic text-secondary mt-1 border-l-2 border-slate-300 pl-2">${entry.notes}</p>` : ''}</div><div class="flex flex-col gap-2"><button onclick="showEditLogModal(${entry.id})" class="text-secondary hover:text-blue-500 transition-colors"><i class="fas fa-edit"></i></button><button onclick="deleteEntry(${entry.id})" class="text-secondary hover:text-red-500 transition-colors"><i class="fas fa-trash"></i></button></div>`; logContainer.appendChild(logItem); }); }
-        function updateLastLogDisplay() { const currentLogs = allLogs[currentProfileId] || []; const lastLog = [...currentLogs].sort((a,b) => b.timestamp - a.timestamp)[0]; const display = $('#last-activity-display'); if(lastLog) { const time = new Date(lastLog.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); const typeName = (lastLog.type === 'custom') ? lastLog.details : lastLog.type.charAt(0).toUpperCase() + lastLog.type.slice(1); display.innerHTML = `<i class="${lastLog.icon} text-${lastLog.color} mr-2"></i>Last: ${typeName} at ${time}`; } else { display.innerHTML = ''; }}
-        function clearLogWithConfirmation() { showConfirmation("This will delete all log entries for the current profile.", () => { allLogs[currentProfileId] = []; allAchievedMilestones[currentProfileId] = []; saveData(); renderLog(); updateLastLogDisplay(); updateMilestoneTicker(); showToast("Log cleared.", "info"); }); }
+        // --- RENDER & DATA DISPLAY ---
+        function renderLog() { logContainer.innerHTML = ''; emptyLogMsg.style.display = logs.length === 0 ? 'block' : 'none'; logContainer.appendChild(emptyLogMsg); [...logs].sort((a, b) => b.timestamp - a.timestamp).forEach(entry => { const logItem = document.createElement('div'); logItem.className = 'flex items-start p-3 bg-primary rounded-lg border border-color animate-fadeIn'; const time = entry.timestamp; const typeName = entry.type.charAt(0).toUpperCase() + entry.type.slice(1); logItem.innerHTML = `<div class="flex-shrink-0 w-10 h-10 rounded-full bg-${entry.color}/10 flex items-center justify-center mr-4"><i class="${entry.icon} text-${entry.color}"></i></div><div class="flex-grow"><p class="font-semibold text-primary">${typeName}</p><p class="text-sm text-secondary">${time.toLocaleDateString()} at ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p><p class="text-sm text-secondary break-words">${entry.details}</p>${entry.notes ? `<p class="text-xs italic text-secondary mt-1 border-l-2 border-slate-300 pl-2">${entry.notes}</p>` : ''}</div><button onclick="deleteEntry('${entry.id}')" class="text-secondary hover:text-red-500 transition-colors ml-2"><i class="fas fa-trash"></i></button>`; logContainer.appendChild(logItem); }); }
+        function updateLastLogDisplay() { const lastLog = [...logs].sort((a,b) => b.timestamp - a.timestamp)[0]; const display = $('#last-activity-display'); if(lastLog) { const time = lastLog.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); const typeName = lastLog.type.charAt(0).toUpperCase() + lastLog.type.slice(1); display.innerHTML = `<i class="${lastLog.icon} text-${lastLog.color} mr-2"></i>Last: ${typeName} at ${time}`; } else { display.innerHTML = ''; }}
+        
+        async function clearLogWithConfirmation() { showConfirmation("This will delete ALL log entries. This cannot be undone.", async () => { const logsCollectionRef = collection(db, `artifacts/baby-tracker/users/${userId}/logs`); const querySnapshot = await getDocs(logsCollectionRef); const batch = writeBatch(db); querySnapshot.forEach((doc) => { batch.delete(doc.ref); }); try { await batch.commit(); showToast("Log cleared.", "info"); } catch (e) { console.error("Error clearing log:", e); showToast("Failed to clear log.", "error"); } }); }
         
         // --- MILESTONE LOGIC ---
-        function populateMilestoneOptions() { const select = $('.milestone-select', formDisplayArea); const achievedIds = (allAchievedMilestones[currentProfileId] || []).map(m => m.id); const available = milestones.filter(m => !achievedIds.includes(m.id)); select.innerHTML = '<option value="">Select a milestone...</option>'; available.forEach(m => { select.innerHTML += `<option value="${m.id}">${m.text} (${m.age} months)</option>`;}); }
-        function updateMilestoneTicker() { const ticker = $('#milestone-ticker'); const profile = getCurrentProfile(); if (!profile) return; const ageInMonths = calculateAgeMonths(profile.dob); const achievedIds = (allAchievedMilestones[currentProfileId] || []).map(m => m.id); const upcoming = milestones.filter(m => !achievedIds.includes(m.id) && m.age >= ageInMonths && m.age <= ageInMonths + 3); ticker.innerHTML = ''; if (upcoming.length > 0) { let tickerHTML = ''; upcoming.forEach(m => { tickerHTML += `<span class="ticker-item">✨ ${m.text} (around ${m.age} months)</span>`; }); ticker.innerHTML = tickerHTML + tickerHTML; ticker.classList.add('ticker-move'); } else { ticker.innerHTML = '<span class="ticker-item">No major milestones expected this month. Enjoy the little moments!</span>'; ticker.classList.remove('ticker-move'); }}
+        function updateMilestoneTicker() { /* ... This can be re-implemented if needed ... */ }
 
-        // --- BACKUP, RESTORE, & SHARING ---
-        function packDataForTransport() {
-            try {
-                const dataToPack = { babyProfiles, allLogs, allAchievedMilestones, allReminders, currentProfileId, allMemories, inventory, customActivities };
-                const jsonString = JSON.stringify(dataToPack);
-                const compressed = pako.deflate(jsonString, { to: 'string' });
-                return btoa(compressed);
-            } catch (e) {
-                console.error("Packing error:", e);
-                showToast("Could not prepare data for backup.", "error");
-                return null;
-            }
-        }
-
-        function restoreDataFromPack(packedData) {
-            try {
-                const decoded = atob(packedData);
-                const decompressed = pako.inflate(decoded, { to: 'string' });
-                const restoredData = JSON.parse(decompressed);
-                
-                localStorage.setItem('babyProfiles', JSON.stringify(restoredData.babyProfiles || []));
-                localStorage.setItem('allLogs', JSON.stringify(restoredData.allLogs || {}));
-                localStorage.setItem('allAchievedMilestones', JSON.stringify(restoredData.allAchievedMilestones || {}));
-                localStorage.setItem('allReminders', JSON.stringify(restoredData.allReminders || {}));
-                localStorage.setItem('currentProfileId', restoredData.currentProfileId || null);
-                localStorage.setItem('allMemories', JSON.stringify(restoredData.allMemories || {}));
-                localStorage.setItem('inventory', JSON.stringify(restoredData.inventory || {}));
-                localStorage.setItem('customActivities', JSON.stringify(restoredData.customActivities || []));
-
-                showToast("Data restored successfully! App will now reload.", "success");
-                setTimeout(() => window.location.replace(window.location.origin + window.location.pathname), 1500);
-            } catch (e) {
-                console.error("Restore error:", e);
-                showToast("Could not restore data. It may be corrupted.", "error");
-                 setTimeout(loadAndInit, 1500);
-            }
-        }
-
-        function copyTextToClipboard(textToCopy) {
-            const textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
-            textArea.style.position = "fixed"; 
-            textArea.style.top = "-9999px";
-            textArea.style.left = "-9999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast("Copied to clipboard!", "success");
-                } else {
-                     showToast("Could not copy to clipboard.", "error");
-                }
-            } catch (err) {
-                 showToast("Could not copy to clipboard.", "error");
-            }
-            document.body.removeChild(textArea);
-        }
-        
-        function shareProfile() {
-            const profile = getCurrentProfile();
-            if(!profile) return;
-            const shareLink = `${window.location.origin}${window.location.pathname}?share=${profile.shareId}`;
-            copyTextToClipboard(shareLink);
-            showToast("Share link copied to clipboard!", "success");
-            hideModal('profile-modal');
-        }
-
-        function copyBackupToClipboard() {
-            const packedData = packDataForTransport();
-            if (packedData) {
-                copyTextToClipboard(packedData);
-                hideModal('backup-options-modal');
-            }
-        }
-        
-        function emailMagicLink() {
-            const packedData = packDataForTransport();
-            if(packedData) {
-                const url = `${window.location.origin}${window.location.pathname}?backup=${packedData}`;
-                const subject = `LittleSprout Backup & Restore Link`;
-                const body = `Here is your LittleSprout magic link. Click it on any device with the app to restore your data.\n\n${url}`;
-                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.location.href = mailtoLink;
-                hideModal('backup-options-modal');
-            }
-        }
-
+        // --- IMPORT/EXPORT ---
         function triggerImport() { $('#import-file-input').click(); }
-        function importData(event) {
+        async function importData(event) {
             const file = event.target.files[0]; if (!file) return;
-            showConfirmation("This will merge imported data with your existing data. Are you sure?", () => {
+            showConfirmation("This will add entries from the CSV to your log. Are you sure?", () => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
                     try {
-                        const content = e.target.result; let importedLogs = [];
-                        if (file.name.endsWith('.csv')) {
-                             const rows = content.split('\n').filter(r => r); rows.shift(); rows.forEach(rowStr => { const row = rowStr.split(','); if(row.length < 9) return; const entry = { id: parseInt(row[0]), timestamp: new Date(row[7]), type: row[3], details: row[4].replace(/"/g, ''), rawAmount: row[5] ? parseFloat(row[5]) : undefined, rawDuration: row[6] ? parseInt(row[6]) : undefined, notes: row[8] ? row[8].replace(/"/g, '') : '' }; if (entry.type === 'milestone') { const achievedIds = (allAchievedMilestones[currentProfileId] || []).map(m => m.id); const m = milestones.find(ms => entry.details.includes(ms.text)); if (m && !achievedIds.includes(m.id)) allAchievedMilestones[currentProfileId].push({ id: m.id, date: new Date(entry.timestamp) }); } const typeMap = {feed:'blue-500',nap:'purple-500',sleep:'indigo-500',diaper:'amber-500',milestone:'yellow-500',weight:'red-500',height:'green-500',medication:'cyan-500',temperature:'orange-500', vaccine: 'teal-500'}; const iconMap = {feed:'fas fa-utensils',nap:'fas fa-bed',sleep:'fas fa-moon',diaper:'fas fa-baby',milestone:'fas fa-trophy',weight:'fas fa-weight-scale',height:'fas fa-ruler-vertical',medication:'fas fa-pills',temperature:'fas fa-thermometer', vaccine: 'fas fa-syringe'}; entry.color = typeMap[entry.type]; entry.icon = iconMap[entry.type]; importedLogs.push(entry); });
-                        }
-                        const currentLogIds = new Set((allLogs[currentProfileId] || []).map(log => log.id));
-                        const newLogs = importedLogs.filter(log => !currentLogIds.has(log.id));
-                        if (newLogs.length > 0) { allLogs[currentProfileId].push(...newLogs); saveData(); renderLog(); updateLastLogDisplay(); updateMilestoneTicker(); showToast(`${newLogs.length} new entries imported!`, 'success'); } else { showToast("No new entries found.", "info"); }
-                    } catch (err) { console.error("Import Error:", err); showToast("Failed to import file.", "error"); } 
-                    finally { event.target.value = null; hideModal('backup-options-modal'); }
+                        const content = e.target.result;
+                        const rows = content.split('\n').slice(1).filter(r => r);
+                        const batch = writeBatch(db);
+                        let importCount = 0;
+                        rows.forEach(rowStr => {
+                           const row = rowStr.split(',');
+                           if(row.length < 8) return;
+                           const entry = { type: row[2], timestamp: Timestamp.fromDate(new Date(row[6])), details: row[3].replace(/"/g, ''), rawAmount: row[4] ? parseFloat(row[4]) : null, rawDuration: row[5] ? parseInt(row[5]) : null, notes: row[7] ? row[7].replace(/"/g, '') : '', icon: 'fas fa-upload', color: 'gray-500' };
+                           const newLogRef = doc(collection(db, `artifacts/baby-tracker/users/${userId}/logs`));
+                           batch.set(newLogRef, entry);
+                           importCount++;
+                        });
+                        await batch.commit();
+                        showToast(`${importCount} entries imported successfully!`, 'success');
+                    } catch (err) { console.error("Import Error:", err); showToast("Failed to import file.", "error"); } finally { event.target.value = null; hideModal('backup-options-modal'); }
                 };
                 reader.readAsText(file);
             });
         }
+        function exportDataToFile(format) {
+            if (logs.length === 0) { showToast("No log data to export.", "info"); return; }
+            let content = "data:text/csv;charset=utf-8,";
+            content += "Baby Name,Date,Type,Details,Amount,Duration,Timestamp,Notes\n";
+            logs.forEach(log => {
+                const row = [ babyProfile.babyName, log.timestamp.toLocaleDateString(), log.type, `"${log.details || ''}"`, log.rawAmount || '', log.rawDuration || '', log.timestamp.toISOString(), `"${log.notes || ''}"` ].join(",");
+                content += row + "\r\n";
+            });
+            const encodedUri = encodeURI(content);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `littlesprout_backup_${babyProfile.babyName}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Backup file downloaded.", "success");
+        }
         
         // --- PDF EXPORT ---
         function generatePDF() {
-            const profile = getCurrentProfile();
             const startDate = new Date($('#pdf-start-date').value);
             const endDate = new Date($('#pdf-end-date').value);
-            if (!profile || !startDate.getTime() || !endDate.getTime() || startDate > endDate) {
-                showToast("Please select a valid date range.", "error");
-                return;
-            }
-            endDate.setHours(23, 59, 59, 999); 
-
-            const logsToExport = (allLogs[currentProfileId] || [])
-                .filter(log => log.timestamp >= startDate && log.timestamp <= endDate)
-                .sort((a, b) => a.timestamp - b.timestamp);
+            if (!babyProfile || !startDate.getTime() || !endDate.getTime() || startDate > endDate) { showToast("Please select a valid date range.", "error"); return; }
+            endDate.setHours(23, 59, 59, 999);
+            const logsToExport = logs.filter(log => log.timestamp >= startDate && log.timestamp <= endDate).sort((a, b) => a.timestamp - b.timestamp);
+            if (logsToExport.length === 0) { showToast("No log entries found in the selected date range.", "info"); return; }
             
-            if (logsToExport.length === 0) {
-                showToast("No log entries found in the selected date range.", "info");
-                return;
-            }
-
             const doc = new jsPDF();
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(18);
-            doc.text(`Activity Log for ${profile.babyName}`, 14, 22);
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Report from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`, 14, 30);
-
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text(`Activity Log for ${babyProfile.babyName}`, 14, 22);
+            doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.text(`Report from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`, 14, 30);
             let yPos = 40;
             logsToExport.forEach(log => {
-                if(yPos > 280) { 
-                    doc.addPage();
-                    yPos = 20;
-                }
+                if (yPos > 280) { doc.addPage(); yPos = 20; }
                 const time = log.timestamp.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
                 doc.setFont('helvetica', 'bold');
                 doc.text(`${log.type.charAt(0).toUpperCase() + log.type.slice(1)}: ${log.details}`, 14, yPos);
@@ -932,595 +614,189 @@
                 }
                 yPos += 15;
             });
-
-            doc.save(`${profile.babyName}_Log_${startDate.toLocaleDateString()}_${endDate.toLocaleDateString()}.pdf`);
-            hideModal('pdf-export-modal');
-            showToast("PDF generated successfully!", "success");
+            doc.save(`${babyProfile.babyName}_Log_${new Date().toISOString().split('T')[0]}.pdf`);
+            hideModal('pdf-export-modal'); showToast("PDF generated successfully!", "success");
         }
 
-        // --- CANVAS CHARTS ---
-        function showCharts() {
-            const modal = $('#charts-modal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            renderGrowthCharts();
-        }
-
-        function hideCharts() {
-            const modal = $('#charts-modal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            if(weightChartInstance) {
-                weightChartInstance.destroy();
-                weightChartInstance = null;
-            }
-            if(heightChartInstance) {
-                heightChartInstance.destroy();
-                heightChartInstance = null;
-            }
-        }
-
+        // --- CHARTS ---
+        function showCharts() { showModal('charts-modal'); renderGrowthCharts(); }
+        function hideCharts() { hideModal('charts-modal'); if (weightChartInstance) weightChartInstance.destroy(); if (heightChartInstance) heightChartInstance.destroy(); weightChartInstance = null; heightChartInstance = null; }
         function renderGrowthCharts() {
-            const currentLogs = (allLogs[currentProfileId] || []);
-            const weightData = currentLogs.filter(log => log.type === 'weight' && log.rawAmount).sort((a,b) => a.timestamp - b.timestamp);
-            const heightData = currentLogs.filter(log => log.type === 'height' && log.rawAmount).sort((a,b) => a.timestamp - b.timestamp);
-            
+            const weightData = logs.filter(log => log.type === 'weight' && log.rawAmount).sort((a,b) => a.timestamp - b.timestamp);
+            const heightData = logs.filter(log => log.type === 'height' && log.rawAmount).sort((a,b) => a.timestamp - b.timestamp);
             const isDark = document.documentElement.classList.contains('dark');
             const gridColor = isDark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(203, 213, 225, 0.5)';
             const fontColor = isDark ? 'rgb(241, 245, 249)' : 'rgb(30, 41, 59)';
             
-            const weightCtx = $('#weight-chart').getContext('2d');
-            if (weightChartInstance) weightChartInstance.destroy();
-            if (weightData.length > 0) {
-                 weightChartInstance = new Chart(weightCtx, {
-                    type: 'line',
-                    data: {
-                        labels: weightData.map(d => d.timestamp.toLocaleDateString()),
-                        datasets: [{
-                            label: 'Weight (lbs)',
-                            data: weightData.map(d => d.rawAmount),
-                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            borderWidth: 2,
-                            tension: 0.1,
-                            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
-                        }]
-                    },
-                    options: { responsive: true, scales: { x: { ticks: { color: fontColor }, grid: { color: gridColor } }, y: { beginAtZero: false, ticks: { color: fontColor }, grid: { color: gridColor } } }, plugins: { legend: { labels: { color: fontColor } } } }
-                });
-            } else {
-                weightCtx.clearRect(0, 0, weightCtx.canvas.width, weightCtx.canvas.height);
-                weightCtx.font = "16px Quicksand";
-                weightCtx.fillStyle = fontColor;
-                weightCtx.textAlign = "center";
-                weightCtx.fillText("No weight data logged yet.", weightCtx.canvas.width/2, weightCtx.canvas.height/2);
-            }
-
-            const heightCtx = $('#height-chart').getContext('2d');
-            if (heightChartInstance) heightChartInstance.destroy();
-            if(heightData.length > 0) {
-                heightChartInstance = new Chart(heightCtx, {
-                    type: 'line',
-                    data: {
-                        labels: heightData.map(d => d.timestamp.toLocaleDateString()),
-                        datasets: [{
-                            label: 'Height (in)',
-                            data: heightData.map(d => d.rawAmount),
-                            backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            borderWidth: 2,
-                            tension: 0.1,
-                            pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                        }]
-                    },
-                    options: { responsive: true, scales: { x: { ticks: { color: fontColor }, grid: { color: gridColor } }, y: { beginAtZero: false, ticks: { color: fontColor }, grid: { color: gridColor } } }, plugins: { legend: { labels: { color: fontColor } } } }
-                });
-            } else {
-                heightCtx.clearRect(0, 0, heightCtx.canvas.width, heightCtx.canvas.height);
-                heightCtx.font = "16px Quicksand";
-                heightCtx.fillStyle = fontColor;
-                heightCtx.textAlign = "center";
-                heightCtx.fillText("No height data logged yet.", heightCtx.canvas.width/2, heightCtx.canvas.height/2);
-            }
+            const createChart = (ctx, chartInstance, data, label, color) => {
+                if (chartInstance) chartInstance.destroy();
+                if (data.length > 0) {
+                    return new Chart(ctx, { type: 'line', data: { labels: data.map(d => d.timestamp.toLocaleDateString()), datasets: [{ label, data: data.map(d => d.rawAmount), backgroundColor: `rgba(${color}, 0.2)`, borderColor: `rgba(${color}, 1)`, borderWidth: 2, tension: 0.1, pointBackgroundColor: `rgba(${color}, 1)` }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: fontColor }, grid: { color: gridColor } }, y: { beginAtZero: false, ticks: { color: fontColor }, grid: { color: gridColor } } }, plugins: { legend: { labels: { color: fontColor } } } } });
+                } else {
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.font = "16px Quicksand"; ctx.fillStyle = fontColor; ctx.textAlign = "center";
+                    ctx.fillText(`No ${label.toLowerCase()} data logged yet.`, ctx.canvas.width/2, ctx.canvas.height/2);
+                    return null;
+                }
+            };
+            
+            weightChartInstance = createChart($('#weight-chart').getContext('2d'), weightChartInstance, weightData, 'Weight (lbs)', '239, 68, 68');
+            heightChartInstance = createChart($('#height-chart').getContext('2d'), heightChartInstance, heightData, 'Height (in)', '34, 197, 94');
         }
-
 
         // --- UTILITIES ---
-        function renderReminders() { const list = $('#reminders-list'); if(!list) return; list.innerHTML = ''; const reminders = allReminders[currentProfileId] || []; if (reminders.length === 0) { list.innerHTML = '<p class="text-secondary text-xs text-center">No active reminders.</p>'; return; } reminders.forEach(r => { let freqText = ''; if (r.frequency === 'daily') freqText = ' (Daily)'; if (r.frequency === 'weekly') freqText = ' (Weekly)'; list.innerHTML += `<div class="flex justify-between items-center bg-primary p-2 rounded-md"><span>${r.text} - ${new Date(r.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}${freqText}</span><button onclick="deleteReminder(${r.id})" class="text-red-500 hover:text-red-700 text-xs px-1"><i class="fas fa-times"></i></button></div>`; });}
-        function setReminder() { 
-            const text = $('#reminder-text').value; 
-            const timeVal = $('#reminder-time').value; 
-            const frequency = $('#reminder-frequency').value;
-            if (!text || !timeVal) { showToast('Please enter reminder text and time.', 'error'); return; } 
-            const time = new Date(timeVal).getTime(); 
-            if (time < Date.now()) { showToast('Please select a future time for the reminder.', 'error'); return; } 
-            
-            const newReminder = { id: Date.now(), text, time, frequency }; 
-            if (!allReminders[currentProfileId]) allReminders[currentProfileId] = []; 
-            allReminders[currentProfileId].push(newReminder); 
-            saveData(); 
-            renderReminders(); 
-            showToast(`Reminder set!`, 'success'); 
-            $('#reminder-text').value = ''; 
-            $('#reminder-time').value = ''; 
-            $('#reminder-frequency').value = 'none';
-        }
-        function deleteReminder(id) { if (!allReminders[currentProfileId]) return; allReminders[currentProfileId] = allReminders[currentProfileId].filter(r => r.id !== id); saveData(); renderReminders(); }
-        
-        function checkReminders() {
-            if(!currentProfileId || !allReminders[currentProfileId]) return;
-            const reminders = allReminders[currentProfileId] || [];
-            const now = Date.now();
-            let remindersFired = false;
-            
-            const remainingReminders = reminders.map(r => {
-                if (now >= r.time) {
-                    new Notification('LittleSprout Reminder', { body: r.text, icon: './favicon.ico' });
-                    remindersFired = true;
-                    if(r.frequency !== 'none') {
-                        let newTime = new Date(r.time);
-                        if(r.frequency === 'daily') newTime.setDate(newTime.getDate() + 1);
-                        if(r.frequency === 'weekly') newTime.setDate(newTime.getDate() + 7);
-                        r.time = newTime.getTime();
-                        return r;
-                    }
-                    return null; 
-                }
-                return r;
-            }).filter(Boolean);
-
-            if (remindersFired) { allReminders[currentProfileId] = remainingReminders; saveData(); renderReminders(); }
-        }
-        
-        function startDateTime() { if(timeInterval) clearInterval(timeInterval); if(reminderInterval) clearInterval(reminderInterval); const mainTimeEl = $('#main-time-display'), mainAmpmEl = $('#main-ampm-display'), mainDateEl = $('#main-date-display'), panelDateEl = $('#panel-date-display'); timeInterval = setInterval(() => { const now = new Date(); const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); const dateString = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); mainTimeEl.textContent = timeString.slice(0, -3); mainAmpmEl.textContent = timeString.slice(-2); mainDateEl.textContent = dateString; if(panelDateEl) panelDateEl.textContent = `${dateString} | ${timeString}`; }, 1000); reminderInterval = setInterval(checkReminders, 5000); }
-        async function fetchWeather(lat, lon) { 
-            const outlookSection = $('#outlook-section'); 
-            const weatherPanel = $('#weather-display-panel');
-            const mainWeather = $('#main-weather-display');
-            
-            const url = lat && lon ? `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=auto` : 'https://wttr.in/?format=j1';
-            
-            try { 
+        function startDateTime() { if(timeInterval) clearInterval(timeInterval); const mainTimeEl = $('#main-time-display'), mainAmpmEl = $('#main-ampm-display'), mainDateEl = $('#main-date-display'), panelDateEl = $('#panel-date-display'); timeInterval = setInterval(() => { const now = new Date(); const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }); const dateString = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); mainTimeEl.textContent = timeString.slice(0, -3); mainAmpmEl.textContent = timeString.slice(-2); mainDateEl.textContent = dateString; if(panelDateEl) panelDateEl.textContent = `${dateString} | ${timeString}`; }, 1000); }
+        async function fetchWeather(lat, lon) {
+            const weatherPanel = $('#weather-display-panel'), mainWeather = $('#main-weather-display'), outlookSection = $('#outlook-section');
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`;
+            try {
                 const res = await fetch(url);
-                if (!res.ok) throw new Error('Weather service not available'); 
+                if (!res.ok) throw new Error('Weather service not available');
                 const data = await res.json();
-                
-                let temp, weatherDesc, locationName;
-
-                if (lat && lon) {
-                    temp = Math.round(data.current_weather.temperature);
-                    weatherDesc = getWeatherDescription(data.current_weather.weathercode);
-                    locationName = "Your Location"; 
-                } else { 
-                    temp = parseInt(data.current_condition[0].temp_F);
-                    weatherDesc = data.current_condition[0].weatherDesc[0].value;
-                    locationName = data.nearest_area[0].areaName[0].value;
-                }
-                
-                const weatherHTML = `<i class="fas fa-map-marker-alt mr-1"></i> ${locationName} | <i class="fas fa-cloud-sun ml-2 mr-1"></i> ${temp}°F, ${weatherDesc}`;
-                
+                const temp = Math.round(data.current.temperature_2m);
+                const weatherDesc = getWeatherDescription(data.current.weather_code);
+                const weatherHTML = `<i class="fas fa-cloud-sun ml-2 mr-1"></i> ${temp}°F, ${weatherDesc}`;
                 mainWeather.innerHTML = weatherHTML;
                 weatherPanel.innerHTML = weatherHTML;
-                
                 updateDynamicSuggestion(temp);
-                outlookSection.classList.remove('hidden'); 
-            } catch (error) { 
+                outlookSection.classList.remove('hidden');
+            } catch (error) {
                 console.error("Weather Error:", error);
                 const errorHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> Could not load weather.`;
-                mainWeather.innerHTML = errorHTML;
-                weatherPanel.innerHTML = errorHTML;
+                mainWeather.innerHTML = errorHTML; weatherPanel.innerHTML = errorHTML;
                 outlookSection.classList.add('hidden');
             }
         }
+        function getWeatherDescription(code) { const codes = {0:"Clear",1:"Mainly Clear",2:"Partly Cloudy",3:"Overcast",45:"Fog",48:"Fog",51:"Drizzle",53:"Drizzle",55:"Drizzle",61:"Rain",63:"Rain",65:"Heavy Rain",80:"Showers",81:"Showers",82:"Heavy Showers",95:"Thunderstorm"}; return codes[code] || "Unknown"; }
+        function updateDynamicSuggestion(temp) { if(!babyProfile) return; const ageInMonths = calculateAgeMonths(babyProfile.dob); const possibleSuggestions = suggestions.filter(s => { const ageMatch = (!s.minAge || ageInMonths >= s.minAge) && (!s.maxAge || ageInMonths < s.maxAge); const tempMatch = (!s.minTemp || temp >= s.minTemp) && (!s.maxTemp || temp < s.maxTemp); return ageMatch && tempMatch; }); const suggestion = possibleSuggestions.length > 0 ? possibleSuggestions[Math.floor(Math.random() * possibleSuggestions.length)] : {text: "Enjoy these precious moments!", icon: "fa-heart"}; $('#outlook-suggestion').innerHTML = `<i class="fas ${suggestion.icon} text-purple-500 mr-2"></i> ${suggestion.text}`; }
+        function showToast(message, type = 'success') { const toast = $('#toast'); toast.textContent = message; toast.className = 'fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-xl transition-all duration-300 z-[100]'; toast.classList.add(type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-slate-800'); toast.classList.add('opacity-100', 'translate-y-0'); setTimeout(() => { toast.classList.remove('opacity-100', 'translate-y-0'); }, 3000); }
 
-        function getWeatherDescription(code) {
-             const codes = {0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle", 61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain", 80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers", 95: "Thunderstorm"};
-             return codes[code] || "Unknown";
-        }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => fetchWeather(position.coords.latitude, position.coords.longitude),
-                    () => fetchWeather() 
-                );
-            } else {
-                fetchWeather(); 
-            }
-        }
-        
-        function updateDynamicSuggestion(temp) {
-            const profile = getCurrentProfile();
-            if(!profile) return;
-            const ageInMonths = calculateAgeMonths(profile.dob);
-
-            const possibleSuggestions = suggestions.filter(s => {
-                const ageMatch = (!s.minAge || ageInMonths >= s.minAge) && (!s.maxAge || ageInMonths < s.maxAge);
-                const tempMatch = (!s.minTemp || temp >= s.minTemp) && (!s.maxTemp || temp < s.maxTemp);
-                return ageMatch && tempMatch;
-            });
-            
-            const suggestion = possibleSuggestions.length > 0 ? possibleSuggestions[Math.floor(Math.random() * possibleSuggestions.length)] : {text: "Enjoy these precious moments with your little one!", icon: "fa-heart"};
-            $('#outlook-suggestion').innerHTML = `<i class="fas ${suggestion.icon} text-purple-500 mr-2"></i> ${suggestion.text}`;
-        }
-
-
-        function showToast(message, type = 'success') { const toast = $('#toast'); toast.textContent = message; toast.className = 'fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-xl transition-opacity duration-300 opacity-0 z-50'; toast.classList.add(type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-slate-800'); toast.classList.add('opacity-100'); setTimeout(() => toast.classList.remove('opacity-100'), 3000); }
-        
-        // --- SUMMARY REPORT ---
-        function generateDailySummary() {
-            const profile = getCurrentProfile(); const now = new Date();
-            const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-            const relevantLogs = (allLogs[currentProfileId] || []).filter(log => new Date(log.timestamp) > twentyFourHoursAgo);
-
-            let totalFeed = 0, totalSleep = 0, diaperCount = 0;
-            relevantLogs.forEach(log => {
-                if(log.type === 'feed' && log.rawAmount) totalFeed += parseFloat(log.rawAmount);
-                if((log.type === 'sleep' || log.type === 'nap' || log.type === 'tummy') && log.rawDuration) totalSleep += log.rawDuration;
-                if(log.type === 'diaper') diaperCount++;
-            });
-
-            const sleepHours = Math.floor(totalSleep / 60); const sleepMinutes = totalSleep % 60;
-            
-            const summaryHTML = `<p><strong>Total Feed:</strong> ${totalFeed.toFixed(1)} oz</p><p><strong>Total Sleep:</strong> ${sleepHours}h ${sleepMinutes}m</p><p><strong>Diapers Changed:</strong> ${diaperCount}</p>`;
-            const summaryText = `24h Report for ${profile.babyName}:\n- Total Feed: ${totalFeed.toFixed(1)} oz\n- Total Sleep: ${sleepHours}h ${sleepMinutes}m\n- Diapers Changed: ${diaperCount}`;
-            
-            $('#summary-content').innerHTML = summaryHTML;
-            summaryModal.dataset.summaryText = summaryText;
-            toggleSettingsPanel();
-            showModal('summary-modal');
-        }
-        function addSummaryToLog() { const summaryDetails = summaryModal.dataset.summaryText.replace(/\n/g, ' | ') || 'Generated daily summary.'; addEntry({ type: 'summary', icon: 'fas fa-chart-pie', color: 'pink-500', details: summaryDetails, timestamp: new Date() }); hideModal('summary-modal'); }
-        function shareSummary(type) { 
-            const text = summaryModal.dataset.summaryText;
-            const profile = getCurrentProfile();
-            const subject = `${profile.babyName}'s Daily Report - ${new Date().toLocaleDateString()}`;
-
-            if (type === 'email') {
-                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
-                window.location.href = mailtoLink;
-            } else if (type === 'clipboard') {
-                 if (navigator.share) { 
-                     navigator.share({ title: subject, text: text }).catch(err => console.error('Share failed:', err)); 
-                 } else { 
-                     copyTextToClipboard(text);
-                 }
-            }
-        }
-    
-        // --- TIMER LOGIC ---
-        function startTimer(type) {
-            if (activeTimer) { showToast('Another timer is already running.', 'error'); return; }
-            activeTimer = { type, startTime: Date.now() };
-            saveData();
-            updateActiveTimerDisplay();
-            showForm(null);
-        }
-
-        function stopTimer() {
-            if (!activeTimer) return;
-            const endTime = Date.now();
-            const duration = Math.round((endTime - activeTimer.startTime) / 60000);
-            const activity = [...defaultActivities, ...customActivities].find(a => a.id === activeTimer.type);
-
-            if (activity) {
-                const hours = Math.floor(duration / 60);
-                const minutes = duration % 60;
-                const details = duration < 60 ? `Duration: ${duration} min` : `Duration: ${hours}h ${minutes}m`;
-                addEntry({ 
-                    type: activity.id, 
-                    icon: activity.icon, 
-                    color: activity.color, 
-                    details: details, 
-                    rawDuration: duration, 
-                    timestamp: new Date(activeTimer.startTime), 
-                    notes: "Logged via timer." 
-                });
-            }
-            
-            activeTimer = null;
-            saveData();
-            updateActiveTimerDisplay();
-        }
-
-        function updateActiveTimerDisplay() {
-            const display = $('#active-timer-display');
-            const logButtonsContainer = $('#log-buttons-container');
-            if (activeTimer) {
-                logButtonsContainer.classList.add('hidden');
-                display.classList.remove('hidden');
-                const activity = [...defaultActivities, ...customActivities].find(a => a.id === activeTimer.type);
-                const typeText = activity ? activity.name : activeTimer.type.charAt(0).toUpperCase() + activeTimer.type.slice(1);
-                const iconClass = activity ? `${activity.icon} text-${activity.color}` : '';
-
-                display.innerHTML = `<h3 class="text-xl font-semibold mb-4 text-center animate-pulse">Active ${typeText} Timer</h3>
-                                     <div class="text-4xl font-bold text-center mb-4" id="timer-value">00:00</div>
-                                     <button onclick="stopTimer()" class="w-full bg-red-500 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center mx-auto"><i class="fas fa-stop mr-2"></i> Stop Timer</button>`;
-                
-                const timerValueEl = $('#timer-value');
-                const timerInterval = setInterval(() => {
-                    if (!activeTimer || !timerValueEl) { clearInterval(timerInterval); return; }
-                    const elapsed = Math.floor((Date.now() - activeTimer.startTime) / 1000);
-                    const hours = Math.floor(elapsed / 3600);
-                    const minutes = Math.floor((elapsed % 3600) / 60);
-                    const seconds = elapsed % 60;
-                    
-                    if (hours > 0) {
-                        timerValueEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    } else {
-                        timerValueEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    }
-                }, 1000);
-            } else {
-                 display.classList.add('hidden');
-                 logButtonsContainer.classList.remove('hidden');
-            }
-        }
-    
-        // --- NEW FEATURES ---
-
+        // --- NEW FEATURES & FIXES ---
         // Memories
         function renderMemories() {
             const container = $('#memories-container');
             const msg = $('#empty-memories-msg');
-            const currentMemories = allMemories[currentProfileId] || [];
             container.innerHTML = '';
-            if (currentMemories.length === 0) {
+            if (memories.length === 0) {
                 container.appendChild(msg);
                 msg.style.display = 'block';
             } else {
                 msg.style.display = 'none';
-                currentMemories.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(memory => {
+                [...memories].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(memory => {
                     const memoryEl = document.createElement('div');
-                    memoryEl.className = 'group relative';
+                    memoryEl.className = 'group relative animate-fadeIn';
                     memoryEl.innerHTML = `
-                        <img src="${memory.image}" class="w-full h-40 object-cover rounded-lg shadow-md" onerror="this.src='https://placehold.co/400x400/a1dd70/ffffff?text=Image'"/>
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-end p-2 text-white">
+                        <img src="${memory.image}" class="w-full h-40 object-cover rounded-lg shadow-md" onerror="this.src='https://placehold.co/400x400/a1dd70/ffffff?text=Image%20Error'"/>
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-end p-2 text-white">
                             <p class="text-xs">${new Date(memory.date).toLocaleDateString()}</p>
                             <p class="text-sm font-semibold">${memory.description}</p>
                         </div>
+                        <button onclick="deleteMemory('${memory.id}')" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-times"></i></button>
                     `;
                     container.appendChild(memoryEl);
                 })
             }
         }
-
-        function addMemory() {
-            const fileInput = $('#memory-photo-input');
-            const file = fileInput.files[0];
+        
+        async function deleteMemory(id) {
+            showConfirmation("Delete this memory forever?", async () => {
+                try {
+                    await deleteDoc(doc(db, `artifacts/baby-tracker/users/${userId}/memories`, id));
+                    showToast("Memory deleted.", "info");
+                } catch (e) {
+                    console.error("Error deleting memory", e);
+                    showToast("Could not delete memory.", "error");
+                }
+            });
+        }
+        
+        function addMemory(event) {
+            const file = event.target.files[0];
             if (!file) return;
 
+            if (file.size > 1024 * 1024) { // 1MB limit
+                showToast("Image is too large (max 1MB).", "error");
+                event.target.value = '';
+                return;
+            }
+            
             const description = prompt("Enter a short description for this memory:");
-            if(description === null) return; 
+            if(description === null) { event.target.value = ''; return; }
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const newMemory = {
-                    id: Date.now(),
                     date: new Date().toISOString(),
                     image: e.target.result,
                     description: description
                 };
-                if (!allMemories[currentProfileId]) allMemories[currentProfileId] = [];
-                allMemories[currentProfileId].push(newMemory);
-                saveData();
-                renderMemories();
-                showToast('Memory saved!', 'success');
+                try {
+                    await addDoc(collection(db, `artifacts/baby-tracker/users/${userId}/memories`), newMemory);
+                    showToast('Memory saved!', 'success');
+                } catch (error) {
+                    console.error("Error saving memory:", error);
+                    showToast("Failed to save memory. It might be too large.", "error");
+                }
             };
             reader.readAsDataURL(file);
-            fileInput.value = ''; 
+            event.target.value = '';
         }
         
         // Inventory
-        function showInventoryModal() {
-            if(!inventory[currentProfileId]) inventory[currentProfileId] = {diapers: 0, formula: 0};
-            $('#diaper-count').value = inventory[currentProfileId].diapers || 0;
-            $('#formula-count').value = inventory[currentProfileId].formula || 0;
+        async function showInventoryModal() {
+            const inventoryRef = doc(db, `artifacts/baby-tracker/users/${userId}/inventory`, "supplies");
+            const docSnap = await getDoc(inventoryRef);
+            if (docSnap.exists()) {
+                inventory = docSnap.data();
+            } else {
+                // If no inventory, create it
+                inventory = { diapers: 0, formula: 0 };
+                await setDoc(inventoryRef, inventory);
+            }
+            $('#current-diapers').textContent = inventory.diapers || 0;
+            $('#current-formula').textContent = inventory.formula || 0;
+            $('#diaper-count').value = inventory.diapers || 0;
+            $('#formula-count').value = inventory.formula || 0;
             showModal('inventory-modal');
         }
 
-        function saveInventory() {
+        async function saveInventory() {
             const diaperCount = parseInt($('#diaper-count').value) || 0;
             const formulaCount = parseInt($('#formula-count').value) || 0;
-            inventory[currentProfileId] = { diapers: diaperCount, formula: formulaCount };
-            saveData();
-            showToast('Inventory updated!', 'success');
-            hideModal('inventory-modal');
-        }
-
-        function updateInventory(item, amount) {
-            if (!inventory[currentProfileId]) inventory[currentProfileId] = { diapers: 0, formula: 0 };
-            inventory[currentProfileId][item] = (inventory[currentProfileId][item] || 0) + amount;
-            if (inventory[currentProfileId][item] < 0) inventory[currentProfileId][item] = 0;
-            saveData();
-            if(inventory[currentProfileId][item] < 10 && item === 'diapers') {
-                showToast(`Low on diapers! Only ${inventory[currentProfileId][item]} left.`, 'error');
-            }
-             if(inventory[currentProfileId][item] < 1 && item === 'formula') {
-                showToast(`Low on formula! Only ${inventory[currentProfileId][item]} left.`, 'error');
+            const newInventory = { diapers: diaperCount, formula: formulaCount };
+            
+            try {
+                const inventoryRef = doc(db, `artifacts/baby-tracker/users/${userId}/inventory`, "supplies");
+                await setDoc(inventoryRef, newInventory);
+                inventory = newInventory;
+                showToast('Inventory updated!', 'success');
+                hideModal('inventory-modal');
+            } catch (error) {
+                console.error("Error saving inventory:", error);
+                showToast("Failed to update inventory.", "error");
             }
         }
-        
-        // Sleep Analysis
-        function analyzeSleepPatterns() {
-            const section = $('#sleep-analysis-section');
-            const content = $('#sleep-analysis-content');
-            const logs = (allLogs[currentProfileId] || []).filter(log => log.type === 'sleep' || log.type === 'nap').sort((a,b) => a.timestamp - b.timestamp);
-            if(logs.length < 5) {
-                section.classList.add('hidden');
-                return;
-            }
 
-            const wakeWindows = [];
-            for (let i = 1; i < logs.length; i++) {
-                const sleepEnd = new Date(logs[i-1].timestamp.getTime() + (logs[i-1].rawDuration * 60000));
-                const nextSleepStart = logs[i].timestamp;
-                const windowMs = nextSleepStart - sleepEnd;
-                if (windowMs > 0) {
-                    wakeWindows.push(windowMs);
+        async function updateInventory(item, change) {
+            const inventoryRef = doc(db, `artifacts/baby-tracker/users/${userId}/inventory`, "supplies");
+            const currentAmount = inventory[item] || 0;
+            const newAmount = Math.max(0, currentAmount + change);
+            try {
+                await updateDoc(inventoryRef, { [item]: newAmount });
+                inventory[item] = newAmount;
+                if (change < 0 && newAmount < 10 && item === 'diapers') {
+                    showToast(`Low on diapers! Only ${newAmount} left.`, 'error');
                 }
-            }
-
-            if(wakeWindows.length < 2) {
-                section.classList.add('hidden');
-                return;
-            }
-            
-            const avgWakeWindowMs = wakeWindows.reduce((a,b) => a + b, 0) / wakeWindows.length;
-            const avgWakeWindowHours = (avgWakeWindowMs / (1000 * 60 * 60)).toFixed(1);
-
-            const lastSleep = logs[logs.length-1];
-            const lastSleepEnd = new Date(lastSleep.timestamp.getTime() + (lastSleep.rawDuration * 60000));
-            const nextNapTime = new Date(lastSleepEnd.getTime() + avgWakeWindowMs);
-
-            content.innerHTML = `<p>Avg. wake window: <strong>${avgWakeWindowHours} hours</strong>.</p>
-                               <p class="mt-1">Next nap may be around <strong>${nextNapTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</strong>.</p>`;
-            section.classList.remove('hidden');
-        }
-        
-        // Edit Logs
-        function showEditLogModal(logId) {
-            const logEntry = allLogs[currentProfileId].find(l => l.id === logId);
-            if (!logEntry) return;
-
-            const container = $('#edit-log-form-container');
-            let formHTML = `
-                <input type="hidden" id="edit-log-id" value="${logId}">
-                <div><label class="block text-sm font-medium text-secondary">Time</label><input type="datetime-local" id="edit-time" class="time mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" value="${new Date(logEntry.timestamp.getTime() - (logEntry.timestamp.getTimezoneOffset() * 60000)).toISOString().slice(0, 16)}"></div>
-            `;
-            
-            if (logEntry.type === 'feed') {
-                 formHTML += `<div><label class="block text-sm font-medium text-secondary">Amount (oz)</label><input type="number" id="edit-amount" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" value="${logEntry.rawAmount}"></div>`;
-            } else if (logEntry.type === 'nap' || logEntry.type === 'sleep' || logEntry.type === 'tummy') {
-                formHTML += `<div><label class="block text-sm font-medium text-secondary">Duration (minutes)</label><input type="number" id="edit-duration" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" value="${logEntry.rawDuration}"></div>`;
-            }
-            
-            formHTML += `<div><label class="block text-sm font-medium text-secondary">Notes</label><textarea id="edit-notes" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3" rows="3">${logEntry.notes || ''}</textarea></div>
-                         <div class="grid grid-cols-2 gap-3 mt-4">
-                             <button class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600" onclick="saveLogEdit()">Save Changes</button>
-                             <button type="button" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500" onclick="hideModal('edit-log-modal')">Cancel</button>
-                         </div>`;
-            
-            container.innerHTML = formHTML;
-            showModal('edit-log-modal');
-        }
-        
-        function saveLogEdit() {
-            const logId = parseInt($('#edit-log-id').value);
-            const logIndex = allLogs[currentProfileId].findIndex(l => l.id === logId);
-            if (logIndex === -1) return;
-            
-            const logEntry = allLogs[currentProfileId][logIndex];
-            
-            logEntry.timestamp = new Date($('#edit-time').value);
-            logEntry.notes = $('#edit-notes').value;
-            
-            if (logEntry.type === 'feed') {
-                logEntry.rawAmount = parseFloat($('#edit-amount').value);
-                logEntry.details = `${logEntry.details.split(' - ')[0]} - ${logEntry.rawAmount} oz`;
-            } else if (logEntry.type === 'nap' || logEntry.type === 'sleep' || logEntry.type === 'tummy') {
-                logEntry.rawDuration = parseInt($('#edit-duration').value);
-                const hours = Math.floor(logEntry.rawDuration / 60);
-                const minutes = logEntry.rawDuration % 60;
-                logEntry.details = logEntry.type === 'sleep' ? `Duration: ${hours}h ${minutes}m` : `Duration: ${logEntry.rawDuration} min`;
-            }
-            
-            saveData();
-            renderLog();
-            hideModal('edit-log-modal');
-            showToast('Entry updated!', 'success');
-        }
-
-        // Custom Activities
-        function populateCustomIconPicker() {
-            const container = $('#custom-icon-picker');
-            container.innerHTML = customIcons.map(icon => `<button onclick="selectCustomIcon(this)" class="p-2 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700"><i class="fas ${icon}"></i></button>`).join('');
-        }
-
-        function selectCustomIcon(button) {
-            document.querySelectorAll('#custom-icon-picker button').forEach(btn => btn.classList.remove('bg-indigo-500', 'text-white'));
-            button.classList.add('bg-indigo-500', 'text-white');
-        }
-
-        function showCustomActivityModal() {
-            hideModal('activity-library-modal');
-            showModal('custom-activity-modal');
-        }
-        
-        function addCustomActivity() {
-            const name = $('#custom-activity-name').value.trim();
-            const selectedIconEl = $('#custom-icon-picker .bg-indigo-500 i');
-            if(!name || !selectedIconEl) {
-                showToast('Please enter a name and select an icon.', 'error');
-                return;
-            }
-            
-            const iconClass = selectedIconEl.className;
-            const newActivity = {
-                id: `custom_${Date.now()}`,
-                name: name,
-                icon: iconClass,
-                color: 'sky-500',
-                isCustom: true
-            };
-            customActivities.push(newActivity);
-            saveData();
-            renderActivityLibrary();
-            renderActivityButtons();
-            hideModal('custom-activity-modal');
-            showToast('Custom activity created!', 'success');
-        }
-
-        // QR Code and File Export/Import
-        function exportDataToFile() {
-            const packedData = packDataForTransport();
-            if(!packedData) return;
-
-            const logs = allLogs[currentProfileId] || [];
-            if(logs.length === 0) {
-                showToast("No log data to export.", "info");
-                return;
-            }
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "ID,Baby Name,Date,Type,Details,Amount,Duration,Timestamp,Notes\n";
-
-            const profile = getCurrentProfile();
-            logs.forEach(log => {
-                const row = [
-                    log.id,
-                    profile.babyName,
-                    new Date(log.timestamp).toLocaleDateString(),
-                    log.type,
-                    `"${log.details || ''}"`,
-                    log.rawAmount || '',
-                    log.rawDuration || '',
-                    log.timestamp.toISOString(),
-                    `"${log.notes || ''}"`
-                ].join(",");
-                csvContent += row + "\r\n";
-            });
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `littlesprout_backup_${profile.babyName}_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("Backup file downloaded.", "success");
-        }
-
-        // Fullscreen
-        function toggleFullScreen() {
-            const btn = $('#fullscreen-button i');
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-                btn.className = "fas fa-compress";
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                    btn.className = "fas fa-expand";
+                 if (change < 0 && newAmount < 2 && item === 'formula') {
+                    showToast(`Low on formula! Only ${newAmount} left.`, 'error');
                 }
+            } catch (error) {
+                console.error("Error updating inventory:", error);
             }
         }
+        
+        // Expose functions to global scope for onclick handlers
+        window.saveBabyInfo = saveBabyInfo; window.acknowledgeDisclaimer = acknowledgeDisclaimer; window.toggleSettingsPanel = toggleSettingsPanel; window.toggleDarkMode = toggleDarkMode; window.showForm = showForm; window.addFeed = addFeed; window.addSleep = addSleep; window.addDiaper = addDiaper; window.addMeasurement = addMeasurement; window.deleteEntry = deleteEntry; window.clearLogWithConfirmation = clearLogWithConfirmation; window.showModal = showModal; window.hideModal = hideModal; window.exportDataToFile = exportDataToFile; window.importData = importData; window.triggerImport = triggerImport; window.generatePDF = generatePDF; window.showCharts = showCharts; window.hideCharts = hideCharts; window.renderMemories = renderMemories; window.addMemory = addMemory; window.deleteMemory = deleteMemory; window.showInventoryModal = showInventoryModal; window.saveInventory = saveInventory;
     </script>
 </body>
 </html>
