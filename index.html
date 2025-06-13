@@ -26,6 +26,10 @@
             --border-color-val: 226 232 240;
             --input-bg-val: 241 245 249;
             --stripe-color: rgba(156, 163, 175, 0.07);
+            /* Glassmorphism variables - LIGHT MODE (less transparent, more frosted) */
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.55);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
         }
 
         html.dark {
@@ -37,6 +41,10 @@
             --border-color-val: 51 65 85;
             --input-bg-val: 51 65 85;
             --stripe-color: rgba(148, 163, 184, 0.05);
+            /* Glassmorphism variables for dark mode */
+            --glass-bg: rgba(30, 41, 59, 0.35);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-shadow: 0 8px 32px 0 rgba(0,0,0,0.28);
         }
 
         @keyframes pulse { 50% { opacity: 0.6; } }
@@ -62,6 +70,25 @@
         /* New Splash Screen Animations */
         #splash-title, #splash-subtitle { opacity: 0; transition: opacity 0.8s ease-in-out; }
         .dot-pulse { animation: pulse 1.5s infinite ease-in-out; }
+
+        /* Glassmorphism class */
+        .glass {
+            background: var(--glass-bg);
+            border: 1.5px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(22px) saturate(160%);
+            -webkit-backdrop-filter: blur(22px) saturate(160%);
+            border-radius: 1.25rem;
+        }
+        /* For smaller cards */
+        .glass-sm {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+            backdrop-filter: blur(16px) saturate(140%);
+            -webkit-backdrop-filter: blur(16px) saturate(140%);
+            border-radius: 0.75rem;
+        }
     </style>
 </head>
 <body class="transition-colors duration-300">
@@ -79,7 +106,7 @@
 
     <!-- Modals -->
      <div id="welcome-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md text-center animate-fadeIn">
+        <div class="panel-bg glass text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md text-center animate-fadeIn">
             <h2 class="text-3xl font-bold mb-2">Welcome to LittleSprout!</h2>
             <p class="text-secondary mb-8">Let's get you started.</p>
             <div class="space-y-4">
@@ -90,7 +117,7 @@
     </div>
     
      <div id="first-run-import-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-lg text-center animate-fadeIn">
+        <div class="panel-bg glass text-primary p-8 rounded-2xl shadow-2xl w-full max-w-lg text-center animate-fadeIn">
             <h2 class="text-2xl font-bold mb-2">Import Your Data</h2>
             <p class="text-secondary mb-6">On your old device, go to Settings > Backup/Restore to get your backup code.</p>
             <div class="space-y-4">
@@ -105,7 +132,7 @@
     </div>
 
     <div id="setup-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
+        <div class="panel-bg glass text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
             <h2 id="setup-title" class="text-2xl font-bold mb-2">Welcome!</h2>
             <p id="setup-subtitle" class="text-secondary mb-6">Let's get you and your little one set up.</p>
             <div class="space-y-4">
@@ -118,7 +145,7 @@
     </div>
 
     <div id="disclaimer-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md text-center animate-fadeIn">
+        <div class="panel-bg glass text-primary p-8 rounded-2xl shadow-2xl w-full max-w-md text-center animate-fadeIn">
             <i class="fas fa-shield-halved text-4xl text-blue-500 mb-4"></i>
             <h2 class="text-2xl font-bold mb-2">Your Data, Your Device</h2>
             <p class="text-secondary mb-6">Just so you know, LittleSprout saves all your precious data directly on this device. We don't store it online, which means it's 100% private to you! Please remember to use the 'Backup/Restore' feature regularly to prevent any accidental data loss.</p>
@@ -127,7 +154,7 @@
     </div>
     
     <div id="backup-options-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg text-center animate-fadeIn">
+        <div class="panel-bg glass text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-lg text-center animate-fadeIn">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Backup & Restore</h2>
                 <button onclick="hideModal('backup-options-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
@@ -171,7 +198,7 @@
     </div>
 
     <div id="qr-code-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-       <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+       <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center">
            <h2 class="text-xl font-bold mb-4">Scan to Transfer</h2>
            <div id="qrcode-container" class="p-4 bg-white rounded-lg flex justify-center items-center">
                 <div id="qrcode" class="w-[256px] h-[256px]"></div>
@@ -182,7 +209,7 @@
     </div>
 
     <div id="qr-scanner-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md text-center">
+        <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md text-center">
             <h2 class="text-xl font-bold mb-4">Scan QR Code</h2>
             <div id="qr-reader" class="w-full aspect-square"></div>
             <p class="text-secondary my-4 text-sm">Point your camera at a LittleSprout QR code to import data.</p>
@@ -191,39 +218,39 @@
     </div>
     
     <div id="activity-log-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-       <div class="p-4 md:p-6 flex-shrink-0">
+       <div class="glass p-4 md:p-6 flex-shrink-0">
            <div class="flex justify-between items-center mb-4">
                <h2 class="text-2xl font-bold">Activity Log</h2>
                <button onclick="hideModal('activity-log-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
            </div>
        </div>
-       <div id="log-container" class="flex-grow space-y-3 px-4 md:px-6 pr-2 overflow-y-auto mt-2 modal-content-scroll">
+       <div id="log-container" class="glass-sm flex-grow space-y-3 px-4 md:px-6 pr-2 overflow-y-auto mt-2 modal-content-scroll">
            <p id="empty-log-msg" class="text-secondary text-center mt-8">No activities logged yet.</p>
        </div>
-       <div class="p-4 md:p-6 pt-4 mt-2 border-t border-color flex-shrink-0">
+       <div class="glass p-4 md:p-6 pt-4 mt-2 border-t border-color flex-shrink-0">
            <button onclick="clearLogWithConfirmation()" class="w-full bg-red-500 text-white font-bold py-2 px-3 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-trash"></i> Clear Log</button>
        </div>
     </div>
 
     <div id="memories-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-        <div class="p-4 md:p-6 flex-shrink-0">
+        <div class="glass p-4 md:p-6 flex-shrink-0">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Memories</h2>
                 <button onclick="hideModal('memories-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
             </div>
              <p class="text-secondary text-sm">A visual timeline of your baby's best moments. Click the camera to add a new memory.</p>
         </div>
-        <div id="memories-container" class="flex-grow p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto modal-content-scroll">
+        <div id="memories-container" class="glass-sm flex-grow p-4 md:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto modal-content-scroll">
             <p id="empty-memories-msg" class="col-span-full text-secondary text-center mt-8">No memories saved yet. Add one!</p>
         </div>
-        <div class="p-4 md:p-6 border-t border-color flex-shrink-0">
+        <div class="glass p-4 md:p-6 border-t border-color flex-shrink-0">
             <input type="file" id="memory-photo-input" class="hidden" accept="image/*" onchange="addMemory(event)">
             <button onclick="document.getElementById('memory-photo-input').click()" class="w-full bg-pink-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-camera-retro"></i> Add New Memory</button>
         </div>
     </div>
     
     <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
+        <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">Supplies Inventory</h2>
                 <button onclick="hideModal('inventory-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
@@ -249,7 +276,7 @@
 
     <!-- Restored Modals -->
     <div id="summary-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+        <div class="panel-bg glass text-primary p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
              <h2 class="text-2xl font-bold mb-4">Last 24-Hour Report</h2>
              <div id="summary-content" class="text-left space-y-2 mb-6"></div>
              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -260,7 +287,7 @@
         </div>
     </div>
     <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm">
+        <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">Manage Profiles</h2>
                 <button onclick="hideModal('profile-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
@@ -273,22 +300,22 @@
         </div>
     </div>
     <div id="activity-library-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-        <div class="p-4 md:p-6 flex-shrink-0">
+        <div class="glass p-4 md:p-6 flex-shrink-0">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Activity Library</h2>
                 <button onclick="hideModal('activity-library-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button>
             </div>
             <p class="text-secondary text-sm">Log any activity for your baby from here.</p>
         </div>
-        <div id="activity-library-container" class="flex-grow p-4 md:p-6 grid grid-cols-3 sm:grid-cols-4 gap-4 overflow-y-auto modal-content-scroll">
+        <div id="activity-library-container" class="glass-sm flex-grow p-4 md:p-6 grid grid-cols-3 sm:grid-cols-4 gap-4 overflow-y-auto modal-content-scroll">
             <!-- Activities rendered here -->
         </div>
-         <div class="p-4 md:p-6 border-t border-color flex-shrink-0">
+         <div class="glass p-4 md:p-6 border-t border-color flex-shrink-0">
              <button onclick="showCustomActivityModal()" class="w-full bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2 text-sm"><i class="fas fa-plus"></i> Add Custom Activity</button>
          </div>
     </div>
     <div id="custom-activity-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
             <h2 class="text-xl font-bold mb-4">Create Custom Activity</h2>
             <div class="space-y-4">
                 <input type="text" id="custom-activity-name" class="input-bg border-transparent rounded-md py-2 px-3 w-full" placeholder="Activity Name (e.g., Park Visit)">
@@ -304,7 +331,7 @@
         </div>
     </div>
      <div id="reminders-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">Reminders</h2>
                 <button onclick="hideModal('reminders-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
@@ -324,7 +351,7 @@
         </div>
     </div>
     <div id="edit-log-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
             <h2 class="text-xl font-bold mb-4">Edit Log Entry</h2>
             <div id="edit-log-form-container" class="space-y-4">
                 <!-- Dynamic edit form will be injected here -->
@@ -334,12 +361,12 @@
 
 
     <!-- Other modals (confirm, pdf, charts, etc.) are assumed to be here and are collapsed for brevity -->
-    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[60] opacity-0 pointer-events-none transition-opacity duration-300"><div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center animate-fadeIn"><h2 class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-secondary mb-6"></p><div class="flex gap-4"><button id="confirm-modal-yes" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600">Yes</button><button id="confirm-modal-no" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button></div></div></div>
-    <div id="pdf-export-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"><div class="panel-bg text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Export to PDF</h2><button onclick="hideModal('pdf-export-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button></div><p class="text-secondary mb-4">Select a date range to generate a PDF report.</p><div class="space-y-3"><div><label for="pdf-start-date" class="block text-sm font-medium text-secondary">Start Date</label><input type="date" id="pdf-start-date" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div><div><label for="pdf-end-date" class="block text-sm font-medium text-secondary">End Date</label><input type="date" id="pdf-end-date" class="mt-1 block w-full input-bg border-transparent rounded-md py-2 px-3"></div></div><div class="mt-6 flex gap-4"><button onclick="generatePDF()" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600">Generate PDF</button><button onclick="hideModal('pdf-export-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button></div></div></div>
-    <div id="charts-modal" class="fixed inset-0 panel-bg text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col p-4 md:p-6"><div class="flex-shrink-0"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Growth Charts</h2><button onclick="hideCharts()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button></div></div><div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto modal-content-scroll"><div><h3 class="text-lg font-semibold text-center mb-2">Weight Over Time (lbs)</h3><div class="p-4 input-bg rounded-lg"><canvas id="weight-chart"></canvas></div></div><div><h3 class="text-lg font-semibold text-center mb-2">Height Over Time (in)</h3><div class="p-4 input-bg rounded-lg"><canvas id="height-chart"></canvas></div></div></div></div>
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[60] opacity-0 pointer-events-none transition-opacity duration-300"><div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center animate-fadeIn"><h2 class="text-xl font-bold mb-4">Are you sure?</h2><p id="confirm-modal-text" class="text-secondary mb-6"></p><div class="flex gap-4"><button id="confirm-modal-yes" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600">Yes</button><button id="confirm-modal-no" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button></div></div></div>
+    <div id="pdf-export-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300"><div class="panel-bg glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Export to PDF</h2><button onclick="hideModal('pdf-export-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button></div><p class="text-secondary mb-4">Select a date range to generate a PDF report.</p><div class="space-y-3"><div><label for="pdf-start-date" class="block text-sm font-medium text-secondary">Start Date</label><input type="date" id="pdf-start-date" class="mt-1 block w-full input-bg glass-sm border-transparent rounded-md py-2 px-3"></div><div><label for="pdf-end-date" class="block text-sm font-medium text-secondary">End Date</label><input type="date" id="pdf-end-date" class="mt-1 block w-full input-bg glass-sm border-transparent rounded-md py-2 px-3"></div></div><div class="mt-6 flex gap-4"><button onclick="generatePDF()" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600">Generate PDF</button><button onclick="hideModal('pdf-export-modal')" class="w-full bg-slate-200 dark:bg-slate-600 text-primary font-bold py-2 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500">Cancel</button></div></div></div>
+    <div id="charts-modal" class="fixed inset-0 panel-bg glass text-primary z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col p-4 md:p-6"><div class="flex-shrink-0"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Growth Charts</h2><button onclick="hideCharts()" class="text-secondary hover:text-primary"><i class="fas fa-times text-2xl"></i></button></div></div><div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto modal-content-scroll"><div><h3 class="text-lg font-semibold text-center mb-2">Weight Over Time (lbs)</h3><div class="p-4 input-bg glass-sm rounded-lg"><canvas id="weight-chart"></canvas></div></div><div><h3 class="text-lg font-semibold text-center mb-2">Height Over Time (in)</h3><div class="p-4 input-bg glass-sm rounded-lg"><canvas id="height-chart"></canvas></div></div></div></div>
 
     <div id="settings-panel" class="fixed inset-0 panel-bg text-primary z-40 opacity-0 pointer-events-none transition-opacity duration-300 flex flex-col">
-       <div class="p-4 md:p-6 flex-shrink-0">
+       <div class="glass p-4 md:p-6 flex-shrink-0">
            <div class="flex justify-between items-start mb-4">
                <div>
                    <h2 class="text-2xl font-bold">Settings</h2>
@@ -359,7 +386,7 @@
            </div>
        </div>
 
-       <div class="flex-grow p-4 md:p-6 overflow-y-auto modal-content-scroll">
+       <div class="glass flex-grow p-4 md:p-6 overflow-y-auto modal-content-scroll">
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <button onclick="showModal('profile-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-users text-purple-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Profiles</span></button>
                 <button onclick="showModal('activity-log-modal'); toggleSettingsPanel();" class="flex flex-col items-center justify-center p-3 input-bg rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700/50 transition-colors"><i class="fas fa-list-alt text-green-500 text-2xl mb-2"></i><span class="font-semibold text-xs">Activity Log</span></button>
@@ -374,14 +401,14 @@
            </div>
        </div>
        
-        <div class="p-4 md:p-6 mt-auto border-t border-color flex-shrink-0">
+        <div class="glass p-4 md:p-6 mt-auto border-t border-color flex-shrink-0">
             <div id="version-info" class="text-xs text-secondary/50 text-center w-full"></div>
        </div>
     </div>
 
 
-    <div id="app-container" class="container mx-auto p-4 md:p-6 max-w-lg opacity-0 transition-opacity duration-500">
-        <header class="flex justify-between items-center mb-4 p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 dark:from-slate-800 dark:to-indigo-900 shadow-lg text-white">
+    <div id="app-container" class="glass container mx-auto p-4 md:p-6 max-w-lg opacity-0 transition-opacity duration-500">
+        <header class="glass flex justify-between items-center mb-4 p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 dark:from-slate-800 dark:to-indigo-900 shadow-lg text-white">
             <div class="w-8"></div>
             <div class="text-center">
                 <h1 id="header-title" class="text-2xl sm:text-3xl font-bold"></h1>
@@ -391,31 +418,31 @@
                 <i class="fas fa-bars text-2xl"></i>
             </button>
         </header>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-6">
+        <div class="glass-sm grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-6">
             <div id="main-clock-container" class="text-center md:text-left"><div class="flex items-end justify-center md:justify-start"><span id="main-time-display" class="text-5xl sm:text-6xl font-bold text-primary leading-none"></span><span id="main-ampm-display" class="text-xl sm:text-2xl font-semibold text-secondary pb-1 ml-2"></span></div><span id="main-date-display" class="text-base sm:text-lg text-secondary"></span></div>
             <div id="main-weather-display" class="text-secondary text-sm text-center md:text-right">Loading weather...</div>
         </div>
-        <div id="last-activity-display" class="text-center text-sm text-secondary mb-6 h-5"></div>
+        <div id="last-activity-display" class="glass-sm text-center text-sm text-secondary mb-6 h-5"></div>
         <main>
-             <div id="active-timer-display" class="hidden text-center text-lg text-primary mb-6 p-4 sm:p-6 rounded-2xl shadow-lg bg-secondary border-t-4 border-red-500 dark:border-red-500"></div>
-            <div id="log-buttons-container" class="bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500">
+             <div id="active-timer-display" class="glass hidden text-center text-lg text-primary mb-6 p-4 sm:p-6 rounded-2xl shadow-lg bg-secondary border-t-4 border-red-500 dark:border-red-500"></div>
+            <div id="log-buttons-container" class="glass bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500">
                  <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-4">What are you logging?</h2>
                  <div id="main-activity-buttons" class="icon-scroll-container flex items-center overflow-x-auto pb-4">
                      <!-- Age-relevant activities will be rendered here -->
                  </div>
             </div>
-            <div id="form-display-area" class="hidden mt-4 bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500 animate-fadeIn"></div>
+            <div id="form-display-area" class="glass hidden mt-4 bg-secondary p-4 sm:p-6 rounded-2xl shadow-lg border-t-4 border-blue-300 dark:border-indigo-500 animate-fadeIn"></div>
             
-            <div id="recent-memories-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-pink-300 dark:border-pink-500 hidden animate-fadeIn">
+            <div id="recent-memories-section" class="glass-sm text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-pink-300 dark:border-pink-500 hidden animate-fadeIn">
                  <h3 class="font-bold text-primary mb-2">Recent Memories</h3>
                  <div id="recent-memories-container" class="grid grid-cols-3 gap-2 text-xs"></div>
                  <button onclick="showModal('memories-modal'); renderMemories();" class="text-sm text-indigo-500 hover:underline mt-4">View all memories</button>
             </div>
-            <div id="sleep-analysis-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-indigo-300 dark:border-indigo-500 hidden animate-fadeIn">
+            <div id="sleep-analysis-section" class="glass-sm text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-indigo-300 dark:border-indigo-500 hidden animate-fadeIn">
                 <h3 class="font-bold text-primary mb-2">Sleep Outlook</h3>
                 <div id="sleep-analysis-content" class="text-primary text-sm space-y-1"></div>
             </div>
-            <div id="recent-milestones-section" class="text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-yellow-300 dark:border-yellow-500 hidden animate-fadeIn">
+            <div id="recent-milestones-section" class="glass-sm text-center mt-6 p-4 bg-secondary rounded-2xl shadow-lg border-t-4 border-yellow-300 dark:border-yellow-500 hidden animate-fadeIn">
                  <h3 class="font-bold text-primary mb-2">Recent Milestones</h3>
                  <div id="recent-milestones-container" class="space-y-2 text-sm"></div>
             </div>
