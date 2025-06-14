@@ -87,7 +87,9 @@
         <i class="fas fa-moon text-2xl"></i>
       </button>
     </header>
-    <div class="glass-sm grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-6 p-4 overflow-hidden">
+    
+    <!-- Clock Section -->
+    <div class="glass-sm grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-4 p-4 overflow-hidden">
       <div id="main-clock-container" class="text-center md:text-left overflow-hidden">
         <div class="flex items-end justify-center md:justify-start flex-wrap overflow-hidden">
           <span id="main-time-display" class="text-5xl font-bold text-primary leading-none break-words overflow-hidden"></span>
@@ -104,6 +106,11 @@
           </div>
         </div>
       </div>
+    </div>
+    
+    <!-- Baby Stats Bar -->
+    <div id="header-stats-bar" class="glass-sm flex flex-wrap justify-center items-center gap-6 mb-6 p-3 text-center text-primary bg-gradient-to-r from-blue-100/40 to-purple-100/40 dark:from-slate-700/40 dark:to-indigo-800/40">
+      <!-- Stats will be rendered here -->
     </div>
     <div id="milestone-ticker" class="glass-sm mb-6 p-4 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 border-l-4 border-yellow-500">
       <div class="flex items-center justify-between">
@@ -289,6 +296,57 @@
         <select id="profile-switcher" onchange="switchProfile()" class="input-enhanced w-full"></select>
         <button onclick="showSetupForNewProfile()" class="w-full bg-indigo-500 text-white font-bold p-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-plus"></i> Add New Profile</button>
         <button onclick="deleteCurrentProfile()" class="w-full bg-red-500 text-white font-bold p-2 rounded-lg hover:bg-red-600 transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-trash-alt"></i> Delete Current Profile</button>
+        <div class="border-t pt-3">
+          <button onclick="showResetAppModal()" class="w-full bg-red-600 text-white font-bold p-2 rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center justify-center gap-2"><i class="fas fa-exclamation-triangle"></i> Reset App (Delete All Data)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Reset App Modal -->
+  <div id="reset-app-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-red-600">⚠️ Reset App</h2>
+        <button onclick="hideModal('reset-app-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <h3 class="font-semibold text-red-700 dark:text-red-300 mb-2">⚠️ Warning: This action cannot be undone!</h3>
+          <p class="text-sm text-red-600 dark:text-red-400">
+            This will permanently delete ALL data including:
+          </p>
+          <ul class="text-sm text-red-600 dark:text-red-400 mt-2 space-y-1">
+            <li>• All baby profiles</li>
+            <li>• Activity logs</li>
+            <li>• Growth data</li>
+            <li>• Milestones</li>
+            <li>• Feeding schedules</li>
+            <li>• Reminders</li>
+            <li>• Appointments</li>
+            <li>• Inventory data</li>
+            <li>• Mood analytics</li>
+          </ul>
+        </div>
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <h4 class="font-semibold text-yellow-700 dark:text-yellow-300 mb-2">💡 Recommendation</h4>
+          <p class="text-sm text-yellow-600 dark:text-yellow-400">
+            Consider backing up your data first using the Backup & Restore feature before resetting.
+          </p>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-secondary mb-1">Type "RESET" to confirm</label>
+            <input type="text" id="reset-confirmation" class="input-enhanced w-full" placeholder="Type RESET to confirm deletion" maxlength="5">
+          </div>
+          <div class="flex space-x-3">
+            <button onclick="hideModal('reset-app-modal')" class="flex-1 bg-gray-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+              Cancel
+            </button>
+            <button onclick="confirmResetApp()" class="flex-1 bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="reset-confirm-btn" disabled>
+              Reset App
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -397,18 +455,19 @@
   </div>
   <!-- Growth Chart Modal -->
   <div id="growth-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div class="glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Growth Chart</h2>
         <button onclick="hideModal('growth-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Add Measurement Form -->
         <div>
           <h3 class="font-semibold mb-3">Add Measurement</h3>
           <form id="growth-form" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-secondary mb-1">Measurement Type</label>
-              <select id="measurement-type" class="input-enhanced w-full" required>
+              <select id="measurement-type" class="input-enhanced w-full" required onchange="updateMeasurementFields()">
                 <option value="">Select type...</option>
                 <option value="weight">Weight</option>
                 <option value="height">Height</option>
@@ -416,17 +475,24 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-secondary mb-1">Value</label>
-              <input type="number" id="measurement-value" class="input-enhanced w-full" step="0.1" required>
+              <label class="block text-sm font-medium text-secondary mb-1">Unit</label>
+              <select id="measurement-unit" class="input-enhanced w-full" required onchange="updateMeasurementFields()">
+                <option value="">Select unit first...</option>
+                <option value="lbs" data-type="weight">Pounds (lbs)</option>
+                <option value="kg" data-type="weight">Kilograms (kg)</option>
+                <option value="in" data-type="height,head-circumference">Inches (in)</option>
+                <option value="cm" data-type="height,head-circumference">Centimeters (cm)</option>
+                <option value="ft-in" data-type="height">Feet & Inches (ft-in)</option>
+                <option value="m-cm" data-type="height">Meters & Centimeters (m-cm)</option>
+              </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-secondary mb-1">Unit</label>
-              <select id="measurement-unit" class="input-enhanced w-full" required>
-                <option value="lbs">Pounds (lbs)</option>
-                <option value="kg">Kilograms (kg)</option>
-                <option value="in">Inches (in)</option>
-                <option value="cm">Centimeters (cm)</option>
-              </select>
+              <label class="block text-sm font-medium text-secondary mb-1">
+                <span id="value-label">Value</span>
+                <span id="format-hint" class="text-xs text-gray-500 ml-2"></span>
+              </label>
+              <input type="text" id="measurement-value" class="input-enhanced w-full" required>
+              <div id="input-help" class="text-xs text-secondary mt-1"></div>
             </div>
             <div>
               <label class="block text-sm font-medium text-secondary mb-1">Date</label>
@@ -437,10 +503,38 @@
             </button>
           </form>
         </div>
-        <div>
-          <h3 class="font-semibold mb-3">Growth History</h3>
-          <div id="growth-history" class="space-y-2 max-h-64 overflow-y-auto">
-            <p class="text-secondary text-center py-4">No measurements recorded yet.</p>
+        
+        <!-- Visual Chart -->
+        <div class="lg:col-span-2">
+          <h3 class="font-semibold mb-3">Growth Chart</h3>
+          <div class="space-y-4">
+            <!-- Chart Type Selector -->
+            <div class="flex space-x-2 mb-4">
+              <button onclick="showGrowthChart('weight')" class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                Weight Chart
+              </button>
+              <button onclick="showGrowthChart('height')" class="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm">
+                Height Chart
+              </button>
+              <button onclick="showGrowthChart('head')" class="px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm">
+                Head Circumference
+              </button>
+            </div>
+            
+            <!-- Chart Container -->
+            <div id="growth-chart-container" class="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4 min-h-64">
+              <div id="growth-chart" class="text-center py-8">
+                <p class="text-secondary">Select a chart type to view growth data</p>
+              </div>
+            </div>
+            
+            <!-- Growth History -->
+            <div>
+              <h4 class="font-semibold mb-3">Recent Measurements</h4>
+              <div id="growth-history" class="space-y-2 max-h-48 overflow-y-auto">
+                <p class="text-secondary text-center py-4">No measurements recorded yet.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1052,8 +1146,6 @@
       { id: 'mood', name: 'Mood', icon: 'fas fa-heart', color: 'pink-500' },
       { id: 'feeding-schedule', name: 'Schedule', icon: 'fas fa-clock', color: 'indigo-500' },
       { id: 'milestone', name: 'Milestone', icon: 'fas fa-trophy', color: 'yellow-500' },
-      { id: 'weight', name: 'Weight', icon: 'fas fa-weight-scale', color: 'red-500' },
-      { id: 'height', name: 'Height', icon: 'fas fa-ruler-vertical', color: 'green-500' },
       { id: 'medication', name: 'Meds', icon: 'fas fa-pills', color: 'cyan-500' },
       { id: 'temperature', name: 'Temp', icon: 'fas fa-thermometer', color: 'orange-500' },
       { id: 'vaccine', name: 'Vaccine', icon: 'fas fa-syringe', color: 'teal-500' },
@@ -1262,6 +1354,8 @@
     }
     // --- GROWTH TRACKING ---
     function addGrowthMeasurement(type, value, unit, date) {
+      type = type.toLowerCase(); // Ensure type is lowercase for consistency
+      console.log('Adding growth measurement:', { type, value, unit, date });
       const measurement = {
         id: Date.now().toString(),
         type: type,
@@ -1274,6 +1368,189 @@
       growthData.sort((a, b) => new Date(b.date) - new Date(a.date));
       saveData();
       renderGrowthHistory();
+
+      // Log as activity for weight/height
+      if (type === 'weight' || type === 'height') {
+        let displayValue = value;
+        if (unit === 'ft-in') {
+          const totalInches = value;
+          const feet = Math.floor(totalInches / 12);
+          const inches = Math.round(totalInches % 12);
+          displayValue = `${feet}-${inches}`;
+        } else if (unit === 'm-cm') {
+          const totalCm = value;
+          const meters = Math.floor(totalCm / 100);
+          const centimeters = Math.round(totalCm % 100);
+          displayValue = `${meters}-${centimeters}`;
+        } else {
+          displayValue = Math.round(value * 10) / 10;
+        }
+        const note = `Logged ${type.charAt(0).toUpperCase() + type.slice(1)}: ${displayValue} ${unit}`;
+        addEntry(type, new Date().toISOString(), note);
+      }
+      // Update header stats
+      updateHeaderStats();
+    }
+    
+    function updateMeasurementFields() {
+      const typeSelect = document.getElementById('measurement-type');
+      const unitSelect = document.getElementById('measurement-unit');
+      const valueLabel = document.getElementById('value-label');
+      const formatHint = document.getElementById('format-hint');
+      const valueInput = document.getElementById('measurement-value');
+      const inputHelp = document.getElementById('input-help');
+      
+      const type = typeSelect.value;
+      const unit = unitSelect.value;
+      
+      // Reset fields
+      valueInput.value = '';
+      valueInput.placeholder = '';
+      formatHint.textContent = '';
+      inputHelp.textContent = '';
+      
+      if (!type || !unit) {
+        valueLabel.textContent = 'Value';
+        return;
+      }
+      
+      // Update unit options based on measurement type
+      const unitOptions = unitSelect.querySelectorAll('option');
+      unitOptions.forEach(option => {
+        if (option.value === '') return; // Skip the placeholder
+        
+        const dataType = option.getAttribute('data-type');
+        if (dataType) {
+          const allowedTypes = dataType.split(',');
+          if (allowedTypes.includes(type)) {
+            option.style.display = '';
+          } else {
+            option.style.display = 'none';
+          }
+        }
+      });
+      
+      // Update labels and hints based on type and unit
+      if (type === 'weight') {
+        valueLabel.textContent = 'Weight';
+        if (unit === 'lbs') {
+          valueInput.placeholder = 'e.g., 8.5';
+          formatHint.textContent = '(pounds)';
+          inputHelp.textContent = 'Enter weight in pounds (e.g., 8.5 for 8 pounds 8 ounces)';
+        } else if (unit === 'kg') {
+          valueInput.placeholder = 'e.g., 3.9';
+          formatHint.textContent = '(kilograms)';
+          inputHelp.textContent = 'Enter weight in kilograms (e.g., 3.9 for 3.9 kg)';
+        }
+      } else if (type === 'height') {
+        valueLabel.textContent = 'Height';
+        if (unit === 'in') {
+          valueInput.placeholder = 'e.g., 20.5';
+          formatHint.textContent = '(inches)';
+          inputHelp.textContent = 'Enter height in inches (e.g., 20.5 for 20.5 inches)';
+        } else if (unit === 'cm') {
+          valueInput.placeholder = 'e.g., 52.1';
+          formatHint.textContent = '(centimeters)';
+          inputHelp.textContent = 'Enter height in centimeters (e.g., 52.1 for 52.1 cm)';
+        } else if (unit === 'ft-in') {
+          valueInput.placeholder = 'e.g., 1-8';
+          formatHint.textContent = '(feet-inches)';
+          inputHelp.textContent = 'Enter height as feet-inches (e.g., 1-8 for 1 foot 8 inches)';
+        } else if (unit === 'm-cm') {
+          valueInput.placeholder = 'e.g., 0-52';
+          formatHint.textContent = '(meters-centimeters)';
+          inputHelp.textContent = 'Enter height as meters-centimeters (e.g., 0-52 for 0 meters 52 cm)';
+        }
+      } else if (type === 'head-circumference') {
+        valueLabel.textContent = 'Head Circumference';
+        if (unit === 'in') {
+          valueInput.placeholder = 'e.g., 14.2';
+          formatHint.textContent = '(inches)';
+          inputHelp.textContent = 'Enter head circumference in inches (e.g., 14.2 for 14.2 inches)';
+        } else if (unit === 'cm') {
+          valueInput.placeholder = 'e.g., 36.1';
+          formatHint.textContent = '(centimeters)';
+          inputHelp.textContent = 'Enter head circumference in centimeters (e.g., 36.1 for 36.1 cm)';
+        }
+      }
+    }
+    
+    function validateMeasurementValue(value, type, unit) {
+      if (!value || !type || !unit) return false;
+      
+      // Remove extra spaces
+      value = value.trim();
+      
+      if (type === 'weight') {
+        if (unit === 'lbs' || unit === 'kg') {
+          const numValue = parseFloat(value);
+          return !isNaN(numValue) && numValue > 0 && numValue < 1000;
+        }
+      } else if (type === 'height') {
+        if (unit === 'in' || unit === 'cm') {
+          const numValue = parseFloat(value);
+          return !isNaN(numValue) && numValue > 0 && numValue < 200;
+        } else if (unit === 'ft-in') {
+          // Format: feet-inches (e.g., 1-8, 2-3)
+          const match = value.match(/^(\d+)-(\d+)$/);
+          if (!match) return false;
+          const feet = parseInt(match[1]);
+          const inches = parseInt(match[2]);
+          return feet >= 0 && feet < 10 && inches >= 0 && inches < 12;
+        } else if (unit === 'm-cm') {
+          // Format: meters-centimeters (e.g., 0-52, 1-25)
+          const match = value.match(/^(\d+)-(\d+)$/);
+          if (!match) return false;
+          const meters = parseInt(match[1]);
+          const centimeters = parseInt(match[2]);
+          return meters >= 0 && meters < 3 && centimeters >= 0 && centimeters < 100;
+        }
+      } else if (type === 'head-circumference') {
+        if (unit === 'in' || unit === 'cm') {
+          const numValue = parseFloat(value);
+          return !isNaN(numValue) && numValue > 0 && numValue < 100;
+        }
+      }
+      
+      return false;
+    }
+    
+    function parseMeasurementValue(value, type, unit) {
+      if (!value || !type || !unit) return null;
+      
+      value = value.trim();
+      
+      if (type === 'weight') {
+        if (unit === 'lbs' || unit === 'kg') {
+          return parseFloat(value);
+        }
+      } else if (type === 'height') {
+        if (unit === 'in' || unit === 'cm') {
+          return parseFloat(value);
+        } else if (unit === 'ft-in') {
+          // Convert feet-inches to total inches
+          const match = value.match(/^(\d+)-(\d+)$/);
+          if (match) {
+            const feet = parseInt(match[1]);
+            const inches = parseInt(match[2]);
+            return feet * 12 + inches;
+          }
+        } else if (unit === 'm-cm') {
+          // Convert meters-centimeters to total centimeters
+          const match = value.match(/^(\d+)-(\d+)$/);
+          if (match) {
+            const meters = parseInt(match[1]);
+            const centimeters = parseInt(match[2]);
+            return meters * 100 + centimeters;
+          }
+        }
+      } else if (type === 'head-circumference') {
+        if (unit === 'in' || unit === 'cm') {
+          return parseFloat(value);
+        }
+      }
+      
+      return null;
     }
     function renderGrowthHistory() {
       const container = $('#growth-history');
@@ -1291,19 +1568,49 @@
           'height': 'Height',
           'head-circumference': 'Head Circumference'
         };
+        
+        // Format the display value based on unit
+        let displayValue = measurement.value;
+        let displayUnit = measurement.unit;
+        
+        if (measurement.unit === 'ft-in') {
+          // Convert total inches back to feet-inches format
+          const totalInches = measurement.value;
+          const feet = Math.floor(totalInches / 12);
+          const inches = Math.round(totalInches % 12);
+          displayValue = `${feet}-${inches}`;
+          displayUnit = 'ft-in';
+        } else if (measurement.unit === 'm-cm') {
+          // Convert total centimeters back to meters-centimeters format
+          const totalCm = measurement.value;
+          const meters = Math.floor(totalCm / 100);
+          const centimeters = Math.round(totalCm % 100);
+          displayValue = `${meters}-${centimeters}`;
+          displayUnit = 'm-cm';
+        } else {
+          // For other units, round to 1 decimal place
+          displayValue = Math.round(measurement.value * 10) / 10;
+        }
+        
         return `
           <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
             <div class="flex items-center">
               <i class="fas fa-chart-line text-blue-500 text-xl mr-3"></i>
               <div>
                 <div class="font-semibold text-primary">${measurementNames[measurement.type]}</div>
-                <div class="text-sm text-secondary">${measurement.value} ${measurement.unit}</div>
+                <div class="text-sm text-secondary">${displayValue} ${displayUnit}</div>
               </div>
             </div>
             <div class="text-sm text-secondary">${new Date(measurement.date).toLocaleDateString()}</div>
           </div>
         `;
       }).join('');
+      
+      // Auto-show weight chart if available
+      const weightData = growthData.filter(m => m.type === 'weight');
+      if (weightData.length > 0) {
+        showGrowthChart('weight');
+      }
     }
     // --- TOT REPORT ---
     function generateTotReport() {
@@ -1963,6 +2270,8 @@
       
       // Update daily stats for today
       updateDailyStats(new Date());
+      // Update header stats
+      updateHeaderStats();
     }
     function calculatePreciseAge(dobString) {
       const dob = new Date(dobString), today = new Date();
@@ -2134,8 +2443,22 @@
             return;
           }
           
-          addGrowthMeasurement(type, value, unit, date);
+          // Validate the measurement value
+          if (!validateMeasurementValue(value, type, unit)) {
+            alert('Please enter a valid measurement value. Check the format hints below the input field.');
+            return;
+          }
+          
+          // Parse the measurement value
+          const parsedValue = parseMeasurementValue(value, type, unit);
+          if (parsedValue === null) {
+            alert('Unable to parse the measurement value. Please check the format and try again.');
+            return;
+          }
+          
+          addGrowthMeasurement(type, parsedValue, unit, date);
           this.reset();
+          updateMeasurementFields(); // Reset the dynamic fields
         });
       }
       
@@ -2357,6 +2680,9 @@
         totReportButton.onclick = showTotReportModal;
       }
       
+      // Setup reset confirmation
+      setupResetConfirmation();
+      
       if (babyProfiles.length === 0) {
         showModal('welcome-modal');
       } else {
@@ -2389,6 +2715,10 @@
     window.viewAppointmentDetails = viewAppointmentDetails;
     window.markAppointmentComplete = markAppointmentComplete;
     window.deleteAppointment = deleteAppointment;
+    window.confirmResetApp = confirmResetApp;
+    window.showResetAppModal = showResetAppModal;
+    window.updateMeasurementFields = updateMeasurementFields;
+    window.showGrowthChart = showGrowthChart;
     
     // Enhanced modal functions
     function showTotReportModal() {
@@ -2396,6 +2726,20 @@
       document.getElementById('report-date').value = today;
       updateDailyStats(new Date());
       showModal('tot-report-modal');
+    }
+    
+    function showResetAppModal() {
+      // Clear any existing confirmation input
+      const resetInput = document.getElementById('reset-confirmation');
+      const resetBtn = document.getElementById('reset-confirm-btn');
+      if (resetInput) {
+        resetInput.value = '';
+      }
+      if (resetBtn) {
+        resetBtn.disabled = true;
+        resetBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+      showModal('reset-app-modal');
     }
     // --- ACTIVITY EDITING ---
     function editActivity(activityId) {
@@ -2928,6 +3272,279 @@
         updateAppointmentStats();
       }
     }
+    // --- APP RESET FUNCTIONALITY ---
+    function confirmResetApp() {
+      const confirmation = document.getElementById('reset-confirmation').value.trim();
+      if (confirmation !== 'RESET') {
+        alert('Please type "RESET" exactly to confirm the deletion.');
+        return;
+      }
+      
+      if (confirm('FINAL WARNING: This will permanently delete ALL data and cannot be undone. Are you absolutely sure?')) {
+        resetApp();
+      }
+    }
+    
+    function resetApp() {
+      try {
+        // Clear all localStorage data
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('activityLog_') || 
+                      key.startsWith('moodAnalytics_') || 
+                      key.startsWith('customActivities_') || 
+                      key.startsWith('milestones_') || 
+                      key.startsWith('growthData_') || 
+                      key.startsWith('feedingSchedules_') || 
+                      key.startsWith('reminders_') || 
+                      key.startsWith('appointments_') || 
+                      key.startsWith('inventory_') ||
+                      key === 'babyProfiles' ||
+                      key === 'currentProfileId' ||
+                      key === 'darkMode')) {
+            keysToRemove.push(key);
+          }
+        }
+        
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        // Reset all global state
+        babyProfiles = [];
+        currentProfileId = null;
+        activityLog = [];
+        moodAnalytics = { total: 0, moods: {} };
+        customActivities = [];
+        milestones = [];
+        growthData = [];
+        feedingSchedules = [];
+        reminders = [];
+        appointments = [];
+        inventory = { diapers: 0, wipes: 0, formula: 0, medicine: 0 };
+        
+        // Reset timer state
+        if (timerState.interval) {
+          clearInterval(timerState.interval);
+        }
+        timerState = {
+          isRunning: false,
+          startTime: null,
+          currentActivity: null,
+          interval: null,
+          elapsed: 0
+        };
+        
+        // Hide all modals
+        hideModal('reset-app-modal');
+        hideModal('profile-modal');
+        
+        // Show success message
+        showResetSuccessMessage();
+        
+        // Redirect to welcome screen after a short delay
+        setTimeout(() => {
+          showModal('welcome-modal');
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Error during app reset:', error);
+        alert('An error occurred during the reset. Please try again.');
+      }
+    }
+    
+    function showResetSuccessMessage() {
+      // Create a success notification
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 animate-bounce';
+      notification.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-check-circle text-2xl"></i>
+          <div>
+            <div class="font-bold">App Reset Complete!</div>
+            <div class="text-sm">All data has been deleted. Starting fresh...</div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 3000);
+    }
+    
+    // Setup reset confirmation input handler
+    function setupResetConfirmation() {
+      const resetInput = document.getElementById('reset-confirmation');
+      const resetBtn = document.getElementById('reset-confirm-btn');
+      
+      if (resetInput && resetBtn) {
+        resetInput.addEventListener('input', function() {
+          const confirmation = this.value.trim();
+          if (confirmation === 'RESET') {
+            resetBtn.disabled = false;
+            resetBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          } else {
+            resetBtn.disabled = true;
+            resetBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+        });
+        
+        // Clear input when modal is shown
+        resetInput.addEventListener('focus', function() {
+          this.value = '';
+          resetBtn.disabled = true;
+          resetBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+      }
+    }
+    
+    function showGrowthChart(chartType) {
+      const chartContainer = $('#growth-chart');
+      if (!chartContainer) return;
+      
+      // Filter data by type
+      const typeMap = {
+        'weight': 'weight',
+        'height': 'height',
+        'head': 'head-circumference'
+      };
+      
+      const targetType = typeMap[chartType];
+      const filteredData = growthData.filter(m => m.type === targetType);
+      
+      if (filteredData.length === 0) {
+        chartContainer.innerHTML = `
+          <div class="text-center py-8">
+            <i class="fas fa-chart-line text-4xl text-gray-400 mb-4"></i>
+            <p class="text-secondary">No ${chartType} data available</p>
+            <p class="text-sm text-secondary mt-2">Add some measurements to see your growth chart!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Sort by date
+      filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      // Create simple bar chart using CSS
+      const chartHtml = createSimpleChart(filteredData, chartType);
+      chartContainer.innerHTML = chartHtml;
+    }
+    
+    function createSimpleChart(data, chartType) {
+      if (data.length === 0) return '<p class="text-secondary">No data available</p>';
+      
+      const maxValue = Math.max(...data.map(d => d.value));
+      const minValue = Math.min(...data.map(d => d.value));
+      const valueRange = maxValue - minValue;
+      
+      let html = `
+        <div class="space-y-4">
+          <h4 class="font-semibold text-center capitalize">${chartType} Growth Chart</h4>
+          <div class="flex items-end justify-center space-x-2 h-48">
+      `;
+      
+      data.forEach((measurement, index) => {
+        const height = valueRange > 0 ? ((measurement.value - minValue) / valueRange) * 100 : 50;
+        const date = new Date(measurement.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        // Format display value
+        let displayValue = measurement.value;
+        if (measurement.unit === 'ft-in') {
+          const totalInches = measurement.value;
+          const feet = Math.floor(totalInches / 12);
+          const inches = Math.round(totalInches % 12);
+          displayValue = `${feet}-${inches}`;
+        } else if (measurement.unit === 'm-cm') {
+          const totalCm = measurement.value;
+          const meters = Math.floor(totalCm / 100);
+          const centimeters = Math.round(totalCm % 100);
+          displayValue = `${meters}-${centimeters}`;
+        } else {
+          displayValue = Math.round(measurement.value * 10) / 10;
+        }
+        
+        html += `
+          <div class="flex flex-col items-center">
+            <div class="bg-blue-500 hover:bg-blue-600 transition-colors rounded-t w-8 relative group" 
+                 style="height: ${Math.max(height, 10)}%">
+              <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                ${displayValue} ${measurement.unit}
+              </div>
+            </div>
+            <div class="text-xs text-secondary mt-2 text-center">${date}</div>
+          </div>
+        `;
+      });
+      
+      html += `
+          </div>
+          <div class="text-center text-sm text-secondary">
+            <div class="flex justify-between items-center">
+              <span>${minValue} ${data[0]?.unit || ''}</span>
+              <span>${maxValue} ${data[0]?.unit || ''}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      return html;
+    }
+    // ... existing code ...
+    function updateHeaderStats() {
+      const statsBar = document.getElementById('header-stats-bar');
+      if (!statsBar) return;
+
+      // Get latest measurements
+      const latestWeight = [...growthData].filter(m => m.type === 'weight').sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      const latestHeight = [...growthData].filter(m => m.type === 'height').sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      const latestHead = [...growthData].filter(m => m.type === 'head-circumference').sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+      // Get profile and age
+      const profile = babyProfiles.find(p => p.id == currentProfileId);
+      const age = profile ? calculatePreciseAge(profile.dob) : '-';
+
+      // Format helpers
+      function formatValue(measurement) {
+        if (!measurement) return '-';
+        let v = measurement.value;
+        if (measurement.unit === 'ft-in') {
+          const feet = Math.floor(v / 12);
+          const inches = Math.round(v % 12);
+          return `${feet} ft ${inches} in`;
+        } else if (measurement.unit === 'm-cm') {
+          const meters = Math.floor(v / 100);
+          const centimeters = Math.round(v % 100);
+          return `${meters} m ${centimeters} cm`;
+        } else {
+          return `${Math.round(v * 10) / 10} ${measurement.unit}`;
+        }
+      }
+
+      statsBar.innerHTML = `
+        <div class="flex flex-col items-center">
+          <div class="text-xs text-secondary">Age</div>
+          <div class="font-bold text-lg flex items-center gap-1"><i class="fas fa-baby text-pink-400"></i> ${age}</div>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="text-xs text-secondary">Current Weight</div>
+          <div class="font-bold text-lg flex items-center gap-1"><i class="fas fa-weight-scale text-red-400"></i> ${formatValue(latestWeight)}</div>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="text-xs text-secondary">Current Height</div>
+          <div class="font-bold text-lg flex items-center gap-1"><i class="fas fa-ruler-vertical text-green-400"></i> ${formatValue(latestHeight)}</div>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="text-xs text-secondary">Head Circumference</div>
+          <div class="font-bold text-lg flex items-center gap-1"><i class="fas fa-circle text-purple-400"></i> ${formatValue(latestHead)}</div>
+        </div>
+      `;
+    }
+    // ... existing code ...
   </script>
 </body>
 </html>
