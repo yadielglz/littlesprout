@@ -796,6 +796,10 @@
                   <span>Dirty:</span>
                   <span id="stats-dirty-diapers" class="font-medium">0</span>
                 </div>
+                <div class="flex justify-between">
+                  <span>Wet & Dirty:</span>
+                  <span id="stats-wet-dirty-diapers" class="font-medium">0</span>
+                </div>
               </div>
             </div>
             <div class="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4">
@@ -1330,6 +1334,33 @@
       </div>
     </div>
   </div>
+  <!-- Diaper Modal -->
+  <div id="diaper-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="glass text-primary p-6 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold">Diaper Change</h2>
+        <button onclick="hideModal('diaper-modal')" class="text-secondary hover:text-primary"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="space-y-4">
+        <div class="text-center mb-6">
+          <i class="fas fa-baby text-4xl text-amber-500 mb-2"></i>
+          <p class="text-secondary">Select the type of diaper change:</p>
+        </div>
+        <button onclick="quickLogDiaper('wet-diaper')" class="w-full bg-blue-500 text-white font-bold py-4 px-6 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-3">
+          <i class="fas fa-tint text-xl"></i>
+          <span class="text-lg">Wet Diaper</span>
+        </button>
+        <button onclick="quickLogDiaper('dirty-diaper')" class="w-full bg-amber-500 text-white font-bold py-4 px-6 rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center space-x-3">
+          <i class="fas fa-poop text-xl"></i>
+          <span class="text-lg">Dirty Diaper</span>
+        </button>
+        <button onclick="quickLogDiaper('wet-dirty-diaper')" class="w-full bg-orange-500 text-white font-bold py-4 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-3">
+          <i class="fas fa-baby text-xl"></i>
+          <span class="text-lg">Wet & Dirty</span>
+        </button>
+      </div>
+    </div>
+  </div>
   <script>
     // --- GLOBAL STATE ---
     let customActivities = [];
@@ -1446,7 +1477,9 @@
       let deductions = [];
       
       switch (activityType) {
-        case 'diaper':
+        case 'wet-diaper':
+        case 'dirty-diaper':
+        case 'wet-dirty-diaper':
           // Diaper change uses 1 diaper and typically 2-3 wipes
           if (inventory.diapers > 0) {
             inventory.diapers--;
@@ -1504,7 +1537,9 @@
       let restorations = [];
       
       switch (activityType) {
-        case 'diaper':
+        case 'wet-diaper':
+        case 'dirty-diaper':
+        case 'wet-dirty-diaper':
           // Restore 1 diaper and 2 wipes
           inventory.diapers++;
           inventory.wipes += 2;
@@ -2056,26 +2091,26 @@
       const moodEntries = [];
       const feedTimes = [];
       const feedQuantities = [];
+      const wetDiaperCount = dayActivities.filter(e => e.type === 'wet-diaper').length;
+      const dirtyDiaperCount = dayActivities.filter(e => e.type === 'dirty-diaper').length;
+      const wetDirtyDiaperCount = dayActivities.filter(e => e.type === 'wet-dirty-diaper').length;
+      const diaperCount = wetDiaperCount + dirtyDiaperCount + wetDirtyDiaperCount;
       const diaperTimes = [];
       const sleepTimes = [];
-      
       dayActivities.forEach(entry => {
         const activity = [...defaultActivities, ...customActivities].find(a => a.id === entry.type);
         const activityName = activity ? activity.name : entry.type;
-        
         activityCounts[activityName] = (activityCounts[activityName] || 0) + 1;
-        
         if (entry.mood) {
           moodEntries.push(entry.mood);
         }
-        
         // Track specific activity times for detailed analysis
         if (entry.type === 'feed') {
           feedTimes.push(new Date(entry.timestamp));
           if (entry.quantity) {
             feedQuantities.push(entry.quantity);
           }
-        } else if (entry.type === 'diaper') {
+        } else if (['wet-diaper','dirty-diaper','wet-dirty-diaper'].includes(entry.type)) {
           diaperTimes.push(new Date(entry.timestamp));
         } else if (entry.type === 'sleep' || entry.type === 'nap') {
           sleepTimes.push(new Date(entry.timestamp));
@@ -2207,11 +2242,12 @@
       }
       
       // Diaper stats
-      const diaperActivities = dayActivities.filter(entry => entry.type === 'diaper');
+      const wetDiaperActivities = dayActivities.filter(entry => entry.type === 'wet-diaper');
+      const dirtyDiaperActivities = dayActivities.filter(entry => entry.type === 'dirty-diaper');
+      const wetDirtyDiaperActivities = dayActivities.filter(entry => entry.type === 'wet-dirty-diaper');
+      const diaperActivities = [...wetDiaperActivities, ...dirtyDiaperActivities, ...wetDirtyDiaperActivities];
       const diaperTimes = diaperActivities.map(entry => new Date(entry.timestamp));
-      
       document.getElementById('stats-diapers').textContent = diaperActivities.length;
-      
       if (diaperTimes.length > 0) {
         const lastDiaper = diaperTimes[diaperTimes.length - 1];
         const timeSinceLastDiaper = Math.round((new Date() - lastDiaper) / (1000 * 60));
@@ -2219,12 +2255,9 @@
       } else {
         document.getElementById('stats-last-diaper').textContent = '-';
       }
-      
-      // For now, we'll estimate wet/dirty based on total (this could be enhanced with specific tracking)
-      const estimatedWet = Math.floor(diaperActivities.length * 0.7);
-      const estimatedDirty = Math.floor(diaperActivities.length * 0.3);
-      document.getElementById('stats-wet-diapers').textContent = estimatedWet;
-      document.getElementById('stats-dirty-diapers').textContent = estimatedDirty;
+      document.getElementById('stats-wet-diapers').textContent = wetDiaperActivities.length;
+      document.getElementById('stats-dirty-diapers').textContent = dirtyDiaperActivities.length;
+      document.getElementById('stats-wet-dirty-diapers').textContent = wetDirtyDiaperActivities.length;
       
       // Sleep stats
       const sleepActivities = dayActivities.filter(entry => entry.type === 'sleep' || entry.type === 'nap');
@@ -2532,6 +2565,11 @@
       container.innerHTML = html;
     }
     function quickLogActivity(activityType) {
+      if (activityType === 'diaper') {
+        showModal('diaper-modal');
+        return;
+      }
+      
       const now = new Date();
       const timestamp = now.toISOString().slice(0, 16); // Format for datetime-local input
       document.getElementById('activity-type').value = activityType;
@@ -2854,15 +2892,15 @@
       const activityTypeSelect = document.getElementById('activity-type');
       if (activityTypeSelect) {
         const allActivities = [...defaultActivities, ...customActivities];
-        activityTypeSelect.innerHTML = '<option value="">Select activity...</option>' + 
-          allActivities.map(act => `<option value="${act.id}">${act.name}</option>`).join('');
+        activityTypeSelect.innerHTML += allActivities
+          .map(act => `<option value="${act.id}">${act.name}</option>`).join('');
       }
       
       // Populate edit activity type dropdown
       const editActivityTypeSelect = document.getElementById('edit-activity-type');
       if (editActivityTypeSelect) {
         const allActivities = [...defaultActivities, ...customActivities];
-        editActivityTypeSelect.innerHTML = '<option value="">Select activity...</option>' + 
+        editActivityTypeSelect.innerHTML = '<option value="">Select activity...</option>' +
           allActivities.map(act => `<option value="${act.id}">${act.name}</option>`).join('');
       }
       
@@ -4341,6 +4379,19 @@
         inventorySection.classList.add('hidden');
       }
     }
+    function quickLogDiaper(diaperType) {
+      const now = new Date();
+      const timestamp = now.toISOString().slice(0, 16);
+      
+      // Log the diaper activity immediately
+      addEntry(diaperType, timestamp, '', null, null, null);
+      
+      // Close the diaper modal
+      hideModal('diaper-modal');
+    }
+    
+    // Make functions globally available
+    window.quickLogDiaper = quickLogDiaper;
   </script>
 </body>
 </html>
