@@ -57,6 +57,7 @@
       transition: all 0.3s;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      color: #1e293b;
     }
     .input-enhanced:focus {
       outline: none;
@@ -64,12 +65,179 @@
       box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
       background: rgba(241,245,249,0.9);
     }
+    html.dark .input-enhanced {
+      background: rgba(51,65,85,0.8);
+      border: 1px solid rgba(148,163,184,0.3);
+      color: #f1f5f9;
+    }
+    html.dark .input-enhanced:focus {
+      border-color: rgba(102,126,234,0.5);
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+      background: rgba(51,65,85,0.9);
+    }
+    html.dark .input-enhanced::placeholder {
+      color: #94a3b8;
+    }
     @media (max-width: 640px) {
       .glass, .glass-sm { border-radius: 1rem; }
     }
     .focus-visible:focus {
       outline: 2px solid rgba(102,126,234,0.5);
       outline-offset: 2px;
+    }
+    
+    /* Dark mode improvements for modals */
+    html.dark .glass {
+      background: rgba(30,41,59,0.85);
+      border: 1.5px solid rgba(148,163,184,0.3);
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5);
+    }
+    
+    html.dark .glass-sm {
+      background: rgba(30,41,59,0.85);
+      border: 1px solid rgba(148,163,184,0.3);
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.3);
+    }
+    
+    /* Improve text contrast in dark mode */
+    html.dark .text-secondary {
+      color: #cbd5e1 !important;
+    }
+    
+    html.dark .text-primary {
+      color: #f8fafc !important;
+    }
+    
+    /* Better contrast for form labels in dark mode */
+    html.dark label {
+      color: #e2e8f0 !important;
+    }
+    
+    /* Improve select dropdowns in dark mode */
+    html.dark select {
+      background-color: rgba(51,65,85,0.9);
+      color: #f1f5f9;
+      border-color: rgba(148,163,184,0.3);
+    }
+    
+    html.dark select option {
+      background-color: #334155;
+      color: #f1f5f9;
+    }
+    
+    /* Improve textarea styling in dark mode */
+    html.dark textarea {
+      background-color: rgba(51,65,85,0.9);
+      color: #f1f5f9;
+      border-color: rgba(148,163,184,0.3);
+    }
+    
+    /* Improve date and time inputs in dark mode */
+    html.dark input[type="date"],
+    html.dark input[type="time"],
+    html.dark input[type="datetime-local"] {
+      background-color: rgba(51,65,85,0.9);
+      color: #f1f5f9;
+      border-color: rgba(148,163,184,0.3);
+    }
+    
+    html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+    html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+    html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+    
+    /* Better button contrast in dark mode */
+    html.dark button:not([class*="bg-"]) {
+      color: #f1f5f9;
+    }
+    
+    /* Improve modal backdrop in dark mode */
+    html.dark .fixed.inset-0.bg-black.bg-opacity-75 {
+      background-color: rgba(0,0,0,0.85) !important;
+    }
+    
+    /* Improve activity button hover states in dark mode */
+    html.dark .timer-activity-btn:hover {
+      background-color: rgba(51,65,85,0.8);
+      border-color: rgba(148,163,184,0.5);
+    }
+    
+    /* Better contrast for inventory items in dark mode */
+    html.dark .inventory-item {
+      background: rgba(51,65,85,0.8) !important;
+      border: 1px solid rgba(148,163,184,0.2);
+    }
+    
+    /* Improve mood button visibility in dark mode */
+    html.dark .mood-btn,
+    html.dark .edit-mood-btn {
+      background-color: rgba(51,65,85,0.5);
+      border-radius: 0.5rem;
+      padding: 0.25rem;
+    }
+    
+    html.dark .mood-btn:hover,
+    html.dark .edit-mood-btn:hover {
+      background-color: rgba(51,65,85,0.8);
+    }
+    
+    /* Better contrast for stats panels in dark mode */
+    html.dark .bg-white\/50 {
+      background-color: rgba(51,65,85,0.8) !important;
+    }
+    
+    /* Improve scrollbar visibility in dark mode */
+    html.dark ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    html.dark ::-webkit-scrollbar-track {
+      background: rgba(51,65,85,0.5);
+      border-radius: 4px;
+    }
+    
+    html.dark ::-webkit-scrollbar-thumb {
+      background: rgba(148,163,184,0.5);
+      border-radius: 4px;
+    }
+    
+    html.dark ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148,163,184,0.7);
+    }
+    
+    /* Better button contrast in dark mode */
+    html.dark button:not([class*="bg-"]) {
+      color: #f1f5f9;
+    }
+    
+    /* Improve modal backdrop in dark mode */
+    html.dark .fixed.inset-0.bg-black.bg-opacity-75 {
+      background-color: rgba(0,0,0,0.85) !important;
+    }
+    
+    /* Ensure all text in modals is visible in dark mode */
+    html.dark .glass h1,
+    html.dark .glass h2,
+    html.dark .glass h3,
+    html.dark .glass h4,
+    html.dark .glass h5,
+    html.dark .glass h6 {
+      color: #f8fafc !important;
+    }
+    
+    html.dark .glass p {
+      color: #e2e8f0 !important;
+    }
+    
+    /* Improve form field spacing and visibility */
+    html.dark .glass .space-y-4 > * + * {
+      margin-top: 1rem;
+    }
+    
+    html.dark .glass .space-y-3 > * + * {
+      margin-top: 0.75rem;
     }
   </style>
 </head>
@@ -394,7 +562,13 @@
           <input type="datetime-local" id="activity-time" class="input-enhanced w-full" required>
         </div>
         <div id="feed-quantity-section" class="hidden">
-          <label class="block text-sm font-medium text-secondary mb-1">Quantity (oz)</label>
+          <label class="block text-sm font-medium text-secondary mb-1">Feed Type</label>
+          <select id="feed-type" class="input-enhanced w-full" required>
+            <option value="">Select feed type...</option>
+            <option value="breast">Breast Feeding</option>
+            <option value="formula">Formula</option>
+          </select>
+          <label class="block text-sm font-medium text-secondary mb-1 mt-3">Quantity (oz)</label>
           <input type="number" id="feed-quantity" class="input-enhanced w-full" min="0" step="0.5" placeholder="e.g., 4.5">
         </div>
         <div>
@@ -842,7 +1016,13 @@
           <input type="datetime-local" id="edit-activity-time" class="input-enhanced w-full" required>
         </div>
         <div id="edit-feed-quantity-section" class="hidden">
-          <label class="block text-sm font-medium text-secondary mb-1">Quantity (oz)</label>
+          <label class="block text-sm font-medium text-secondary mb-1">Feed Type</label>
+          <select id="edit-feed-type" class="input-enhanced w-full" required>
+            <option value="">Select feed type...</option>
+            <option value="breast">Breast Feeding</option>
+            <option value="formula">Formula</option>
+          </select>
+          <label class="block text-sm font-medium text-secondary mb-1 mt-3">Quantity (oz)</label>
           <input type="number" id="edit-feed-quantity" class="input-enhanced w-full" min="0" step="0.5" placeholder="e.g., 4.5">
         </div>
         <div>
@@ -1205,14 +1385,15 @@
       }
     }
     // --- ACTIVITY LOGGING ---
-    function addEntry(activityType, timestamp, notes = '', mood = null, quantity = null) {
+    function addEntry(activityType, timestamp, notes = '', mood = null, quantity = null, feedType = null) {
       const entry = {
         id: Date.now().toString(),
         type: activityType,
         timestamp: timestamp,
         notes: notes,
         mood: mood,
-        quantity: quantity
+        quantity: quantity,
+        feedType: feedType
       };
       activityLog.unshift(entry);
       if (mood) {
@@ -1244,6 +1425,7 @@
         const timeAgo = getTimeAgo(new Date(entry.timestamp));
         const moodDisplay = entry.mood ? `<span class="text-2xl ml-2">${entry.mood}</span>` : '';
         const quantityDisplay = entry.quantity ? `<div class="text-sm text-blue-600 font-medium">${entry.quantity} oz</div>` : '';
+        const feedTypeDisplay = entry.feedType ? `<div class="text-sm text-purple-600 font-medium">${entry.feedType === 'breast' ? 'Breast' : 'Formula'}</div>` : '';
         return `
           <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
             <div class="flex items-center">
@@ -1251,6 +1433,7 @@
               <div>
                 <div class="font-semibold text-primary">${activity?.name || entry.type}</div>
                 <div class="text-sm text-secondary">${timeAgo}</div>
+                ${feedTypeDisplay}
                 ${quantityDisplay}
                 ${entry.notes ? `<div class="text-sm text-secondary mt-1">${entry.notes}</div>` : ''}
               </div>
@@ -2141,6 +2324,8 @@
       const quantitySection = document.getElementById('feed-quantity-section');
       if (activityType === 'feed') {
         quantitySection.classList.remove('hidden');
+        document.getElementById('feed-type').value = '';
+        document.getElementById('feed-quantity').value = '';
       } else {
         quantitySection.classList.add('hidden');
       }
@@ -2206,7 +2391,9 @@
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('darkMode', isDark);
       const btn = document.querySelector('button[onclick="toggleDarkMode()"] i');
-      if (btn) btn.className = isDark ? 'fas fa-sun text-yellow-500 text-2xl' : 'fas fa-moon text-indigo-500 text-2xl';
+      if (btn) {
+        btn.className = isDark ? 'fas fa-sun text-yellow-500 text-2xl' : 'fas fa-moon text-indigo-500 text-2xl';
+      }
     }
     // --- MODAL HELPERS ---
     function showModal(id) {
@@ -2372,6 +2559,22 @@
     }
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
+      // Initialize dark mode - default to dark mode
+      const savedDarkMode = localStorage.getItem('darkMode');
+      if (savedDarkMode === null || savedDarkMode === 'true') {
+        // Default to dark mode if no preference saved or if it was previously enabled
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('darkMode', 'true');
+        // Update the toggle button icon
+        const btn = document.querySelector('button[onclick="toggleDarkMode()"] i');
+        if (btn) btn.className = 'fas fa-sun text-yellow-500 text-2xl';
+      } else {
+        // User has explicitly disabled dark mode
+        document.documentElement.classList.remove('dark');
+        const btn = document.querySelector('button[onclick="toggleDarkMode()"] i');
+        if (btn) btn.className = 'fas fa-moon text-indigo-500 text-2xl';
+      }
+      
       renderActivityButtons();
       startDateTime();
       fetchWeather();
@@ -2402,14 +2605,19 @@
           
           // Get quantity if it's a feed activity
           let quantity = null;
+          let feedType = null;
           if (activityType === 'feed') {
             const quantityInput = document.getElementById('feed-quantity');
+            const feedTypeInput = document.getElementById('feed-type');
             if (quantityInput && quantityInput.value) {
               quantity = parseFloat(quantityInput.value);
             }
+            if (feedTypeInput && feedTypeInput.value) {
+              feedType = feedTypeInput.value;
+            }
           }
           
-          addEntry(activityType, activityTime, activityNotes, selectedMood, quantity);
+          addEntry(activityType, activityTime, activityNotes, selectedMood, quantity, feedType);
           hideModal('log-modal');
           this.reset();
           document.getElementById('feed-quantity-section').classList.add('hidden');
@@ -2590,10 +2798,15 @@
           
           // Get quantity if it's a feed activity
           let quantity = null;
+          let feedType = null;
           if (activityType === 'feed') {
             const quantityInput = document.getElementById('edit-feed-quantity');
+            const feedTypeInput = document.getElementById('edit-feed-type');
             if (quantityInput && quantityInput.value) {
               quantity = parseFloat(quantityInput.value);
+            }
+            if (feedTypeInput && feedTypeInput.value) {
+              feedType = feedTypeInput.value;
             }
           }
           
@@ -2604,7 +2817,8 @@
             timestamp: activityTime,
             notes: activityNotes,
             mood: selectedMood,
-            quantity: quantity
+            quantity: quantity,
+            feedType: feedType
           };
           
           saveData();
@@ -2820,6 +3034,7 @@
       if (activity.type === 'feed') {
         editQuantitySection.classList.remove('hidden');
         document.getElementById('edit-feed-quantity').value = activity.quantity || '';
+        document.getElementById('edit-feed-type').value = activity.feedType || '';
       } else {
         editQuantitySection.classList.add('hidden');
       }
@@ -2941,8 +3156,9 @@
       const schedule = feedingSchedules.find(s => s.id === scheduleId);
       if (!schedule) return;
       
-      // Add to activity log
-      addEntry('feed', new Date().toISOString(), `Scheduled: ${schedule.type} at ${schedule.time}${schedule.notes ? ` - ${schedule.notes}` : ''}`);
+      // Add to activity log with feed type
+      const feedType = schedule.type === 'breast' ? 'breast' : 'formula';
+      addEntry('feed', new Date().toISOString(), `Scheduled: ${schedule.type} at ${schedule.time}${schedule.notes ? ` - ${schedule.notes}` : ''}`, null, null, feedType);
       
       // Remove from schedule
       feedingSchedules = feedingSchedules.filter(s => s.id !== scheduleId);
@@ -3627,6 +3843,9 @@
       // Show/hide quantity field for feed activities
       if (activityType === 'feed') {
         quantitySection.classList.remove('hidden');
+        // Reset feed type and quantity fields
+        document.getElementById('feed-type').value = '';
+        document.getElementById('feed-quantity').value = '';
       } else {
         quantitySection.classList.add('hidden');
       }
@@ -3647,6 +3866,9 @@
       // Show/hide quantity field for feed activities
       if (activityType === 'feed') {
         quantitySection.classList.remove('hidden');
+        // Reset feed type and quantity fields
+        document.getElementById('edit-feed-type').value = '';
+        document.getElementById('edit-feed-quantity').value = '';
       } else {
         quantitySection.classList.add('hidden');
       }
