@@ -3113,10 +3113,6 @@
     }
     // ... existing code ...
     // Call renderLogModal during initialization
-    const originalInitializeApp = initializeApp;
-    initializeApp = function() {
-      renderLogModal();
-      originalInitializeApp();
     };
     // ... existing code ...
 
@@ -3295,14 +3291,6 @@
       `);
     }
     // ... existing code ...
-    const originalInitializeApp = initializeApp;
-    initializeApp = function() {
-      renderLogModal();
-      renderMilestoneModal();
-      renderInventoryModal();
-      renderReminderModal();
-      renderAppointmentModal();
-      originalInitializeApp();
     };
     // ... existing code ...
 
@@ -3643,8 +3631,23 @@
       `);
     }
     // ... existing code ...
+    };
+    // ... existing code ...
+
+    // ... existing code ...
+    // Remove all previous initializeApp overrides and keep only one below:
+    };
+    // ... existing code ...
+    // In DOMContentLoaded, call only initializeApp()
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeApp();
+    });
+    // ... existing code ...
+
+    // Single initializeApp override that handles all modal injection and initialization
     const originalInitializeApp = initializeApp;
     initializeApp = function() {
+      // Inject all modals
       renderLogModal();
       renderMilestoneModal();
       renderInventoryModal();
@@ -3662,6 +3665,16 @@
       renderAddAppointmentModal();
       renderAppointmentDetailsModal();
       renderTotReportModal();
+      // Main UI setup
+      renderActivityButtons();
+      startDateTime();
+      fetchWeather();
+      loadProfiles();
+      // Call original app logic (render logs, stats, etc.)
       originalInitializeApp();
     };
-    // ... existing code ...
+    
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeApp();
+    });
