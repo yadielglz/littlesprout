@@ -1,0 +1,66 @@
+{
+  "name": "littlesprout-react",
+  "version": "6.0.0",
+  "description": "A modern React baby tracking app with enhanced features and performance",
+  "private": true,
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.6",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.14",
+    "chart.js": "^4.4.0",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "framer-motion": "^10.16.4",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^2.5.1",
+    "lucide-react": "^0.263.1",
+    "pako": "^2.1.0",
+    "postcss": "^8.4.27",
+    "qrcode.react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-hook-form": "^7.43.9",
+    "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.5.2",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.8.1",
+    "react-virtualized-auto-sizer": "^1.0.20",
+    "react-window": "^1.8.8",
+    "recharts": "^2.7.2",
+    "tailwindcss": "^3.3.5",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "@types/pako": "^2.0.3",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

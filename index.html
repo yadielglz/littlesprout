@@ -1,137 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="LittleSprout - A modern baby tracking app to help parents monitor their little one's growth, feeding, sleep, and milestones." />
+    <meta name="keywords" content="baby tracker, parenting app, baby milestones, feeding tracker, sleep tracker" />
+    <meta name="author" content="LittleSprout" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yourusername.github.io/littlesprout/" />
+    <meta property="og:title" content="LittleSprout - Baby Tracker" />
+    <meta property="og:description" content="Track your baby's growth, feeding, sleep, and milestones with ease." />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://yourusername.github.io/littlesprout/" />
+    <meta property="twitter:title" content="LittleSprout - Baby Tracker" />
+    <meta property="twitter:description" content="Track your baby's growth, feeding, sleep, and milestones with ease." />
+    <meta property="twitter:image" content="/og-image.png" />
+
+    <!-- PWA -->
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="LittleSprout" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    
     <title>LittleSprout - Baby Tracker</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-3">
-                    <i class="fas fa-seedling text-2xl text-green-500"></i>
-                    <h1 class="text-2xl font-bold text-gray-900">LittleSprout</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div id="current-time" class="text-lg font-semibold text-gray-700"></div>
-                    <button id="dark-mode-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fas fa-moon text-gray-600"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Baby Info Section -->
-        <div id="baby-info" class="bg-white rounded-xl shadow-sm p-6 mb-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 id="baby-name" class="text-2xl font-bold text-gray-900">Baby Name</h2>
-                    <p id="baby-age" class="text-gray-600">Age: Loading...</p>
-                </div>
-                <button id="setup-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                    <i class="fas fa-cog mr-2"></i>Setup
-                </button>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-            <button class="quick-action-btn" data-activity="feed">
-                <i class="fas fa-utensils text-2xl"></i>
-                <span>Feed</span>
-            </button>
-            <button class="quick-action-btn" data-activity="diaper">
-                <i class="fas fa-baby text-2xl"></i>
-                <span>Diaper</span>
-            </button>
-            <button class="quick-action-btn" data-activity="sleep">
-                <i class="fas fa-moon text-2xl"></i>
-                <span>Sleep</span>
-            </button>
-            <button class="quick-action-btn" data-activity="nap">
-                <i class="fas fa-bed text-2xl"></i>
-                <span>Nap</span>
-            </button>
-            <button class="quick-action-btn" data-activity="tummy">
-                <i class="fas fa-child-reaching text-2xl"></i>
-                <span>Tummy Time</span>
-            </button>
-        </div>
-
-        <!-- Main Dashboard -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Activity Log -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold text-gray-900">Recent Activities</h3>
-                        <button id="add-activity-btn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
-                            <i class="fas fa-plus mr-2"></i>Add Activity
-                        </button>
-                    </div>
-                    <div id="activity-log" class="space-y-4">
-                        <div class="text-center text-gray-500 py-8">
-                            <i class="fas fa-baby text-4xl mb-4"></i>
-                            <p>No activities logged yet</p>
-                            <p class="text-sm">Start by logging your first activity!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Timer -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Timer</h3>
-                    <div id="timer-display" class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 mb-2">00:00</div>
-                        <div class="text-sm text-gray-600 mb-4">No timer running</div>
-                        <div class="space-y-2">
-                            <button id="start-timer-btn" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                                Start Timer
-                            </button>
-                            <button id="stop-timer-btn" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors hidden">
-                                Stop Timer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Today's Stats</h3>
-                    <div id="daily-stats" class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Feeds:</span>
-                            <span class="font-semibold">0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Diapers:</span>
-                            <span class="font-semibold">0</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Sleep:</span>
-                            <span class="font-semibold">0h</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modal Container -->
-    <div id="modal-container"></div>
-
-    <!-- Scripts -->
-    <script src="app.js"></script>
-</body>
+  </head>
+  <body class="h-full">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html> 
