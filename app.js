@@ -1,5 +1,8 @@
 // LittleSprout Baby Tracker - Main Application
 
+// Global instance for onclick handlers
+let babyTracker;
+
 class BabyTracker {
     constructor() {
         this.state = {
@@ -246,8 +249,8 @@ class BabyTracker {
         if (timerDisplay) {
             const activityName = this.state.timer.currentActivity || 'Activity';
             timerDisplay.innerHTML = `
-                <div class="text-3xl font-bold text-gray-900 mb-2">${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</div>
-                <div class="text-sm text-gray-600 mb-4">${activityName} timer running</div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2">${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">${activityName} timer running</div>
             `;
         }
     }
@@ -267,8 +270,8 @@ class BabyTracker {
             if (timerDisplay) {
                 timerDisplay.classList.remove('timer-running');
                 timerDisplay.innerHTML = `
-                    <div class="text-3xl font-bold text-gray-900 mb-2">00:00</div>
-                    <div class="text-sm text-gray-600 mb-4">No timer running</div>
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2">00:00</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">No timer running</div>
                 `;
             }
         }
@@ -338,13 +341,13 @@ class BabyTracker {
                     <div class="flex items-center space-x-3">
                         <i class="${icon} text-${color} text-xl"></i>
                         <div>
-                            <div class="font-medium text-gray-900">${this.capitalizeFirst(activity.type)}</div>
-                            <div class="text-sm text-gray-600">${timeAgo}</div>
-                            ${details ? `<div class="text-sm text-gray-500">${details}</div>` : ''}
+                            <div class="font-medium text-gray-900 dark:text-white">${this.capitalizeFirst(activity.type)}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">${timeAgo}</div>
+                            ${details ? `<div class="text-sm text-gray-500 dark:text-gray-400">${details}</div>` : ''}
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        ${activity.notes ? `<div class="text-sm text-gray-500">${activity.notes}</div>` : ''}
+                        ${activity.notes ? `<div class="text-sm text-gray-500 dark:text-gray-400">${activity.notes}</div>` : ''}
                         <button onclick="babyTracker.editActivity('${activity.id}')" class="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -363,16 +366,16 @@ class BabyTracker {
 
         dailyStats.innerHTML = `
             <div class="flex justify-between">
-                <span class="text-gray-600">Feeds:</span>
-                <span class="font-semibold">${this.state.stats.today.feeds}</span>
+                <span class="text-gray-600 dark:text-gray-400">Feeds:</span>
+                <span class="font-semibold text-gray-900 dark:text-white">${this.state.stats.today.feeds}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-600">Diapers:</span>
-                <span class="font-semibold">${this.state.stats.today.diapers}</span>
+                <span class="text-gray-600 dark:text-gray-400">Diapers:</span>
+                <span class="font-semibold text-gray-900 dark:text-white">${this.state.stats.today.diapers}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-600">Sleep:</span>
-                <span class="font-semibold">${this.state.stats.today.sleep}</span>
+                <span class="text-gray-600 dark:text-gray-400">Sleep:</span>
+                <span class="font-semibold text-gray-900 dark:text-white">${this.state.stats.today.sleep}</span>
             </div>
         `;
     }
@@ -528,7 +531,7 @@ class BabyTracker {
     showTimerModal() {
         const modal = this.createModal('Start Timer', `
             <div class="space-y-4">
-                <p class="text-gray-600">Select an activity to start timing:</p>
+                <p class="text-gray-600 dark:text-gray-400">Select an activity to start timing:</p>
                 <div class="grid grid-cols-1 gap-3">
                     <button class="timer-option-btn" data-activity="sleep">
                         <i class="fas fa-moon text-indigo-500 text-xl mr-3"></i>
@@ -798,7 +801,6 @@ class BabyTracker {
 }
 
 // Initialize the app when DOM is loaded
-let babyTracker;
 document.addEventListener('DOMContentLoaded', () => {
     babyTracker = new BabyTracker();
 }); 
