@@ -15,8 +15,6 @@ const Dashboard = () => {
     getCurrentProfile,
     addLog,
     getCurrentLogs,
-    getCurrentInventory,
-    setInventory,
     currentProfileId,
     deleteLog,
     updateLog,
@@ -27,7 +25,6 @@ const Dashboard = () => {
   } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
-  const inventory = getCurrentInventory()
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
@@ -40,14 +37,6 @@ const Dashboard = () => {
   const [apptModalOpen, setApptModalOpen] = useState(false)
   const [editAppt, setEditAppt] = useState<Appointment | null>(null)
   const [remindersOpen, setRemindersOpen] = useState(false)
-
-  // Inventory state
-  const handleInventoryChange = (item: 'diapers'|'formula', delta: number) => {
-    setInventory(profile?.id || '', {
-      ...inventory,
-      [item]: Math.max(0, (inventory?.[item] || 0) + delta)
-    })
-  }
 
   // Quick action handlers
   const handleQuickAction = (type: typeof modalType) => {
