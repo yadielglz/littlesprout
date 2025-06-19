@@ -5,8 +5,7 @@ import {
   BarChart3, 
   TrendingUp, 
   Calendar,
-  Filter,
-  Download
+  Filter
 } from 'lucide-react'
 import {
   LineChart,
@@ -214,7 +213,11 @@ const Charts = () => {
               dataKey="value"
             >
               {chartData.activityDistribution.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={colors[index % colors.length]} 
+                  name={entry.name}
+                />
               ))}
             </Pie>
             <Tooltip />
@@ -249,19 +252,39 @@ const Charts = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-            >
-              <option value="week">Last 7 Days</option>
-              <option value="month">Last 30 Days</option>
-              <option value="quarter">Last 3 Months</option>
-            </select>
-            <button className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              <Download size={20} className="mr-2" />
-              Export
-            </button>
+            {/* Time Range Filter */}
+            <div className="flex items-center space-x-2">
+              <Calendar className="text-gray-500 dark:text-gray-400" size={20} />
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"
+              >
+                <option value="week">Last Week</option>
+                <option value="month">Last Month</option>
+                <option value="quarter">Last Quarter</option>
+              </select>
+            </div>
+            {/* Chart Type Filter */}
+            <div className="flex items-center space-x-2">
+              <Filter className="text-gray-500 dark:text-gray-400" size={20} />
+              <select
+                value={selectedChart}
+                onChange={(e) => setSelectedChart(e.target.value)}
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"
+              >
+                <option value="feeding">Feeding</option>
+                <option value="sleep">Sleep</option>
+                <option value="diaper">Diaper Changes</option>
+                <option value="weight">Weight</option>
+                <option value="distribution">Activity Distribution</option>
+              </select>
+            </div>
+            {/* Chart Icons */}
+            <div className="flex items-center space-x-2">
+              <BarChart3 className="text-blue-500" size={20} />
+              <TrendingUp className="text-green-500" size={20} />
+            </div>
           </div>
         </div>
 

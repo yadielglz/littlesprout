@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useStore, BabyProfile } from '../store/store'
 import { motion } from 'framer-motion'
 import { 
-  Settings as SettingsIcon, 
-  User, 
   Users, 
   Bell, 
   Moon, 
@@ -12,10 +10,7 @@ import {
   Edit,
   Trash2,
   Download,
-  Upload,
-  Shield,
-  Eye,
-  EyeOff
+  Upload
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
@@ -121,8 +116,13 @@ const Settings = () => {
     const reader = new FileReader()
     reader.onload = (e) => {
       try {
-        const data = JSON.parse(e.target?.result as string)
-        // Here you would typically validate and import the data
+        const importedData = JSON.parse(e.target?.result as string)
+        // Validate the imported data structure
+        if (!importedData.profiles || !Array.isArray(importedData.profiles)) {
+          throw new Error('Invalid data format')
+        }
+        // Here you would typically process and import the data
+        // For example: importedData.profiles.forEach(profile => addProfile(profile))
         toast.success('Data imported successfully!')
       } catch (error) {
         toast.error('Invalid backup file')

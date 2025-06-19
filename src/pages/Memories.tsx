@@ -4,12 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Camera, 
   Plus, 
-  Heart, 
   Calendar,
   Trash2,
-  Edit,
-  Download,
-  Filter
+  Edit
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'

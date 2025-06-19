@@ -188,89 +188,106 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
                 Manage notifications for {profile.babyName}'s care
               </p>
             </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              <Plus size={20} className="mr-2" />
-              Add Reminder
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <Plus size={20} className="mr-2" />
+                Add Reminder
+              </button>
+              <button
+                onClick={() => onClose()}
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                title="Notification Settings"
+              >
+                <Settings size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Reminders List */}
           <div className="space-y-3">
-            {reminders.length === 0 ? (
-              <div className="text-center py-8">
-                <Bell className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
-                  No reminders yet
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Add reminders for feeding times, diaper changes, and other important activities.
-                </p>
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Add Your First Reminder
-                </button>
-              </div>
-            ) : (
-              reminders.map((reminder) => (
+            <AnimatePresence>
+              {reminders.length === 0 ? (
                 <motion.div
-                  key={reminder.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`p-4 rounded-lg border transition-colors ${
-                    reminder.isActive
-                      ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                      : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60'
-                  }`}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="text-center py-8"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <button
-                        onClick={() => toggleReminder(reminder)}
-                        className={`p-2 rounded-full transition-colors ${
-                          reminder.isActive
-                            ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
-                        }`}
-                      >
-                        {reminder.isActive ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-                      </button>
-                      <div className="flex-1">
-                        <p className={`font-medium ${reminder.isActive ? 'text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                          {reminder.text}
-                        </p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          <span className="flex items-center">
-                            <Clock size={14} className="mr-1" />
-                            {formatTime(reminder.time)}
-                          </span>
-                          <span>{getFrequencyLabel(reminder.frequency)}</span>
-                          <span>Next: {getNextDue(reminder)}</span>
+                  <Bell className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">
+                    No reminders yet
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Add reminders for feeding times, diaper changes, and other important activities.
+                  </p>
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Add Your First Reminder
+                  </button>
+                </motion.div>
+              ) : (
+                reminders.map((reminder) => (
+                  <motion.div
+                    key={reminder.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className={`p-4 rounded-lg border transition-colors ${
+                      reminder.isActive
+                        ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                        : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <button
+                          onClick={() => toggleReminder(reminder)}
+                          className={`p-2 rounded-full transition-colors ${
+                            reminder.isActive
+                              ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
+                          }`}
+                        >
+                          {reminder.isActive ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                        </button>
+                        <div className="flex-1">
+                          <p className={`font-medium ${reminder.isActive ? 'text-gray-800 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+                            {reminder.text}
+                          </p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            <span className="flex items-center">
+                              <Clock size={14} className="mr-1" />
+                              {formatTime(reminder.time)}
+                            </span>
+                            <span>{getFrequencyLabel(reminder.frequency)}</span>
+                            <span>Next: {getNextDue(reminder)}</span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setEditReminder(reminder)}
+                          className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteReminderItem(reminder)}
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setEditReminder(reminder)}
-                        className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteReminderItem(reminder)}
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))
-            )}
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Quick Add Suggestions */}

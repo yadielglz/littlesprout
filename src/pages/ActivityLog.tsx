@@ -249,42 +249,39 @@ const ActivityLog = () => {
                   key={log.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4">
-                      <div className="text-2xl">{log.icon}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-gray-800 dark:text-white capitalize">
-                            {log.type}
-                          </h3>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {formatTime(log.timestamp)}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-2xl">{log.icon}</span>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-gray-800 dark:text-white">
+                            {log.type.charAt(0).toUpperCase() + log.type.slice(1)}
                           </span>
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <Clock size={14} className="mr-1" />
+                            <span>{formatTime(log.timestamp)}</span>
+                          </div>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 mb-1">
-                          {log.details}
-                        </p>
+                        <p className="text-gray-600 dark:text-gray-300 mt-1">{log.details}</p>
                         {log.notes && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                            "{log.notes}"
-                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{log.notes}</p>
                         )}
                       </div>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex items-center space-x-2">
                       <button
                         onClick={() => setEditLog(log)}
-                        className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
+                        className="p-2 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400"
                       >
-                        <Edit size={16} />
+                        <Edit size={18} />
                       </button>
                       <button
                         onClick={() => setDeleteLogEntry(log)}
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        className="p-2 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </div>
@@ -293,6 +290,24 @@ const ActivityLog = () => {
             </div>
           )}
         </div>
+
+        {/* Filter Indicators */}
+        {(filterType !== 'all' || dateFilter !== 'all') && (
+          <div className="mt-4 flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+            {filterType !== 'all' && (
+              <div className="flex items-center">
+                <Filter size={16} className="mr-1" />
+                <span>Filtered by: {filterType}</span>
+              </div>
+            )}
+            {dateFilter !== 'all' && (
+              <div className="flex items-center">
+                <Calendar size={16} className="mr-1" />
+                <span>Time range: {dateFilters.find(f => f.value === dateFilter)?.label}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Add Activity Modal */}
         <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Activity">
