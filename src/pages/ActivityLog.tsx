@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useStore, LogEntry } from '../store/store'
 import { motion } from 'framer-motion'
+import Timer from '../components/Timer'
 import { 
   Search, 
   Filter, 
@@ -8,16 +9,23 @@ import {
   Trash2, 
   Calendar,
   Clock,
-  Plus
+  Plus,
+  Play,
+  Pause,
+  StopCircle
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
 import toast from 'react-hot-toast'
 
 const ActivityLog = () => {
-  const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog } = useStore()
+  const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog, setActiveTimer, activeTimer } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
+
+  // Timer state
+  const [timerOpen, setTimerOpen] = useState(false)
+  const [timerType, setTimerType] = useState<'sleep' | 'nap' | 'tummy' | null>(null)
 
   // State
   const [searchTerm, setSearchTerm] = useState('')
@@ -149,6 +157,35 @@ const ActivityLog = () => {
     })
   }
 
+  // Handle timer actions
+  const handleStartTimer = (type: 'sleep' | 'nap' | 'tummy') => {
+    setActiveTimer({ type, startTime: Date.now() })
+    setTimerType(type)
+    setTimerOpen(true)
+  }
+
+  const handleStopTimer = (duration: number, time: string) => {
+    if (!profile || !timerType) return
+
+    const icon = timerType === 'sleep' ? '😴' : timerType === 'nap' ? '🛏️' : '⏱️'
+    const details = `Duration: ${Math.round(duration/60000)} min`
+
+    addLog(profile.id, {
+      id: generateId(),
+      type: timerType,
+      icon,
+      color: '',
+      details,
+      timestamp: new Date(time),
+      rawDuration: duration
+    })
+
+    setActiveTimer(null)
+    setTimerType(null)
+    setTimerOpen(false)
+    toast.success('Timer logged successfully!')
+  }
+
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -175,14 +212,53 @@ const ActivityLog = () => {
               Track and manage {profile.babyName}'s daily activities
             </p>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="mt-4 md:mt-0 flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Plus size={20} className="mr-2" />
-            Add Activity
-          </button>
+          <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+            {/* Timer Buttons */}
+            <button
+              onClick={() => handleStartTimer('sleep')}
+              className="flex items-center px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+              disabled={!!activeTimer}
+            >
+              <Clock size={20} className="mr-2" />
+              Sleep Timer
+            </button>
+            <button
+              onClick={() => handleStartTimer('nap')}
+              className="flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+              disabled={!!activeTimer}
+            >
+              <Clock size={20} className="mr-2" />
+              Nap Timer
+            </button>
+            <button
+              onClick={() => handleStartTimer('tummy')}
+              className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              disabled={!!activeTimer}
+            >
+              <Clock size={20} className="mr-2" />
+              Tummy Time
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <Plus size={20} className="mr-2" />
+              Add Activity
+            </button>
+          </div>
         </div>
+
+        {/* Active Timer Display */}
+        {activeTimer && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
+            <Timer
+              isOpen={timerOpen}
+              onClose={() => setTimerOpen(false)}
+              onSave={handleStopTimer}
+              label={`${timerType?.charAt(0).toUpperCase()}${timerType?.slice(1)} Timer`}
+            />
+          </div>
+        )}
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">

@@ -3,13 +3,21 @@ import React, { useState, useEffect } from 'react'
 interface TimerProps {
   label: string
   onSave: (duration: number, time: string) => void
-  onCancel: () => void
+  onClose: () => void
+  isOpen: boolean
 }
 
-const Timer: React.FC<TimerProps> = ({ label, onSave, onCancel }) => {
+const Timer: React.FC<TimerProps> = ({ label, onSave, onClose, isOpen }) => {
   const [isRunning, setIsRunning] = useState(false)
   const [startTime, setStartTime] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    if (isOpen && !isRunning && !startTime) {
+      handleStart()
+    }
+  }, [isOpen])
+
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined
     if (isRunning && startTime !== null) {
@@ -21,27 +29,32 @@ const Timer: React.FC<TimerProps> = ({ label, onSave, onCancel }) => {
       if (interval) clearInterval(interval)
     }
   }, [isRunning, startTime])
+
   const handleStart = () => {
     setIsRunning(true)
     setStartTime(Date.now())
     setElapsed(0)
   }
+
   const handleStop = () => {
     setIsRunning(false)
     if (startTime) setElapsed(Date.now() - startTime)
   }
+
   const handleSave = () => {
     onSave(elapsed, new Date().toISOString().slice(0,16))
     setIsRunning(false)
     setStartTime(null)
     setElapsed(0)
   }
+
   const handleCancel = () => {
     setIsRunning(false)
     setStartTime(null)
     setElapsed(0)
-    onCancel()
+    onClose()
   }
+
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000)
     const h = Math.floor(totalSeconds / 3600)
@@ -49,6 +62,7 @@ const Timer: React.FC<TimerProps> = ({ label, onSave, onCancel }) => {
     const s = totalSeconds % 60
     return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`
   }
+
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="text-2xl font-bold text-gray-800 dark:text-white">{label}</div>
