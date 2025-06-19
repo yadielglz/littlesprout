@@ -120,49 +120,54 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-slate-800">
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col py-4 space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-                  Hello, {profile.userName}!
-                </h1>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {profile.babyName} is {calculateAge(profile.dob)}
-                </p>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                  <span className="text-xl">🌱</span>
-                </div>
-                <ClockWeather />
-              </div>
+          <div className="flex justify-between items-center py-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Hello, {profile.userName}!
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                {profile.babyName} is {calculateAge(profile.dob)}
+              </p>
             </div>
-            <div className="flex flex-wrap gap-2 justify-start">
-              <button 
-                onClick={() => setQuickActionsOpen(true)} 
-                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
-              >
-                <span className="mr-2">➕</span>
-                Quick Actions
-              </button>
-              <button 
-                onClick={() => setRemindersOpen(true)} 
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors flex items-center"
-              >
-                <span className="mr-2">🔔</span>
-                Reminders
-              </button>
-              <button 
-                onClick={() => setSettingsOpen(true)} 
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center"
-              >
-                <span className="mr-2">⚙️</span>
-                Settings
-              </button>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                <span className="text-xl">🌱</span>
+              </div>
+              <ClockWeather />
             </div>
           </div>
         </div>
       </header>
+      
+      {/* Action Buttons Bar */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap gap-2 py-3">
+            <button 
+              onClick={() => setQuickActionsOpen(true)} 
+              className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
+            >
+              <span className="mr-2">➕</span>
+              Quick Actions
+            </button>
+            <button 
+              onClick={() => setRemindersOpen(true)} 
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors flex items-center"
+            >
+              <span className="mr-2">🔔</span>
+              Reminders
+            </button>
+            <button 
+              onClick={() => setSettingsOpen(true)} 
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center"
+            >
+              <span className="mr-2">⚙️</span>
+              Settings
+            </button>
+          </div>
+        </div>
+      </div>
+      
       {profile && <div className="my-4"><MilestoneTicker dob={profile.dob} /></div>}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 md:space-y-14">
@@ -340,11 +345,11 @@ const Dashboard = () => {
                 <select
                   name="details"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-                  defaultValue="Formula"
+                  defaultValue="Bottle (Formula)"
                 >
-                  <option>Formula</option>
-                  <option>Breast Milk</option>
-                  <option>Solid Food</option>
+                  <option>Bottle (Formula)</option>
+                  <option>Breast Feed</option>
+                  <option>Food (Solids)</option>
                 </select>
               </div>
               <div>
@@ -498,7 +503,13 @@ const Dashboard = () => {
               const feedType = form.feedType.value;
               const amount = form.amount.value;
               const time = form.time.value;
-              updateLog(currentProfileId!, editLog.id, { details: `${feedType === 'bottle' ? 'Bottle (Formula)' : 'Breast'} Feed, Amount: ${amount} oz`, timestamp: new Date(time) });
+              const feedTypeText = feedType === 'bottle' ? 'Bottle (Formula)' : 
+                                 feedType === 'breast' ? 'Breast Feed' : 'Food (Solids)';
+              updateLog(currentProfileId!, editLog.id, { 
+                details: `${feedTypeText} - ${amount}ml`, 
+                timestamp: new Date(time),
+                rawAmount: parseFloat(amount)
+              });
             } else if (editLog.type === 'diaper') {
               const type = form.type.value;
               const time = form.time.value;
@@ -521,12 +532,16 @@ const Dashboard = () => {
             {editLog.type === 'feed' && (
               <>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Feed Type</label>
-                <select name="feedType" className="w-full px-3 py-2 border rounded" defaultValue={editLog.details.includes('Bottle') ? 'bottle' : 'breast'} required>
+                <select name="feedType" className="w-full px-3 py-2 border rounded" defaultValue={
+                  editLog.details.includes('Bottle') ? 'bottle' : 
+                  editLog.details.includes('Breast') ? 'breast' : 'food'
+                } required>
                   <option value="bottle">Bottle (Formula)</option>
-                  <option value="breast">Breast</option>
+                  <option value="breast">Breast Feed</option>
+                  <option value="food">Food (Solids)</option>
                 </select>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount (oz)</label>
-                <input name="amount" type="number" min="0" step="0.1" className="w-full px-3 py-2 border rounded" defaultValue={editLog.details.match(/Amount: ([\d.]+)/)?.[1] || ''} required />
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount (ml)</label>
+                <input name="amount" type="number" min="0" step="5" className="w-full px-3 py-2 border rounded" defaultValue={editLog.details.match(/Amount: ([\d.]+)/)?.[1] || ''} required />
               </>
             )}
             {editLog.type === 'diaper' && (
