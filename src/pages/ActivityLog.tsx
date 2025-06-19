@@ -9,10 +9,7 @@ import {
   Trash2, 
   Calendar,
   Clock,
-  Plus,
-  Play,
-  Pause,
-  StopCircle
+  Plus
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'

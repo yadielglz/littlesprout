@@ -15,7 +15,7 @@ import Charts from './pages/Charts'
 import { loadData } from './utils/storage'
 import { initializeApp } from './utils/initialization'
 
-function App() {
+const App = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [showSplash, setShowSplash] = useState(true)
   const { profiles, setProfiles, setCurrentProfileId, getCurrentProfile } = useStore()
