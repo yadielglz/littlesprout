@@ -21,13 +21,6 @@ export interface LogEntry {
   rawDuration?: number
 }
 
-export interface Memory {
-  id: string
-  date: string
-  image: string
-  description: string
-}
-
 export interface Inventory {
   diapers: number
   formula: number
@@ -76,7 +69,6 @@ interface AppState {
   profiles: BabyProfile[]
   currentProfileId: string | null
   logs: Record<string, LogEntry[]>
-  memories: Record<string, Memory[]>
   inventories: Record<string, Inventory>
   reminders: Record<string, Reminder[]>
   customActivities: CustomActivity[]
@@ -94,9 +86,6 @@ interface AppState {
   addLog: (profileId: string, log: LogEntry) => void
   updateLog: (profileId: string, logId: string, updates: Partial<LogEntry>) => void
   deleteLog: (profileId: string, logId: string) => void
-  setMemories: (profileId: string, memories: Memory[]) => void
-  addMemory: (profileId: string, memory: Memory) => void
-  deleteMemory: (profileId: string, memoryId: string) => void
   setInventory: (profileId: string, inventory: Inventory) => void
   updateInventory: (profileId: string, item: keyof Inventory, change: number) => void
   setReminders: (profileId: string, reminders: Reminder[]) => void
@@ -115,7 +104,6 @@ interface AppState {
   setSidebarOpen: (open: boolean) => void
   getCurrentProfile: () => BabyProfile | null
   getCurrentLogs: () => LogEntry[]
-  getCurrentMemories: () => Memory[]
   getCurrentInventory: () => Inventory
   getCurrentReminders: () => Reminder[]
   getCurrentAchievedMilestones: () => AchievedMilestone[]
@@ -131,7 +119,6 @@ export const useStore = create<AppState>()(
       profiles: [],
       currentProfileId: null,
       logs: {},
-      memories: {},
       inventories: {},
       reminders: {},
       customActivities: [],
@@ -180,21 +167,6 @@ export const useStore = create<AppState>()(
         logs: {
           ...state.logs,
           [profileId]: (state.logs[profileId] || []).filter(log => log.id !== logId)
-        }
-      })),
-      setMemories: (profileId, memories) => set((state) => ({
-        memories: { ...state.memories, [profileId]: memories }
-      })),
-      addMemory: (profileId, memory) => set((state) => ({
-        memories: { 
-          ...state.memories, 
-          [profileId]: [...(state.memories[profileId] || []), memory] 
-        }
-      })),
-      deleteMemory: (profileId, memoryId) => set((state) => ({
-        memories: {
-          ...state.memories,
-          [profileId]: (state.memories[profileId] || []).filter(m => m.id !== memoryId)
         }
       })),
       setInventory: (profileId, inventory) => set((state) => ({
@@ -259,23 +231,19 @@ export const useStore = create<AppState>()(
       },
       getCurrentLogs: () => {
         const state = get()
-        return state.logs[state.currentProfileId || ''] || []
-      },
-      getCurrentMemories: () => {
-        const state = get()
-        return state.memories[state.currentProfileId || ''] || []
+        return state.currentProfileId ? state.logs[state.currentProfileId] || [] : []
       },
       getCurrentInventory: () => {
         const state = get()
-        return state.inventories[state.currentProfileId || ''] || { diapers: 0, formula: 0 }
+        return state.currentProfileId ? state.inventories[state.currentProfileId] || { diapers: 0, formula: 0 } : { diapers: 0, formula: 0 }
       },
       getCurrentReminders: () => {
         const state = get()
-        return state.reminders[state.currentProfileId || ''] || []
+        return state.currentProfileId ? state.reminders[state.currentProfileId] || [] : []
       },
       getCurrentAchievedMilestones: () => {
         const state = get()
-        return state.achievedMilestones[state.currentProfileId || ''] || []
+        return state.currentProfileId ? state.achievedMilestones[state.currentProfileId] || [] : []
       },
       addAppointment: (profileId, appt) => set((state) => ({
         appointments: {
@@ -286,46 +254,28 @@ export const useStore = create<AppState>()(
       updateAppointment: (profileId, apptId, updates) => set((state) => ({
         appointments: {
           ...state.appointments,
-          [profileId]: (state.appointments[profileId] || []).map(a => a.id === apptId ? { ...a, ...updates } : a)
+          [profileId]: (state.appointments[profileId] || []).map(appt =>
+            appt.id === apptId ? { ...appt, ...updates } : appt
+          )
         }
       })),
       deleteAppointment: (profileId, apptId) => set((state) => ({
         appointments: {
           ...state.appointments,
-          [profileId]: (state.appointments[profileId] || []).filter(a => a.id !== apptId)
+          [profileId]: (state.appointments[profileId] || []).filter(appt => appt.id !== apptId)
         }
       })),
       getNextAppointment: (profileId) => {
-        const appts = get().appointments[profileId] || []
+        const state = get()
         const now = new Date()
-        return appts
-          .filter(a => new Date(a.date + 'T' + a.time) >= now)
-          .sort((a, b) => new Date(a.date + 'T' + a.time).getTime() - new Date(b.date + 'T' + b.time).getTime())[0] || null
-      },
+        return (state.appointments[profileId] || [])
+          .filter(appt => new Date(`${appt.date}T${appt.time}`) > now)
+          .sort((a, b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime())[0] || null
+      }
     }),
     {
-      name: 'littlesprout-storage',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        profiles: state.profiles,
-        currentProfileId: state.currentProfileId,
-        logs: state.logs,
-        memories: state.memories,
-        inventories: state.inventories,
-        reminders: state.reminders,
-        customActivities: state.customActivities,
-        achievedMilestones: state.achievedMilestones,
-        appointments: state.appointments,
-        isDarkMode: state.isDarkMode
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          const { profiles, currentProfileId } = state
-          if (profiles?.length > 0 && !currentProfileId) {
-            state.currentProfileId = profiles[0].id
-          }
-        }
-      }
+      name: 'baby-tracker-storage',
+      storage: createJSONStorage(() => localStorage)
     }
   )
 ) 
