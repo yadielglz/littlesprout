@@ -1,6 +1,6 @@
 import { useStore, Appointment } from '../store/store'
 import { calculateAge } from '../utils/initialization'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Modal from '../components/Modal'
 import Timer from '../components/Timer'
 import { generateId } from '../utils/initialization'
@@ -37,6 +37,32 @@ const Dashboard = () => {
   const [apptModalOpen, setApptModalOpen] = useState(false)
   const [editAppt, setEditAppt] = useState<Appointment | null>(null)
   const [remindersOpen, setRemindersOpen] = useState(false)
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false)
+  const quickActionsRef = useRef<HTMLDivElement>(null)
+
+  // Close quick actions menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (quickActionsRef.current && !quickActionsRef.current.contains(event.target as Node)) {
+        setQuickActionsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Activity types
+  const activityTypes = [
+    { type: 'feed', label: 'Feed', icon: '🍼', color: 'bg-blue-500' },
+    { type: 'sleep', label: 'Sleep', icon: '😴', color: 'bg-indigo-500' },
+    { type: 'nap', label: 'Nap', icon: '🛏️', color: 'bg-yellow-500' },
+    { type: 'diaper', label: 'Diaper', icon: '👶', color: 'bg-amber-500' },
+    { type: 'weight', label: 'Weight & Height', icon: '📏', color: 'bg-red-500' },
+    { type: 'tummy', label: 'Tummy Time', icon: '⏱️', color: 'bg-green-500' },
+    { type: 'temperature', label: 'Temperature', icon: '🌡️', color: 'bg-purple-500' },
+    { type: 'vaccine', label: 'Vaccine', icon: '💉', color: 'bg-pink-500' },
+    { type: 'health', label: 'Health Note', icon: '📝', color: 'bg-teal-500' }
+  ]
 
   // Quick action handlers
   const handleQuickAction = (type: typeof modalType) => {
@@ -131,13 +157,37 @@ const Dashboard = () => {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2 py-3">
-            <button 
-              onClick={() => handleQuickAction('feed')} 
-              className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
-            >
-              <span className="mr-2">📝</span>
-              Quick Actions
-            </button>
+            <div className="relative" ref={quickActionsRef}>
+              <button 
+                onClick={() => setQuickActionsOpen(!quickActionsOpen)} 
+                className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
+              >
+                <span className="mr-2">📝</span>
+                Quick Actions
+              </button>
+              
+              {/* Quick Actions Dropdown */}
+              {quickActionsOpen && (
+                <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="py-1" role="menu" aria-orientation="vertical">
+                    {activityTypes.map((activity) => (
+                      <button
+                        key={activity.type}
+                        onClick={() => {
+                          handleQuickAction(activity.type as typeof modalType)
+                          setQuickActionsOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                        role="menuitem"
+                      >
+                        <span className="mr-2">{activity.icon}</span>
+                        {activity.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <button 
               onClick={() => setRemindersOpen(true)} 
               className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors flex items-center"
@@ -601,28 +651,12 @@ const Dashboard = () => {
       </Modal>
 
       {/* Timer Modal */}
-      <Modal isOpen={timerOpen} onClose={() => { setTimerOpen(false); setTimerLabel('') }} title={timerLabel}>
-        <Timer label={timerLabel} onSave={(duration, time) => handleTimerSave(duration, time)} onCancel={() => { setTimerOpen(false); setTimerLabel('') }} />
-        <div className="mt-4 border-t pt-4">
-          <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 text-center">Missed a log? Enter manually:</div>
-          <form onSubmit={e => {
-            e.preventDefault();
-            const form = e.target as any;
-            const mins = parseInt(form.manualMins.value, 10) || 0;
-            const hrs = parseInt(form.manualHrs.value, 10) || 0;
-            const duration = (hrs * 60 + mins) * 60000;
-            const time = form.time.value;
-            handleTimerSave(duration, time);
-          }} className="flex flex-col items-center space-y-2">
-            <div className="flex space-x-2">
-              <input name="manualHrs" type="number" min="0" max="23" placeholder="Hrs" className="w-16 px-2 py-1 border rounded" />
-              <input name="manualMins" type="number" min="0" max="59" placeholder="Mins" className="w-16 px-2 py-1 border rounded" />
-            </div>
-            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
-            <button type="submit" className="bg-blue-500 text-white px-4 py-1 rounded">Log Manually</button>
-          </form>
-        </div>
-      </Modal>
+      <Timer
+        label={timerLabel}
+        onSave={handleTimerSave}
+        onClose={() => setTimerOpen(false)}
+        isOpen={timerOpen}
+      />
 
       {/* Settings Modal */}
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
