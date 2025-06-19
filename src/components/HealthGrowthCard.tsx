@@ -1,4 +1,5 @@
-import { useStore } from '../store/store'
+import { useStore, LogEntry } from '../store/store'
+import React from 'react'
 
 interface HealthGrowthCardProps {
   onLogGrowth: () => void
@@ -13,24 +14,24 @@ const HealthGrowthCard: React.FC<HealthGrowthCardProps> = ({
   onLogVaccine,
   onAddNote
 }) => {
-  const logs = useStore(state => state.getCurrentLogs())
+  const logs = useStore((state: { getCurrentLogs: () => LogEntry[] }) => state.getCurrentLogs())
 
   // Get latest measurements
   const latestWeight = logs
-    .filter(l => l.type === 'weight' && l.details.includes('Weight:'))
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+    .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'weight' && l.notes?.includes('Weight:'))
+    .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
 
   const latestHeight = logs
-    .filter(l => l.type === 'weight' && l.details.includes('Height:'))
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+    .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'height' && l.notes?.includes('Height:'))
+    .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
 
   const latestTemp = logs
-    .filter(l => l.type === 'temperature')
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+    .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'temperature')
+    .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
 
   const latestVaccine = logs
-    .filter(l => l.type === 'vaccine')
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+    .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'vaccine')
+    .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -46,10 +47,10 @@ const HealthGrowthCard: React.FC<HealthGrowthCardProps> = ({
           </div>
           <div className="flex-grow space-y-2">
             <div className="text-sm text-gray-600 dark:text-gray-300">
-              Weight: {latestWeight ? latestWeight.details.split('Weight:')[1].trim().split(' ')[0] : 'Not recorded'}
+              Weight: {latestWeight ? latestWeight.notes?.split('Weight:')[1]?.trim().split(' ')[0] : 'Not recorded'}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-300">
-              Height: {latestHeight ? latestHeight.details.split('Height:')[1].trim().split(' ')[0] : 'Not recorded'}
+              Height: {latestHeight ? latestHeight.notes?.split('Height:')[1]?.trim().split(' ')[0] : 'Not recorded'}
             </div>
           </div>
           <button
@@ -68,7 +69,7 @@ const HealthGrowthCard: React.FC<HealthGrowthCardProps> = ({
           </div>
           <div className="flex-grow space-y-2">
             <div className="text-sm text-gray-600 dark:text-gray-300">
-              Last Reading: {latestTemp ? latestTemp.details.split(':')[1].trim() : 'Not recorded'}
+              Last Reading: {latestTemp ? latestTemp.notes?.split(':')[1]?.trim() : 'Not recorded'}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               Normal: 97.5°F - 99.5°F

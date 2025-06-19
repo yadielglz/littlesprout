@@ -4,7 +4,6 @@ import { useStore } from '../store/store'
 import { 
   Home, 
   Activity, 
-  Heart, 
   BarChart3, 
   Settings, 
   Menu,
