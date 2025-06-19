@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Modal from './Modal'
 
 interface TimerProps {
   label: string
@@ -64,16 +65,43 @@ const Timer: React.FC<TimerProps> = ({ label, onSave, onClose, isOpen }) => {
   }
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <div className="text-2xl font-bold text-gray-800 dark:text-white">{label}</div>
-      <div className="text-3xl font-mono text-green-600 dark:text-green-400">{formatTime(elapsed)}</div>
-      <div className="flex space-x-2">
-        {!isRunning && <button onClick={handleStart} className="px-4 py-2 bg-green-500 text-white rounded">Start</button>}
-        {isRunning && <button onClick={handleStop} className="px-4 py-2 bg-yellow-500 text-white rounded">Stop</button>}
-        {!isRunning && elapsed > 0 && <button onClick={handleSave} className="px-4 py-2 bg-blue-500 text-white rounded">Save</button>}
-        <button onClick={handleCancel} className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded">Cancel</button>
+    <Modal isOpen={isOpen} onClose={onClose} title={label}>
+      <div className="flex flex-col items-center space-y-6 py-4">
+        <div className="text-4xl font-mono text-green-600 dark:text-green-400">{formatTime(elapsed)}</div>
+        <div className="flex space-x-3">
+          {!isRunning && (
+            <button 
+              onClick={handleStart} 
+              className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
+            >
+              Start
+            </button>
+          )}
+          {isRunning && (
+            <button 
+              onClick={handleStop} 
+              className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium"
+            >
+              Stop
+            </button>
+          )}
+          {!isRunning && elapsed > 0 && (
+            <button 
+              onClick={handleSave} 
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+            >
+              Save
+            </button>
+          )}
+          <button 
+            onClick={handleCancel} 
+            className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
-    </div>
+    </Modal>
   )
 }
 
