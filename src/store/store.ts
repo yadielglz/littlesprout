@@ -315,6 +315,7 @@ export const useStore = create<AppState>()(
         reminders: state.reminders,
         customActivities: state.customActivities,
         achievedMilestones: state.achievedMilestones,
+        appointments: state.appointments,
         isDarkMode: state.isDarkMode
       })
     }

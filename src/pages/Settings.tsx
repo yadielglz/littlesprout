@@ -94,6 +94,14 @@ const Settings = () => {
     const data = {
       profiles,
       currentProfileId,
+      logs: useStore.getState().logs,
+      memories: useStore.getState().memories,
+      inventories: useStore.getState().inventories,
+      reminders: useStore.getState().reminders,
+      customActivities: useStore.getState().customActivities,
+      achievedMilestones: useStore.getState().achievedMilestones,
+      appointments: useStore.getState().appointments,
+      isDarkMode,
       timestamp: new Date().toISOString()
     }
     
@@ -106,7 +114,7 @@ const Settings = () => {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    toast.success('Data exported successfully!')
+    toast.success('Complete backup exported successfully!')
   }
 
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,15 +125,77 @@ const Settings = () => {
     reader.onload = (e) => {
       try {
         const importedData = JSON.parse(e.target?.result as string)
+        
         // Validate the imported data structure
         if (!importedData.profiles || !Array.isArray(importedData.profiles)) {
-          throw new Error('Invalid data format')
+          throw new Error('Invalid backup file format')
         }
-        // Here you would typically process and import the data
-        // For example: importedData.profiles.forEach(profile => addProfile(profile))
-        toast.success('Data imported successfully!')
+
+        // Import all data using store methods
+        const store = useStore.getState()
+        
+        // Import profiles
+        importedData.profiles.forEach((profile: BabyProfile) => {
+          addProfile(profile)
+        })
+        
+        // Import other data if available
+        if (importedData.logs) {
+          Object.keys(importedData.logs).forEach(profileId => {
+            store.setLogs(profileId, importedData.logs[profileId])
+          })
+        }
+        
+        if (importedData.memories) {
+          Object.keys(importedData.memories).forEach(profileId => {
+            store.setMemories(profileId, importedData.memories[profileId])
+          })
+        }
+        
+        if (importedData.inventories) {
+          Object.keys(importedData.inventories).forEach(profileId => {
+            store.setInventory(profileId, importedData.inventories[profileId])
+          })
+        }
+        
+        if (importedData.reminders) {
+          Object.keys(importedData.reminders).forEach(profileId => {
+            store.setReminders(profileId, importedData.reminders[profileId])
+          })
+        }
+        
+        if (importedData.customActivities) {
+          store.setCustomActivities(importedData.customActivities)
+        }
+        
+        if (importedData.achievedMilestones) {
+          Object.keys(importedData.achievedMilestones).forEach(profileId => {
+            store.setAchievedMilestones(profileId, importedData.achievedMilestones[profileId])
+          })
+        }
+        
+        if (importedData.appointments) {
+          Object.keys(importedData.appointments).forEach(profileId => {
+            importedData.appointments[profileId].forEach((appt: any) => {
+              store.addAppointment(profileId, appt)
+            })
+          })
+        }
+        
+        // Set current profile if available
+        if (importedData.currentProfileId) {
+          setCurrentProfileId(importedData.currentProfileId)
+        }
+        
+        // Set dark mode if available
+        if (typeof importedData.isDarkMode === 'boolean') {
+          store.setDarkMode(importedData.isDarkMode)
+        }
+        
+        toast.success('Backup restored successfully!')
       } catch (error) {
-        toast.error('Invalid backup file')
+        console.error('Import error:', error)
+        toast.error('Invalid backup file or import failed')
       }
     }
     reader.readAsText(file)

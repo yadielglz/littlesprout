@@ -7,7 +7,6 @@ import {
   Heart, 
   BarChart3, 
   Settings, 
-  Download,
   Menu,
   X
 } from 'lucide-react'
@@ -24,7 +23,6 @@ const Navigation = () => {
     { path: '/memories', icon: Heart, label: 'Memories' },
     { path: '/charts', icon: BarChart3, label: 'Charts' },
     { path: '/settings', icon: Settings, label: 'Settings' },
-    { path: '/backup', icon: Download, label: 'Backup' },
   ]
 
   const isActive = (path: string) => {

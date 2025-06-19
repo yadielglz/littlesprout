@@ -12,7 +12,6 @@ import Settings from './pages/Settings'
 import ActivityLog from './pages/ActivityLog'
 import Memories from './pages/Memories'
 import Charts from './pages/Charts'
-import Backup from './pages/Backup'
 import { loadData } from './utils/storage'
 import { initializeApp } from './utils/initialization'
 
@@ -138,18 +137,6 @@ function App() {
                       exit={{ opacity: 0, x: -20 }}
                     >
                       <Charts />
-                    </motion.div>
-                  } 
-                />
-                <Route 
-                  path="/backup" 
-                  element={
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                    >
-                      <Backup />
                     </motion.div>
                   } 
                 />
