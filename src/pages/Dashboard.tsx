@@ -5,6 +5,7 @@ import Modal from '../components/Modal'
 import Timer from '../components/Timer'
 import { generateId } from '../utils/initialization'
 import SettingsModal from '../components/SettingsModal'
+import Reminders from '../components/Reminders'
 import { LogEntry } from '../store/store'
 import ClockWeather from '../components/ClockWeather'
 import MilestoneTicker from '../components/MilestoneTicker'
@@ -39,6 +40,7 @@ const Dashboard = () => {
   const [deleteLogEntry, setDeleteLogEntry] = useState<LogEntry | null>(null)
   const [apptModalOpen, setApptModalOpen] = useState(false)
   const [editAppt, setEditAppt] = useState<Appointment | null>(null)
+  const [remindersOpen, setRemindersOpen] = useState(false)
 
   // Inventory state
   const handleInventoryChange = (item: 'diapers'|'formula', delta: number) => {
@@ -133,6 +135,7 @@ const Dashboard = () => {
               <ClockWeather />
             </div>
             <button onClick={() => setQuickActionsOpen(true)} className="ml-4 px-4 py-2 bg-green-500 text-white rounded shadow">Quick Actions</button>
+            <button onClick={() => setRemindersOpen(true)} className="ml-2 px-4 py-2 bg-blue-500 text-white rounded shadow">Reminders</button>
             <button onClick={() => setSettingsOpen(true)} className="ml-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded shadow">Settings</button>
           </div>
         </div>
@@ -414,6 +417,7 @@ const Dashboard = () => {
 
       {/* Settings Modal */}
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <Reminders isOpen={remindersOpen} onClose={() => setRemindersOpen(false)} />
 
       {/* Edit Log Modal */}
       <Modal isOpen={!!editLog} onClose={() => setEditLog(null)} title="Edit Log">
