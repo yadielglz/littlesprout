@@ -15,16 +15,20 @@ const App = () => {
   const hasProfile = useStore(state => state.profiles.length > 0)
 
   useEffect(() => {
-    // Wait for store to be hydrated
-    const unsubHydrate = useStore.persist.onHydrate(() => setIsHydrated(false))
-    const unsubFinishHydration = useStore.persist.onFinishHydration(() => setIsHydrated(true))
+    // Set initial hydration state
+    setIsHydrated(useStore.persist.hasHydrated())
+
+    // Subscribe to hydration updates
+    const unsubFinishHydration = useStore.persist.onFinishHydration(() => {
+      setIsHydrated(true)
+    })
 
     return () => {
-      unsubHydrate()
       unsubFinishHydration()
     }
   }, [])
 
+  // Show splash screen while hydrating
   if (!isHydrated) {
     return <SplashScreen show={true} />
   }
