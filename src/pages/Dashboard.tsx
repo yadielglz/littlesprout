@@ -31,7 +31,7 @@ const Dashboard = () => {
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState<'feed'|'sleep'|'diaper'|'weight'|'nap'|'tummy'|null>(null)
+  const [modalType, setModalType] = useState<'feed'|'sleep'|'diaper'|'weight'|'nap'|'tummy'|'temperature'|'vaccine'|'health'|null>(null)
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerLabel, setTimerLabel] = useState('')
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -290,6 +290,151 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Health Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
+            Health & Growth
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Growth Tracking */}
+            <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 shadow">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-2xl">📏</div>
+                <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-800 px-2 py-1 rounded">Growth</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Height & Weight</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Latest Weight:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">
+                    {(() => {
+                      const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                      if (weightLogs.length > 0) {
+                        const match = weightLogs[0].details.match(/Weight: ([\d.]+) lbs/);
+                        return match ? `${match[1]} lbs` : 'Not recorded';
+                      }
+                      return 'Not recorded';
+                    })()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Latest Height:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">
+                    {(() => {
+                      const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                      if (weightLogs.length > 0) {
+                        const match = weightLogs[0].details.match(/Height: (\d+)'(\d+)\"/);
+                        return match ? `${match[1]}'${match[2]}"` : 'Not recorded';
+                      }
+                      return 'Not recorded';
+                    })()}
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => handleQuickAction('weight')} 
+                className="w-full mt-3 bg-purple-500 text-white py-2 rounded text-sm hover:bg-purple-600 transition-colors"
+              >
+                Log Growth
+              </button>
+            </div>
+
+            {/* Temperature */}
+            <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-lg p-4 shadow">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-2xl">🌡️</div>
+                <span className="text-xs text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-800 px-2 py-1 rounded">Vital</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Temperature</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Last Reading:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">
+                    {(() => {
+                      const tempLogs = logs.filter(l => l.type === 'temperature').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                      if (tempLogs.length > 0) {
+                        const match = tempLogs[0].details.match(/Temperature: ([\d.]+)°F/);
+                        return match ? `${match[1]}°F` : 'Not recorded';
+                      }
+                      return 'Not recorded';
+                    })()}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Normal: 97.5-99.5°F
+                </div>
+              </div>
+              <button 
+                onClick={() => handleQuickAction('temperature')} 
+                className="w-full mt-3 bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 transition-colors"
+              >
+                Log Temperature
+              </button>
+            </div>
+
+            {/* Vaccinations */}
+            <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg p-4 shadow">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-2xl">💉</div>
+                <span className="text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-800 px-2 py-1 rounded">Immunization</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Vaccinations</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Last Vaccine:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">
+                    {(() => {
+                      const vaccineLogs = logs.filter(l => l.type === 'vaccine').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                      if (vaccineLogs.length > 0) {
+                        return vaccineLogs[0].details.split(' - ')[0];
+                      }
+                      return 'None recorded';
+                    })()}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Next due: Check schedule
+                </div>
+              </div>
+              <button 
+                onClick={() => handleQuickAction('vaccine')} 
+                className="w-full mt-3 bg-green-500 text-white py-2 rounded text-sm hover:bg-green-600 transition-colors"
+              >
+                Log Vaccine
+              </button>
+            </div>
+
+            {/* Health Notes */}
+            <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-2xl">📋</div>
+                <span className="text-xs text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">Notes</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Health Notes</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-300">Recent Notes:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">
+                    {(() => {
+                      const healthLogs = logs.filter(l => l.type === 'health').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                      return healthLogs.length > 0 ? healthLogs.length : 0;
+                    })()} notes
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Track symptoms, concerns
+                </div>
+              </div>
+              <button 
+                onClick={() => handleQuickAction('health')} 
+                className="w-full mt-3 bg-blue-500 text-white py-2 rounded text-sm hover:bg-blue-600 transition-colors"
+              >
+                Add Note
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="mt-8">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
             Recent Activity
@@ -430,6 +575,111 @@ const Dashboard = () => {
               <input name="heightIn" type="number" min="0" max="11" placeholder="in" className="w-16 px-2 py-2 border rounded" required />
             </div>
             <button type="submit" className="w-full bg-red-500 text-white py-2 rounded">Log Weight & Height</button>
+          </form>
+        )}
+        {modalType === 'temperature' && (
+          <form onSubmit={e => {
+            e.preventDefault();
+            const form = e.target as any;
+            const temperature = form.temperature.value;
+            const method = form.method.value;
+            const notes = form.notes.value;
+            const time = form.time.value;
+            handleLog('temperature', `Temperature: ${temperature}°F (${method})${notes ? ` - ${notes}` : ''}`, time)
+          }} className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Temperature (°F)</label>
+            <input name="temperature" type="number" min="90" max="110" step="0.1" className="w-full px-3 py-2 border rounded" required />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Method</label>
+            <select name="method" className="w-full px-3 py-2 border rounded" required>
+              <option value="oral">Oral</option>
+              <option value="rectal">Rectal</option>
+              <option value="armpit">Armpit</option>
+              <option value="ear">Ear</option>
+              <option value="forehead">Forehead</option>
+            </select>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
+            <textarea name="notes" className="w-full px-3 py-2 border rounded" placeholder="Any symptoms or concerns..." />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <button type="submit" className="w-full bg-red-500 text-white py-2 rounded">Log Temperature</button>
+          </form>
+        )}
+        {modalType === 'vaccine' && (
+          <form onSubmit={e => {
+            e.preventDefault();
+            const form = e.target as any;
+            const vaccine = form.vaccine.value;
+            const dose = form.dose.value;
+            const location = form.location.value;
+            const notes = form.notes.value;
+            const time = form.time.value;
+            handleLog('vaccine', `${vaccine} - Dose ${dose} (${location})${notes ? ` - ${notes}` : ''}`, time)
+          }} className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Vaccine Name</label>
+            <select name="vaccine" className="w-full px-3 py-2 border rounded" required>
+              <option value="">Select vaccine...</option>
+              <option value="Hepatitis B">Hepatitis B</option>
+              <option value="DTaP">DTaP</option>
+              <option value="Hib">Hib</option>
+              <option value="IPV">IPV</option>
+              <option value="PCV13">PCV13</option>
+              <option value="Rotavirus">Rotavirus</option>
+              <option value="MMR">MMR</option>
+              <option value="Varicella">Varicella</option>
+              <option value="Hepatitis A">Hepatitis A</option>
+              <option value="Influenza">Influenza</option>
+              <option value="COVID-19">COVID-19</option>
+              <option value="Other">Other</option>
+            </select>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Dose Number</label>
+            <input name="dose" type="text" className="w-full px-3 py-2 border rounded" placeholder="e.g., 1st, 2nd, Booster" required />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+            <input name="location" type="text" className="w-full px-3 py-2 border rounded" placeholder="e.g., Left thigh, Right arm" required />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
+            <textarea name="notes" className="w-full px-3 py-2 border rounded" placeholder="Any reactions or notes..." />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">Log Vaccine</button>
+          </form>
+        )}
+        {modalType === 'health' && (
+          <form onSubmit={e => {
+            e.preventDefault();
+            const form = e.target as any;
+            const category = form.category.value;
+            const symptoms = form.symptoms.value;
+            const severity = form.severity.value;
+            const notes = form.notes.value;
+            const time = form.time.value;
+            handleLog('health', `${category} - ${symptoms} (${severity})${notes ? ` - ${notes}` : ''}`, time)
+          }} className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+            <select name="category" className="w-full px-3 py-2 border rounded" required>
+              <option value="">Select category...</option>
+              <option value="Fever">Fever</option>
+              <option value="Cough">Cough</option>
+              <option value="Cold">Cold</option>
+              <option value="Rash">Rash</option>
+              <option value="Vomiting">Vomiting</option>
+              <option value="Diarrhea">Diarrhea</option>
+              <option value="Allergy">Allergy</option>
+              <option value="Injury">Injury</option>
+              <option value="Teething">Teething</option>
+              <option value="Other">Other</option>
+            </select>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Symptoms</label>
+            <input name="symptoms" type="text" className="w-full px-3 py-2 border rounded" placeholder="Describe symptoms..." required />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Severity</label>
+            <select name="severity" className="w-full px-3 py-2 border rounded" required>
+              <option value="Mild">Mild</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Severe">Severe</option>
+            </select>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
+            <textarea name="notes" className="w-full px-3 py-2 border rounded" placeholder="Additional details, medications, etc..." />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">Add Health Note</button>
           </form>
         )}
       </Modal>
