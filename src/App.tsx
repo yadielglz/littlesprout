@@ -4,7 +4,6 @@ import { useStore } from './store/store'
 import Navigation from './components/Navigation'
 import Dashboard from './pages/Dashboard'
 import ActivityLog from './pages/ActivityLog'
-import Memories from './pages/Memories'
 import Charts from './pages/Charts'
 import Settings from './pages/Settings'
 import Welcome from './pages/Welcome'
@@ -42,7 +41,6 @@ const App = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/log" element={<ActivityLog />} />
-            <Route path="/memories" element={<Memories />} />
             <Route path="/charts" element={<Charts />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -95,7 +95,6 @@ const Settings = () => {
       profiles,
       currentProfileId,
       logs: useStore.getState().logs,
-      memories: useStore.getState().memories,
       inventories: useStore.getState().inventories,
       reminders: useStore.getState().reminders,
       customActivities: useStore.getState().customActivities,
@@ -143,12 +142,6 @@ const Settings = () => {
         if (importedData.logs) {
           Object.keys(importedData.logs).forEach(profileId => {
             store.setLogs(profileId, importedData.logs[profileId])
-          })
-        }
-        
-        if (importedData.memories) {
-          Object.keys(importedData.memories).forEach(profileId => {
-            store.setMemories(profileId, importedData.memories[profileId])
           })
         }
         
@@ -418,7 +411,7 @@ const Settings = () => {
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                       <h3 className="font-medium text-green-800 dark:text-green-200 mb-2">Export Data</h3>
                       <p className="text-sm text-green-700 dark:text-green-300 mb-3">
-                        Download a backup of all your data including profiles, activities, and memories.
+                        Download a backup of all your data including profiles and activities.
                       </p>
                       <button
                         onClick={handleExportData}
@@ -574,7 +567,7 @@ const Settings = () => {
           {deleteProfileItem && (
             <div className="space-y-4">
               <p className="text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this profile? This will permanently remove all associated data including activities, memories, and settings.
+                Are you sure you want to delete this profile? This will permanently remove all associated data including activities and settings.
               </p>
               <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
                 <p className="font-medium text-red-800 dark:text-red-200">

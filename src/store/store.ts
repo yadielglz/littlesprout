@@ -1,46 +1,40 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-export interface BabyProfile {
-  id: string
-  userName: string
-  babyName: string
-  dob: string
-  createdAt: string
-}
-
 export interface LogEntry {
   id: string
-  type: string
-  icon: string
-  color: string
-  details: string
-  timestamp: Date
+  timestamp: string
+  type: 'feeding' | 'sleep' | 'diaper' | 'activity' | 'custom'
+  duration?: number
+  amount?: number
   notes?: string
-  rawAmount?: number
-  rawDuration?: number
+  customActivity?: string
+  mood?: 'happy' | 'fussy' | 'calm' | 'crying' | 'sleepy'
 }
 
-export interface Memory {
+export interface BabyProfile {
   id: string
-  date: string
-  image: string
-  description: string
+  babyName: string
+  birthDate: string
+  gender: 'boy' | 'girl' | 'other'
+  weight: number
+  height: number
+  createdAt: string
 }
 
 export interface Inventory {
   diapers: number
   formula: number
-  wipes?: number
-  diapersSize?: string
 }
 
 export interface Reminder {
   id: string
-  text: string
-  time: number
-  frequency: 'none' | 'daily' | 'weekly'
+  title: string
+  time: string
+  days: string[]
   isActive: boolean
+  type: 'feeding' | 'sleep' | 'diaper' | 'medicine' | 'custom'
+  customMessage?: string
 }
 
 export interface CustomActivity {
@@ -48,35 +42,35 @@ export interface CustomActivity {
   name: string
   icon: string
   color: string
-  isCustom: boolean
 }
 
 export interface AchievedMilestone {
   id: string
-  date: string
+  milestoneId: string
+  achievedAt: string
+  notes?: string
 }
 
 export interface ActiveTimer {
-  type: string
-  startTime: number
+  id: string
+  type: 'feeding' | 'sleep' | 'activity'
+  startTime: string
+  customActivity?: string
 }
 
 export interface Appointment {
   id: string
-  date: string // ISO date
-  time: string // HH:mm
-  doctor: string
-  location: string
-  reason: string
+  title: string
+  date: string
+  time: string
+  type: 'doctor' | 'vaccination' | 'checkup' | 'other'
   notes?: string
-  summary?: string
 }
 
 interface AppState {
   profiles: BabyProfile[]
   currentProfileId: string | null
   logs: Record<string, LogEntry[]>
-  memories: Record<string, Memory[]>
   inventories: Record<string, Inventory>
   reminders: Record<string, Reminder[]>
   customActivities: CustomActivity[]
@@ -94,9 +88,6 @@ interface AppState {
   addLog: (profileId: string, log: LogEntry) => void
   updateLog: (profileId: string, logId: string, updates: Partial<LogEntry>) => void
   deleteLog: (profileId: string, logId: string) => void
-  setMemories: (profileId: string, memories: Memory[]) => void
-  addMemory: (profileId: string, memory: Memory) => void
-  deleteMemory: (profileId: string, memoryId: string) => void
   setInventory: (profileId: string, inventory: Inventory) => void
   updateInventory: (profileId: string, item: keyof Inventory, change: number) => void
   setReminders: (profileId: string, reminders: Reminder[]) => void
@@ -115,7 +106,6 @@ interface AppState {
   setSidebarOpen: (open: boolean) => void
   getCurrentProfile: () => BabyProfile | null
   getCurrentLogs: () => LogEntry[]
-  getCurrentMemories: () => Memory[]
   getCurrentInventory: () => Inventory
   getCurrentReminders: () => Reminder[]
   getCurrentAchievedMilestones: () => AchievedMilestone[]
@@ -131,7 +121,6 @@ export const useStore = create<AppState>()(
       profiles: [],
       currentProfileId: null,
       logs: {},
-      memories: {},
       inventories: {},
       reminders: {},
       customActivities: [],
@@ -180,21 +169,6 @@ export const useStore = create<AppState>()(
         logs: {
           ...state.logs,
           [profileId]: (state.logs[profileId] || []).filter(log => log.id !== logId)
-        }
-      })),
-      setMemories: (profileId, memories) => set((state) => ({
-        memories: { ...state.memories, [profileId]: memories }
-      })),
-      addMemory: (profileId, memory) => set((state) => ({
-        memories: { 
-          ...state.memories, 
-          [profileId]: [...(state.memories[profileId] || []), memory] 
-        }
-      })),
-      deleteMemory: (profileId, memoryId) => set((state) => ({
-        memories: {
-          ...state.memories,
-          [profileId]: (state.memories[profileId] || []).filter(m => m.id !== memoryId)
         }
       })),
       setInventory: (profileId, inventory) => set((state) => ({
@@ -261,10 +235,6 @@ export const useStore = create<AppState>()(
         const state = get()
         return state.logs[state.currentProfileId || ''] || []
       },
-      getCurrentMemories: () => {
-        const state = get()
-        return state.memories[state.currentProfileId || ''] || []
-      },
       getCurrentInventory: () => {
         const state = get()
         return state.inventories[state.currentProfileId || ''] || { diapers: 0, formula: 0 }
@@ -310,7 +280,6 @@ export const useStore = create<AppState>()(
         profiles: state.profiles,
         currentProfileId: state.currentProfileId,
         logs: state.logs,
-        memories: state.memories,
         inventories: state.inventories,
         reminders: state.reminders,
         customActivities: state.customActivities,
