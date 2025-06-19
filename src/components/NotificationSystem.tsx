@@ -29,10 +29,10 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editReminder, setEditReminder] = useState<Reminder | null>(null)
   const [deleteReminderItem, setDeleteReminderItem] = useState<Reminder | null>(null)
-  const [newReminderData, setNewReminderData] = useState({
+  const [newReminderData, setNewReminderData] = useState<Omit<Reminder, 'id'>>({
     text: '',
-    time: new Date().getTime(),
-    frequency: 'daily' as 'none' | 'daily' | 'weekly',
+    time: Date.now(),
+    frequency: 'daily',
     isActive: true
   })
 
@@ -95,17 +95,14 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
 
     const reminder: Reminder = {
       id: generateId(),
-      text: newReminderData.text,
-      time: newReminderData.time,
-      frequency: newReminderData.frequency,
-      isActive: newReminderData.isActive
+      ...newReminderData
     }
 
     addReminder(profile.id, reminder)
     setShowAddModal(false)
     setNewReminderData({
       text: '',
-      time: new Date().getTime(),
+      time: Date.now(),
       frequency: 'daily',
       isActive: true
     })
@@ -137,7 +134,8 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
   }
 
   const toggleReminder = (reminder: Reminder) => {
-    updateReminder(profile?.id || '', reminder.id, { isActive: !reminder.isActive })
+    if (!profile) return
+    updateReminder(profile.id, reminder.id, { isActive: !reminder.isActive })
   }
 
   const formatTime = (timestamp: number) => {
@@ -148,7 +146,7 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
     })
   }
 
-  const getFrequencyLabel = (frequency: string) => {
+  const getFrequencyLabel = (frequency: 'none' | 'daily' | 'weekly') => {
     switch (frequency) {
       case 'daily': return 'Daily'
       case 'weekly': return 'Weekly'
@@ -328,146 +326,147 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
       </Modal>
 
       {/* Add Reminder Modal */}
-      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Reminder">
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Add New Reminder"
+      >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Reminder Text *
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Reminder Text
             </label>
             <input
               type="text"
               value={newReminderData.text}
-              onChange={(e) => setNewReminderData({ ...newReminderData, text: e.target.value })}
-              placeholder="e.g., Feed baby, Change diaper, etc."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              onChange={(e) => setNewReminderData(prev => ({ ...prev, text: e.target.value }))}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+              placeholder="Enter reminder text..."
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Time *
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Time
             </label>
             <input
               type="time"
-              value={new Date(newReminderData.time).toLocaleTimeString('en-US', { hour12: false }).slice(0, 5)}
+              value={formatTime(newReminderData.time)}
               onChange={(e) => {
                 const [hours, minutes] = e.target.value.split(':')
-                const newTime = new Date().setHours(parseInt(hours), parseInt(minutes), 0, 0)
-                setNewReminderData({ ...newReminderData, time: newTime })
+                const date = new Date()
+                date.setHours(parseInt(hours))
+                date.setMinutes(parseInt(minutes))
+                setNewReminderData(prev => ({ ...prev, time: date.getTime() }))
               }}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Frequency
             </label>
             <select
               value={newReminderData.frequency}
-              onChange={(e) => setNewReminderData({ ...newReminderData, frequency: e.target.value as 'none' | 'daily' | 'weekly' })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+              onChange={(e) => setNewReminderData(prev => ({ 
+                ...prev, 
+                frequency: e.target.value as 'none' | 'daily' | 'weekly'
+              }))}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
             >
+              <option value="none">Once</option>
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
-              <option value="none">Once</option>
             </select>
           </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="isActive"
-              checked={newReminderData.isActive}
-              onChange={(e) => setNewReminderData({ ...newReminderData, isActive: e.target.checked })}
-              className="mr-2"
-            />
-            <label htmlFor="isActive" className="text-sm text-gray-700 dark:text-gray-300">
-              Active reminder
-            </label>
-          </div>
-          <div className="flex space-x-3 pt-4">
-            <button
-              onClick={handleAddReminder}
-              className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Add Reminder
-            </button>
+
+          <div className="flex justify-end space-x-3 mt-6">
             <button
               onClick={() => setShowAddModal(false)}
-              className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
             >
               Cancel
+            </button>
+            <button
+              onClick={handleAddReminder}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+              Add Reminder
             </button>
           </div>
         </div>
       </Modal>
 
       {/* Edit Reminder Modal */}
-      <Modal isOpen={!!editReminder} onClose={() => setEditReminder(null)} title="Edit Reminder">
+      <Modal
+        isOpen={!!editReminder}
+        onClose={() => setEditReminder(null)}
+        title="Edit Reminder"
+      >
         {editReminder && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Reminder Text *
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Reminder Text
               </label>
               <input
                 type="text"
                 value={editReminder.text}
                 onChange={(e) => setEditReminder({ ...editReminder, text: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                placeholder="Enter reminder text..."
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Time *
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Time
               </label>
               <input
                 type="time"
-                value={new Date(editReminder.time).toLocaleTimeString('en-US', { hour12: false }).slice(0, 5)}
+                value={formatTime(editReminder.time)}
                 onChange={(e) => {
                   const [hours, minutes] = e.target.value.split(':')
-                  const newTime = new Date().setHours(parseInt(hours), parseInt(minutes), 0, 0)
-                  setEditReminder({ ...editReminder, time: newTime })
+                  const date = new Date()
+                  date.setHours(parseInt(hours))
+                  date.setMinutes(parseInt(minutes))
+                  setEditReminder({ ...editReminder, time: date.getTime() })
                 }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Frequency
               </label>
               <select
                 value={editReminder.frequency}
-                onChange={(e) => setEditReminder({ ...editReminder, frequency: e.target.value as 'none' | 'daily' | 'weekly' })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                onChange={(e) => setEditReminder({ 
+                  ...editReminder, 
+                  frequency: e.target.value as 'none' | 'daily' | 'weekly'
+                })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
               >
+                <option value="none">Once</option>
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
-                <option value="none">Once</option>
               </select>
             </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="editIsActive"
-                checked={editReminder.isActive}
-                onChange={(e) => setEditReminder({ ...editReminder, isActive: e.target.checked })}
-                className="mr-2"
-              />
-              <label htmlFor="editIsActive" className="text-sm text-gray-700 dark:text-gray-300">
-                Active reminder
-              </label>
-            </div>
-            <div className="flex space-x-3 pt-4">
-              <button
-                onClick={handleUpdateReminder}
-                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Update Reminder
-              </button>
+
+            <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setEditReminder(null)}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               >
                 Cancel
+              </button>
+              <button
+                onClick={handleUpdateReminder}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Update Reminder
               </button>
             </div>
           </div>
@@ -475,36 +474,31 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal isOpen={!!deleteReminderItem} onClose={() => setDeleteReminderItem(null)} title="Delete Reminder">
-        {deleteReminderItem && (
-          <div className="space-y-4">
-            <p className="text-gray-600 dark:text-gray-300">
-              Are you sure you want to delete this reminder? This action cannot be undone.
-            </p>
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-              <p className="font-medium text-gray-800 dark:text-white">
-                {deleteReminderItem.text}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {formatTime(deleteReminderItem.time)} • {getFrequencyLabel(deleteReminderItem.frequency)}
-              </p>
-            </div>
-            <div className="flex space-x-3 pt-4">
-              <button
-                onClick={handleDeleteReminder}
-                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setDeleteReminderItem(null)}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
+      <Modal
+        isOpen={!!deleteReminderItem}
+        onClose={() => setDeleteReminderItem(null)}
+        title="Delete Reminder"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600 dark:text-gray-400">
+            Are you sure you want to delete this reminder? This action cannot be undone.
+          </p>
+
+          <div className="flex justify-end space-x-3 mt-6">
+            <button
+              onClick={() => setDeleteReminderItem(null)}
+              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteReminder}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            >
+              Delete
+            </button>
           </div>
-        )}
+        </div>
       </Modal>
     </>
   )

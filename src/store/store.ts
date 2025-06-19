@@ -29,12 +29,10 @@ export interface Inventory {
 
 export interface Reminder {
   id: string
-  title: string
-  time: string
-  days: string[]
+  text: string
+  time: number
+  frequency: 'none' | 'daily' | 'weekly'
   isActive: boolean
-  type: 'feeding' | 'sleep' | 'diaper' | 'medicine' | 'custom'
-  customMessage?: string
 }
 
 export interface CustomActivity {
