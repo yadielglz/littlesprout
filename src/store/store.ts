@@ -317,7 +317,15 @@ export const useStore = create<AppState>()(
         achievedMilestones: state.achievedMilestones,
         appointments: state.appointments,
         isDarkMode: state.isDarkMode
-      })
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const { profiles, currentProfileId } = state
+          if (profiles?.length > 0 && !currentProfileId) {
+            state.currentProfileId = profiles[0].id
+          }
+        }
+      }
     }
   )
 ) 

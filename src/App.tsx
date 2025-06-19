@@ -18,7 +18,9 @@ import { initializeApp } from './utils/initialization'
 function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [showSplash, setShowSplash] = useState(true)
-  const { profiles, setProfiles, setCurrentProfileId } = useStore()
+  const { profiles, setProfiles, setCurrentProfileId, getCurrentProfile } = useStore()
+  const [isHydrated, setIsHydrated] = useState(false)
+  const profile = getCurrentProfile()
 
   useEffect(() => {
     const initialize = async () => {
@@ -43,8 +45,19 @@ function App() {
     initialize()
   }, [setProfiles, setCurrentProfileId])
 
-  if (isLoading) {
-    return <SplashScreen show={showSplash} />
+  useEffect(() => {
+    // Wait for store to be hydrated
+    const unsubHydrate = useStore.persist.onHydrate(() => setIsHydrated(false))
+    const unsubFinishHydration = useStore.persist.onFinishHydration(() => setIsHydrated(true))
+
+    return () => {
+      unsubHydrate()
+      unsubFinishHydration()
+    }
+  }, [])
+
+  if (!isHydrated) {
+    return <SplashScreen show={true} />
   }
 
   return (
