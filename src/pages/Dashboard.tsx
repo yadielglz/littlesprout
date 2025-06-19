@@ -146,8 +146,8 @@ const Dashboard = () => {
               onClick={() => handleQuickAction('feed')} 
               className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
             >
-              <span className="mr-2">🍼</span>
-              Quick Feed
+              <span className="mr-2">📝</span>
+              Quick Activity
             </button>
             <button 
               onClick={() => setRemindersOpen(true)} 
@@ -192,245 +192,169 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => handleQuickAction('feed')} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-2">
-                  🍼
-                </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-white">Feed</span>
-              </button>
-              <button onClick={() => handleQuickAction('sleep')} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-2">
-                  😴
-                </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-white">Sleep</span>
-              </button>
-              <button onClick={() => handleQuickAction('diaper')} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-2">
-                  👶
-                </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-white">Diaper</span>
-              </button>
-              <button onClick={() => handleQuickAction('weight')} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <div className="w-12 h-12 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-2">
-                  📏
-                </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-white">Weight</span>
-              </button>
-              <button onClick={() => handleQuickAction('nap')} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors col-span-2">
-                <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 rounded-full flex items-center justify-center mb-2">
-                  🛏️
-                </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-white">Nap Timer</span>
-              </button>
-              <button onClick={() => handleQuickAction('tummy')} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors col-span-2">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mb-2">
-                  ⏱️
-                </div>
-                <span className="text-sm font-medium text-gray-800 dark:text-white">Tummy Time</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Inventory UI */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-              Inventory
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col items-center bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-2">🧷</div>
-                <div className="font-semibold text-gray-800 dark:text-white mb-1">Diapers</div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <button onClick={() => handleInventoryChange('diapers', -1)} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-lg">-</button>
-                  <span className="text-xl font-bold text-green-700 dark:text-green-300">{inventory?.diapers || 0}</span>
-                  <button onClick={() => handleInventoryChange('diapers', 1)} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-lg">+</button>
-                </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Track diaper stock</span>
-              </div>
-              <div className="flex flex-col items-center bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-2">🍼</div>
-                <div className="font-semibold text-gray-800 dark:text-white mb-1">Formula</div>
-                <div className="flex items-center space-x-2 mb-2">
-                  <button onClick={() => handleInventoryChange('formula', -1)} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-lg">-</button>
-                  <span className="text-xl font-bold text-blue-700 dark:text-blue-300">{inventory?.formula || 0}</span>
-                  <button onClick={() => handleInventoryChange('formula', 1)} className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-lg">+</button>
-                </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Track formula stock</span>
-              </div>
-            </div>
-          </div>
-
           {/* Today's Summary */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
               Today's Summary
             </h2>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-1">🍼</div>
-                <div className="text-lg font-bold text-blue-700 dark:text-blue-300">{feedsToday}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">Feeds</div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 dark:text-gray-300">Feeds</span>
+                <span className="font-semibold text-gray-800 dark:text-white">{feedsToday}</span>
               </div>
-              <div className="flex flex-col items-center bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-indigo-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-1">😴</div>
-                <div className="text-lg font-bold text-indigo-700 dark:text-indigo-300">{Math.floor(sleepToday/3600000)}h {Math.round((sleepToday%3600000)/60000)}m</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">Sleep</div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 dark:text-gray-300">Sleep</span>
+                <span className="font-semibold text-gray-800 dark:text-white">{Math.round(sleepToday/60000)} min</span>
               </div>
-              <div className="flex flex-col items-center bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-1">👶</div>
-                <div className="text-lg font-bold text-amber-700 dark:text-amber-300">{diapersToday}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">Diapers</div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 dark:text-gray-300">Diapers</span>
+                <span className="font-semibold text-gray-800 dark:text-white">{diapersToday}</span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Health Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
-            Health & Growth
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Growth Tracking */}
-            <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 shadow">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-2xl">📏</div>
-                <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-800 px-2 py-1 rounded">Growth</span>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Height & Weight</h3>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-300">Latest Weight:</span>
-                  <span className="font-medium text-gray-800 dark:text-white">
-                    {(() => {
-                      const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                      if (weightLogs.length > 0) {
-                        const match = weightLogs[0].details.match(/Weight: ([\d.]+) lbs/);
-                        return match ? `${match[1]} lbs` : 'Not recorded';
-                      }
-                      return 'Not recorded';
-                    })()}
-                  </span>
+          {/* Health Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
+              Health & Growth
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Growth Tracking */}
+              <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-2xl">📏</div>
+                  <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-800 px-2 py-1 rounded">Growth</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-300">Latest Height:</span>
-                  <span className="font-medium text-gray-800 dark:text-white">
-                    {(() => {
-                      const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                      if (weightLogs.length > 0) {
-                        const match = weightLogs[0].details.match(/Height: (\d+)'(\d+)\"/);
-                        return match ? `${match[1]}'${match[2]}"` : 'Not recorded';
-                      }
-                      return 'Not recorded';
-                    })()}
-                  </span>
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Height & Weight</h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-300">Latest Weight:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">
+                      {(() => {
+                        const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                        if (weightLogs.length > 0) {
+                          const match = weightLogs[0].details.match(/Weight: ([\d.]+) lbs/);
+                          return match ? `${match[1]} lbs` : 'Not recorded';
+                        }
+                        return 'Not recorded';
+                      })()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-300">Latest Height:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">
+                      {(() => {
+                        const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                        if (weightLogs.length > 0) {
+                          const match = weightLogs[0].details.match(/Height: (\d+)'(\d+)\"/);
+                          return match ? `${match[1]}'${match[2]}"` : 'Not recorded';
+                        }
+                        return 'Not recorded';
+                      })()}
+                    </span>
+                  </div>
                 </div>
+                <button 
+                  onClick={() => handleQuickAction('weight')} 
+                  className="w-full mt-3 bg-purple-500 text-white py-2 rounded text-sm hover:bg-purple-600 transition-colors"
+                >
+                  Log Growth
+                </button>
               </div>
-              <button 
-                onClick={() => handleQuickAction('weight')} 
-                className="w-full mt-3 bg-purple-500 text-white py-2 rounded text-sm hover:bg-purple-600 transition-colors"
-              >
-                Log Growth
-              </button>
-            </div>
 
-            {/* Temperature */}
-            <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-lg p-4 shadow">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-2xl">🌡️</div>
-                <span className="text-xs text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-800 px-2 py-1 rounded">Vital</span>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Temperature</h3>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-300">Last Reading:</span>
-                  <span className="font-medium text-gray-800 dark:text-white">
-                    {(() => {
-                      const tempLogs = logs.filter(l => l.type === 'temperature').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                      if (tempLogs.length > 0) {
-                        const match = tempLogs[0].details.match(/Temperature: ([\d.]+)°F/);
-                        return match ? `${match[1]}°F` : 'Not recorded';
-                      }
-                      return 'Not recorded';
-                    })()}
-                  </span>
+              {/* Temperature */}
+              <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-lg p-4 shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-2xl">🌡️</div>
+                  <span className="text-xs text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-800 px-2 py-1 rounded">Vital</span>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Normal: 97.5-99.5°F
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Temperature</h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-300">Last Reading:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">
+                      {(() => {
+                        const tempLogs = logs.filter(l => l.type === 'temperature').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                        if (tempLogs.length > 0) {
+                          const match = tempLogs[0].details.match(/Temperature: ([\d.]+)°F/);
+                          return match ? `${match[1]}°F` : 'Not recorded';
+                        }
+                        return 'Not recorded';
+                      })()}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Normal: 97.5-99.5°F
+                  </div>
                 </div>
+                <button 
+                  onClick={() => handleQuickAction('temperature')} 
+                  className="w-full mt-3 bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 transition-colors"
+                >
+                  Log Temperature
+                </button>
               </div>
-              <button 
-                onClick={() => handleQuickAction('temperature')} 
-                className="w-full mt-3 bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 transition-colors"
-              >
-                Log Temperature
-              </button>
-            </div>
 
-            {/* Vaccinations */}
-            <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg p-4 shadow">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-2xl">💉</div>
-                <span className="text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-800 px-2 py-1 rounded">Immunization</span>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Vaccinations</h3>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-300">Last Vaccine:</span>
-                  <span className="font-medium text-gray-800 dark:text-white">
-                    {(() => {
-                      const vaccineLogs = logs.filter(l => l.type === 'vaccine').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                      if (vaccineLogs.length > 0) {
-                        return vaccineLogs[0].details.split(' - ')[0];
-                      }
-                      return 'None recorded';
-                    })()}
-                  </span>
+              {/* Vaccinations */}
+              <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg p-4 shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-2xl">💉</div>
+                  <span className="text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-800 px-2 py-1 rounded">Immunization</span>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Next due: Check schedule
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Vaccinations</h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-300">Last Vaccine:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">
+                      {(() => {
+                        const vaccineLogs = logs.filter(l => l.type === 'vaccine').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                        if (vaccineLogs.length > 0) {
+                          return vaccineLogs[0].details.split(' - ')[0];
+                        }
+                        return 'None recorded';
+                      })()}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Next due: Check schedule
+                  </div>
                 </div>
+                <button 
+                  onClick={() => handleQuickAction('vaccine')} 
+                  className="w-full mt-3 bg-green-500 text-white py-2 rounded text-sm hover:bg-green-600 transition-colors"
+                >
+                  Log Vaccine
+                </button>
               </div>
-              <button 
-                onClick={() => handleQuickAction('vaccine')} 
-                className="w-full mt-3 bg-green-500 text-white py-2 rounded text-sm hover:bg-green-600 transition-colors"
-              >
-                Log Vaccine
-              </button>
-            </div>
 
-            {/* Health Notes */}
-            <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-2xl">📋</div>
-                <span className="text-xs text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">Notes</span>
-              </div>
-              <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Health Notes</h3>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-300">Recent Notes:</span>
-                  <span className="font-medium text-gray-800 dark:text-white">
-                    {(() => {
-                      const healthLogs = logs.filter(l => l.type === 'health').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                      return healthLogs.length > 0 ? healthLogs.length : 0;
-                    })()} notes
-                  </span>
+              {/* Health Notes */}
+              <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-2xl">📋</div>
+                  <span className="text-xs text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">Notes</span>
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Track symptoms, concerns
+                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Health Notes</h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-300">Recent Notes:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">
+                      {(() => {
+                        const healthLogs = logs.filter(l => l.type === 'health').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+                        return healthLogs.length > 0 ? healthLogs.length : 0;
+                      })()} notes
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Track symptoms, concerns
+                  </div>
                 </div>
+                <button 
+                  onClick={() => handleQuickAction('health')} 
+                  className="w-full mt-3 bg-blue-500 text-white py-2 rounded text-sm hover:bg-blue-600 transition-colors"
+                >
+                  Add Note
+                </button>
               </div>
-              <button 
-                onClick={() => handleQuickAction('health')} 
-                className="w-full mt-3 bg-blue-500 text-white py-2 rounded text-sm hover:bg-blue-600 transition-colors"
-              >
-                Add Note
-              </button>
             </div>
           </div>
         </div>
