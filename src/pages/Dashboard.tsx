@@ -23,7 +23,6 @@ const Dashboard = () => {
     addAppointment,
     updateAppointment,
     deleteAppointment,
-    appointments,
   } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
