@@ -5,10 +5,11 @@ import Modal from '../components/Modal'
 import Timer from '../components/Timer'
 import { generateId } from '../utils/initialization'
 import SettingsModal from '../components/SettingsModal'
-import Reminders from '../components/Reminders'
 import { LogEntry } from '../store/store'
 import ClockWeather from '../components/ClockWeather'
 import MilestoneTicker from '../components/MilestoneTicker'
+import HealthGrowthCard from '../components/HealthGrowthCard'
+import NotificationSystem from '../components/NotificationSystem'
 
 const Dashboard = () => {
   const {
@@ -208,235 +209,73 @@ const Dashboard = () => {
       
       {profile && <div className="my-4"><MilestoneTicker dob={profile.dob} /></div>}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 md:space-y-14">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Doctor's Appointment Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Next Doctor's Appointment</h2>
-            {nextAppt ? (
-              <div>
-                <div className="font-bold text-blue-700 dark:text-blue-300">{nextAppt.date} at {nextAppt.time}</div>
-                <div className="text-gray-700 dark:text-gray-200">Dr. {nextAppt.doctor} &mdash; {nextAppt.location}</div>
-                <div className="text-gray-500 dark:text-gray-400 text-sm">Reason: {nextAppt.reason}</div>
-                {nextAppt.notes && <div className="text-xs text-gray-400 mt-1">Notes: {nextAppt.notes}</div>}
-                {nextAppt.summary && <div className="text-xs text-gray-400 mt-1">Summary: {nextAppt.summary}</div>}
-              </div>
-            ) : (
-              <div className="text-gray-500 dark:text-gray-400">No upcoming appointments</div>
-            )}
-          </div>
-          <div>
-            <button onClick={() => { setEditAppt(null); setApptModalOpen(true) }} className="bg-blue-500 text-white px-4 py-2 rounded shadow">{nextAppt ? 'Edit' : 'Add'} Appointment</button>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Next Doctor's Appointment</h2>
+              {nextAppt ? (
+                <div>
+                  <div className="font-bold text-blue-700 dark:text-blue-300">{nextAppt.date} at {nextAppt.time}</div>
+                  <div className="text-gray-700 dark:text-gray-200">Dr. {nextAppt.doctor} &mdash; {nextAppt.location}</div>
+                  <div className="text-gray-500 dark:text-gray-400 text-sm">Reason: {nextAppt.reason}</div>
+                  {nextAppt.notes && <div className="text-xs text-gray-400 mt-1">Notes: {nextAppt.notes}</div>}
+                  {nextAppt.summary && <div className="text-xs text-gray-400 mt-1">Summary: {nextAppt.summary}</div>}
+                </div>
+              ) : (
+                <div className="text-gray-500 dark:text-gray-400">No upcoming appointments</div>
+              )}
+            </div>
+            <div>
+              <button 
+                onClick={() => { setEditAppt(null); setApptModalOpen(true) }} 
+                className="w-full md:w-auto bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition-colors"
+              >
+                {nextAppt ? 'Edit' : 'Add'} Appointment
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Today's Summary */}
+        {/* Today's Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
               Today's Summary
             </h2>
             <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-1">🍼</div>
-                <div className="text-lg font-bold text-blue-700 dark:text-blue-300">{feedsToday}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">Feeds</div>
+              <div className="flex flex-col items-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4">
+                <div className="text-3xl mb-2">🍼</div>
+                <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">{feedsToday}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Feeds</div>
               </div>
-              <div className="flex flex-col items-center bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-indigo-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-1">😴</div>
-                <div className="text-lg font-bold text-indigo-700 dark:text-indigo-300">{Math.floor(sleepToday/3600000)}h {Math.round((sleepToday%3600000)/60000)}m</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">Sleep</div>
+              <div className="flex flex-col items-center bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800 rounded-lg p-4">
+                <div className="text-3xl mb-2">😴</div>
+                <div className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">
+                  {Math.floor(sleepToday/3600000)}h {Math.round((sleepToday%3600000)/60000)}m
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Sleep</div>
               </div>
-              <div className="flex flex-col items-center bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 rounded-lg p-4 shadow">
-                <div className="text-3xl mb-1">👶</div>
-                <div className="text-lg font-bold text-amber-700 dark:text-amber-300">{diapersToday}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">Diapers</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Health Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
-              Health & Growth
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Growth Tracking */}
-              <div className="bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-2xl">📏</div>
-                  <span className="text-xs text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-800 px-2 py-1 rounded">Growth</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Height & Weight</h3>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Latest Weight:</span>
-                    <span className="font-medium text-gray-800 dark:text-white">
-                      {(() => {
-                        const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                        if (weightLogs.length > 0) {
-                          const match = weightLogs[0].details.match(/Weight: ([\d.]+) lbs/);
-                          return match ? `${match[1]} lbs` : 'Not recorded';
-                        }
-                        return 'Not recorded';
-                      })()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Latest Height:</span>
-                    <span className="font-medium text-gray-800 dark:text-white">
-                      {(() => {
-                        const weightLogs = logs.filter(l => l.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                        if (weightLogs.length > 0) {
-                          const match = weightLogs[0].details.match(/Height: (\d+)'(\d+)\"/);
-                          return match ? `${match[1]}'${match[2]}"` : 'Not recorded';
-                        }
-                        return 'Not recorded';
-                      })()}
-                    </span>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => handleQuickAction('weight')} 
-                  className="w-full mt-3 bg-purple-500 text-white py-2 rounded text-sm hover:bg-purple-600 transition-colors"
-                >
-                  Log Growth
-                </button>
-              </div>
-
-              {/* Temperature */}
-              <div className="bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-lg p-4 shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-2xl">🌡️</div>
-                  <span className="text-xs text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-800 px-2 py-1 rounded">Vital</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Temperature</h3>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Last Reading:</span>
-                    <span className="font-medium text-gray-800 dark:text-white">
-                      {(() => {
-                        const tempLogs = logs.filter(l => l.type === 'temperature').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                        if (tempLogs.length > 0) {
-                          const match = tempLogs[0].details.match(/Temperature: ([\d.]+)°F/);
-                          return match ? `${match[1]}°F` : 'Not recorded';
-                        }
-                        return 'Not recorded';
-                      })()}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Normal: 97.5-99.5°F
-                  </div>
-                </div>
-                <button 
-                  onClick={() => handleQuickAction('temperature')} 
-                  className="w-full mt-3 bg-red-500 text-white py-2 rounded text-sm hover:bg-red-600 transition-colors"
-                >
-                  Log Temperature
-                </button>
-              </div>
-
-              {/* Vaccinations */}
-              <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-lg p-4 shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-2xl">💉</div>
-                  <span className="text-xs text-green-600 dark:text-green-300 bg-green-100 dark:bg-green-800 px-2 py-1 rounded">Immunization</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Vaccinations</h3>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Last Vaccine:</span>
-                    <span className="font-medium text-gray-800 dark:text-white">
-                      {(() => {
-                        const vaccineLogs = logs.filter(l => l.type === 'vaccine').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                        if (vaccineLogs.length > 0) {
-                          return vaccineLogs[0].details.split(' - ')[0];
-                        }
-                        return 'None recorded';
-                      })()}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Next due: Check schedule
-                  </div>
-                </div>
-                <button 
-                  onClick={() => handleQuickAction('vaccine')} 
-                  className="w-full mt-3 bg-green-500 text-white py-2 rounded text-sm hover:bg-green-600 transition-colors"
-                >
-                  Log Vaccine
-                </button>
-              </div>
-
-              {/* Health Notes */}
-              <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-2xl">📋</div>
-                  <span className="text-xs text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">Notes</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 dark:text-white mb-2">Health Notes</h3>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Recent Notes:</span>
-                    <span className="font-medium text-gray-800 dark:text-white">
-                      {(() => {
-                        const healthLogs = logs.filter(l => l.type === 'health').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-                        return healthLogs.length > 0 ? healthLogs.length : 0;
-                      })()} notes
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Track symptoms, concerns
-                  </div>
-                </div>
-                <button 
-                  onClick={() => handleQuickAction('health')} 
-                  className="w-full mt-3 bg-blue-500 text-white py-2 rounded text-sm hover:bg-blue-600 transition-colors"
-                >
-                  Add Note
-                </button>
+              <div className="flex flex-col items-center bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900 dark:to-amber-800 rounded-lg p-4">
+                <div className="text-3xl mb-2">👶</div>
+                <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">{diapersToday}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Diapers</div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-8">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
-            Recent Activity
-          </h2>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-            {logs.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-2">📝</div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                  No activities logged yet
-                </p>
-                <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
-                  Start tracking to see your baby's journey
-                </p>
-              </div>
-            ) : (
-              <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-                {logs.slice(-10).reverse().map(log => (
-                  <li key={log.id} className="py-2 flex items-center space-x-3">
-                    <span className="text-2xl">{log.icon}</span>
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-800 dark:text-white">{log.type.charAt(0).toUpperCase() + log.type.slice(1)}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{log.details}</div>
-                      <div className="text-xs text-gray-400 dark:text-gray-500">{new Date(log.timestamp).toLocaleString()}</div>
-                    </div>
-                    <button onClick={() => setEditLog(log)} className="text-xs px-2 py-1 bg-blue-200 rounded">Edit</button>
-                    <button onClick={() => setDeleteLogEntry(log)} className="text-xs px-2 py-1 bg-red-200 rounded">Delete</button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {/* Health & Growth Section */}
+          <HealthGrowthCard 
+            onLogGrowth={() => handleQuickAction('weight')}
+            onLogTemp={() => handleQuickAction('temperature')}
+            onLogVaccine={() => handleQuickAction('vaccine')}
+            onAddNote={() => handleQuickAction('health')}
+          />
         </div>
       </main>
 
-      {/* Modal for quick actions */}
+      {/* Modals */}
       <Modal isOpen={modalOpen} onClose={() => { setModalOpen(false); setModalType(null) }} title={modalType ? `Log ${modalType.charAt(0).toUpperCase() + modalType.slice(1)}` : ''}>
         {modalType === 'feed' && (
           <form onSubmit={(e) => {
@@ -650,17 +489,9 @@ const Dashboard = () => {
         )}
       </Modal>
 
-      {/* Timer Modal */}
-      <Timer
-        label={timerLabel}
-        onSave={handleTimerSave}
-        onClose={() => setTimerOpen(false)}
-        isOpen={timerOpen}
-      />
-
-      {/* Settings Modal */}
+      <Timer isOpen={timerOpen} onClose={() => setTimerOpen(false)} onSave={handleTimerSave} label={timerLabel} />
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
-      <Reminders isOpen={remindersOpen} onClose={() => setRemindersOpen(false)} />
+      <NotificationSystem isOpen={remindersOpen} onClose={() => setRemindersOpen(false)} />
 
       {/* Edit Log Modal */}
       <Modal isOpen={!!editLog} onClose={() => setEditLog(null)} title="Edit Log">
