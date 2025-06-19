@@ -50,10 +50,10 @@ const MilestoneTicker: React.FC<MilestoneTickerProps> = ({ dob }) => {
   if (upcoming.length === 0) return null
 
   return (
-    <div className="w-full bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900 dark:to-blue-900 py-2 px-4 rounded shadow flex items-center overflow-x-auto my-2 md:my-4 md:mt-0 md:mb-4 md:max-w-2xl md:mx-auto">
-      <span className="mr-2 text-green-700 dark:text-green-300 font-bold whitespace-nowrap">Upcoming Milestone:</span>
-      <div className="whitespace-nowrap animate-marquee text-gray-800 dark:text-white font-medium">
-        {upcoming[index].text} <span className="text-xs text-gray-500 ml-2">({upcoming[index].age} mo)</span>
+    <div className="w-full bg-gradient-to-r from-green-100 to-blue-100 dark:from-green-900 dark:to-blue-900 py-2 px-4 rounded shadow flex flex-col items-center overflow-x-auto my-2 md:my-4 md:mt-0 md:mb-4 md:max-w-2xl md:mx-auto">
+      <div className="text-xs text-green-700 dark:text-green-300 font-bold mb-1">Upcoming Milestone ({upcoming[index].age} mo)</div>
+      <div className="text-center text-gray-800 dark:text-white font-medium leading-tight">
+        {upcoming[index].text}
       </div>
     </div>
   )

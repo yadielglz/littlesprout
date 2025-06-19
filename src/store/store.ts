@@ -61,6 +61,17 @@ export interface ActiveTimer {
   startTime: number
 }
 
+export interface Appointment {
+  id: string
+  date: string // ISO date
+  time: string // HH:mm
+  doctor: string
+  location: string
+  reason: string
+  notes?: string
+  summary?: string
+}
+
 interface AppState {
   profiles: BabyProfile[]
   currentProfileId: string | null
@@ -73,6 +84,7 @@ interface AppState {
   activeTimer: ActiveTimer | null
   isDarkMode: boolean
   sidebarOpen: boolean
+  appointments: Record<string, Appointment[]>
   setProfiles: (profiles: BabyProfile[]) => void
   addProfile: (profile: BabyProfile) => void
   updateProfile: (id: string, updates: Partial<BabyProfile>) => void
@@ -107,6 +119,10 @@ interface AppState {
   getCurrentInventory: () => Inventory
   getCurrentReminders: () => Reminder[]
   getCurrentAchievedMilestones: () => AchievedMilestone[]
+  addAppointment: (profileId: string, appt: Appointment) => void
+  updateAppointment: (profileId: string, apptId: string, updates: Partial<Appointment>) => void
+  deleteAppointment: (profileId: string, apptId: string) => void
+  getNextAppointment: (profileId: string) => Appointment | null
 }
 
 export const useStore = create<AppState>()(
@@ -123,6 +139,7 @@ export const useStore = create<AppState>()(
       activeTimer: null,
       isDarkMode: false,
       sidebarOpen: false,
+      appointments: {},
       setProfiles: (profiles) => set({ profiles }),
       addProfile: (profile) => set((state) => ({ 
         profiles: [...state.profiles, profile],
@@ -260,6 +277,31 @@ export const useStore = create<AppState>()(
         const state = get()
         return state.achievedMilestones[state.currentProfileId || ''] || []
       },
+      addAppointment: (profileId, appt) => set((state) => ({
+        appointments: {
+          ...state.appointments,
+          [profileId]: [...(state.appointments[profileId] || []), appt]
+        }
+      })),
+      updateAppointment: (profileId, apptId, updates) => set((state) => ({
+        appointments: {
+          ...state.appointments,
+          [profileId]: (state.appointments[profileId] || []).map(a => a.id === apptId ? { ...a, ...updates } : a)
+        }
+      })),
+      deleteAppointment: (profileId, apptId) => set((state) => ({
+        appointments: {
+          ...state.appointments,
+          [profileId]: (state.appointments[profileId] || []).filter(a => a.id !== apptId)
+        }
+      })),
+      getNextAppointment: (profileId) => {
+        const appts = get().appointments[profileId] || []
+        const now = new Date()
+        return appts
+          .filter(a => new Date(a.date + 'T' + a.time) >= now)
+          .sort((a, b) => new Date(a.date + 'T' + a.time).getTime() - new Date(b.date + 'T' + b.time).getTime())[0] || null
+      },
     }),
     {
       name: 'littlesprout-storage',
@@ -273,6 +315,7 @@ export const useStore = create<AppState>()(
         customActivities: state.customActivities,
         achievedMilestones: state.achievedMilestones,
         isDarkMode: state.isDarkMode,
+        appointments: state.appointments,
       }),
     }
   )

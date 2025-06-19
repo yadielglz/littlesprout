@@ -1,4 +1,4 @@
-import { useStore } from '../store/store'
+import { useStore, Appointment } from '../store/store'
 import { calculateAge } from '../utils/initialization'
 import { useState } from 'react'
 import Modal from '../components/Modal'
@@ -19,6 +19,11 @@ const Dashboard = () => {
     currentProfileId,
     deleteLog,
     updateLog,
+    getNextAppointment,
+    addAppointment,
+    updateAppointment,
+    deleteAppointment,
+    appointments,
   } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
@@ -33,6 +38,8 @@ const Dashboard = () => {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editLog, setEditLog] = useState<LogEntry | null>(null)
   const [deleteLogEntry, setDeleteLogEntry] = useState<LogEntry | null>(null)
+  const [apptModalOpen, setApptModalOpen] = useState(false)
+  const [editAppt, setEditAppt] = useState<Appointment | null>(null)
 
   // Inventory state
   const handleInventoryChange = (item: 'diapers'|'formula', delta: number) => {
@@ -90,6 +97,8 @@ const Dashboard = () => {
   const sleepToday = logs.filter(l => (l.type === 'sleep' || l.type === 'nap') && new Date(l.timestamp).toDateString() === today).reduce((acc, l) => acc + (l.rawDuration || 0), 0)
   const diapersToday = logs.filter(l => l.type === 'diaper' && new Date(l.timestamp).toDateString() === today).length
 
+  const nextAppt = profile ? getNextAppointment(profile.id) : null
+
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -131,7 +140,28 @@ const Dashboard = () => {
       </header>
       {profile && <div className="my-4"><MilestoneTicker dob={profile.dob} /></div>}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 md:space-y-14">
+        {/* Doctor's Appointment Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Next Doctor's Appointment</h2>
+            {nextAppt ? (
+              <div>
+                <div className="font-bold text-blue-700 dark:text-blue-300">{nextAppt.date} at {nextAppt.time}</div>
+                <div className="text-gray-700 dark:text-gray-200">Dr. {nextAppt.doctor} &mdash; {nextAppt.location}</div>
+                <div className="text-gray-500 dark:text-gray-400 text-sm">Reason: {nextAppt.reason}</div>
+                {nextAppt.notes && <div className="text-xs text-gray-400 mt-1">Notes: {nextAppt.notes}</div>}
+                {nextAppt.summary && <div className="text-xs text-gray-400 mt-1">Summary: {nextAppt.summary}</div>}
+              </div>
+            ) : (
+              <div className="text-gray-500 dark:text-gray-400">No upcoming appointments</div>
+            )}
+          </div>
+          <div>
+            <button onClick={() => { setEditAppt(null); setApptModalOpen(true) }} className="bg-blue-500 text-white px-4 py-2 rounded shadow">{nextAppt ? 'Edit' : 'Add'} Appointment</button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
@@ -469,6 +499,49 @@ const Dashboard = () => {
         <div className="mb-4">Are you sure you want to delete this log?</div>
         <button onClick={() => { if (deleteLogEntry && currentProfileId) { deleteLog(currentProfileId, deleteLogEntry.id); } setDeleteLogEntry(null); }} className="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
         <button onClick={() => setDeleteLogEntry(null)} className="ml-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded">Cancel</button>
+      </Modal>
+
+      {/* Appointment Modal */}
+      <Modal isOpen={apptModalOpen} onClose={() => setApptModalOpen(false)} title={editAppt ? 'Edit Appointment' : 'Add Appointment'}>
+        <form onSubmit={e => {
+          e.preventDefault();
+          const form = e.target as any;
+          const appt: Appointment = {
+            id: editAppt?.id || Math.random().toString(36).substr(2, 9),
+            date: form.date.value,
+            time: form.time.value,
+            doctor: form.doctor.value,
+            location: form.location.value,
+            reason: form.reason.value,
+            notes: form.notes.value,
+            summary: form.summary.value,
+          }
+          if (editAppt) {
+            updateAppointment(profile!.id, appt.id, appt)
+          } else {
+            addAppointment(profile!.id, appt)
+          }
+          setApptModalOpen(false)
+        }} className="space-y-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+          <input name="date" type="date" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.date || ''} required />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+          <input name="time" type="time" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.time || ''} required />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Doctor</label>
+          <input name="doctor" type="text" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.doctor || ''} required />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+          <input name="location" type="text" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.location || ''} required />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason</label>
+          <input name="reason" type="text" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.reason || ''} required />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
+          <textarea name="notes" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.notes || ''} />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Summary</label>
+          <textarea name="summary" className="w-full px-3 py-2 border rounded" defaultValue={editAppt?.summary || ''} />
+          {editAppt && (
+            <button type="button" onClick={() => { deleteAppointment(profile!.id, editAppt.id); setApptModalOpen(false) }} className="w-full bg-red-500 text-white py-2 rounded mt-2">Delete Appointment</button>
+          )}
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">Save</button>
+        </form>
       </Modal>
     </div>
   )
