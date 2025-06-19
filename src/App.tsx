@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/store'
 import Navigation from './components/Navigation'
@@ -7,10 +6,9 @@ import ActivityLog from './pages/ActivityLog'
 import Charts from './pages/Charts'
 import Settings from './pages/Settings'
 import Welcome from './pages/Welcome'
-import SplashScreen from './components/SplashScreen'
 
 function App() {
-  const { profiles, currentProfileId } = useStore()
+  const { profiles } = useStore()
   const hasProfiles = profiles.length > 0
 
   return (

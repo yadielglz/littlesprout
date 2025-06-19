@@ -19,6 +19,7 @@ export interface LogEntry {
   notes?: string
   rawAmount?: number
   rawDuration?: number
+  customActivity?: string
 }
 
 export interface Inventory {
