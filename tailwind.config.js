@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'quicksand': ['Quicksand', 'sans-serif'],
+        'nunito': ['Nunito', 'system-ui', 'sans-serif'],
       },
       colors: {
         primary: {

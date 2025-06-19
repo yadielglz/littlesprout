@@ -4,19 +4,34 @@
 
 @layer base {
   html {
-    font-family: 'Quicksand', system-ui, sans-serif;
+    font-family: 'Nunito', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
   }
 
   /* Apply different font weights for better hierarchy */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold;
+  h1 {
+    @apply font-bold tracking-tight;
+  }
+
+  h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
   }
 
   /* Ensure buttons and interactive elements use medium weight */
   button, a, .interactive {
     @apply font-medium;
+  }
+
+  /* Slightly tighter letter spacing for large text */
+  .text-xl, .text-2xl, .text-3xl, .text-4xl {
+    @apply tracking-tight;
+  }
+
+  /* Slightly looser letter spacing for small text */
+  .text-sm, .text-xs {
+    @apply tracking-wide;
   }
 } 
