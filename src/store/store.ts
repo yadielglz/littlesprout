@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export interface BabyProfile {
   id: string
@@ -305,6 +305,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'littlesprout-storage',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         profiles: state.profiles,
         currentProfileId: state.currentProfileId,
@@ -314,9 +315,8 @@ export const useStore = create<AppState>()(
         reminders: state.reminders,
         customActivities: state.customActivities,
         achievedMilestones: state.achievedMilestones,
-        isDarkMode: state.isDarkMode,
-        appointments: state.appointments,
-      }),
+        isDarkMode: state.isDarkMode
+      })
     }
   )
 ) 
