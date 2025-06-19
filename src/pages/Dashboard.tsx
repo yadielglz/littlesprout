@@ -34,7 +34,6 @@ const Dashboard = () => {
   const [modalType, setModalType] = useState<'feed'|'sleep'|'diaper'|'weight'|'nap'|'tummy'|null>(null)
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerLabel, setTimerLabel] = useState('')
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editLog, setEditLog] = useState<LogEntry | null>(null)
   const [deleteLogEntry, setDeleteLogEntry] = useState<LogEntry | null>(null)
@@ -144,11 +143,11 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2 py-3">
             <button 
-              onClick={() => setQuickActionsOpen(true)} 
+              onClick={() => handleQuickAction('feed')} 
               className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
             >
-              <span className="mr-2">➕</span>
-              Quick Actions
+              <span className="mr-2">🍼</span>
+              Quick Feed
             </button>
             <button 
               onClick={() => setRemindersOpen(true)} 
@@ -456,36 +455,6 @@ const Dashboard = () => {
             <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
             <button type="submit" className="bg-blue-500 text-white px-4 py-1 rounded">Log Manually</button>
           </form>
-        </div>
-      </Modal>
-
-      {/* Quick Actions Modal */}
-      <Modal isOpen={quickActionsOpen} onClose={() => setQuickActionsOpen(false)} title="Quick Actions" size="large">
-        <div className="grid grid-cols-2 gap-4">
-          <button onClick={() => { setQuickActionsOpen(false); handleQuickAction('feed') }} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-2">🍼</div>
-            <span className="text-sm font-medium text-gray-800 dark:text-white">Feed</span>
-          </button>
-          <button onClick={() => { setQuickActionsOpen(false); handleQuickAction('sleep') }} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-2">😴</div>
-            <span className="text-sm font-medium text-gray-800 dark:text-white">Sleep</span>
-          </button>
-          <button onClick={() => { setQuickActionsOpen(false); handleQuickAction('diaper') }} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-2">👶</div>
-            <span className="text-sm font-medium text-gray-800 dark:text-white">Diaper</span>
-          </button>
-          <button onClick={() => { setQuickActionsOpen(false); handleQuickAction('weight') }} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-2">📏</div>
-            <span className="text-sm font-medium text-gray-800 dark:text-white">Weight</span>
-          </button>
-          <button onClick={() => { setQuickActionsOpen(false); handleQuickAction('nap') }} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors col-span-2">
-            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 rounded-full flex items-center justify-center mb-2">🛏️</div>
-            <span className="text-sm font-medium text-gray-800 dark:text-white">Nap Timer</span>
-          </button>
-          <button onClick={() => { setQuickActionsOpen(false); handleQuickAction('tummy') }} className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors col-span-2">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mb-2">⏱️</div>
-            <span className="text-sm font-medium text-gray-800 dark:text-white">Tummy Time</span>
-          </button>
         </div>
       </Modal>
 
