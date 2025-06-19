@@ -54,7 +54,7 @@ const Dashboard = () => {
   }
 
   // Log submit handlers
-  const handleLog = (type: string, details: string) => {
+  const handleLog = (type: string, details: string, time: string) => {
     if (!profile) return
     addLog(profile.id, {
       id: generateId(),
@@ -62,14 +62,14 @@ const Dashboard = () => {
       icon: type === 'feed' ? '🍼' : type === 'diaper' ? '👶' : type === 'weight' ? '📏' : '',
       color: '',
       details,
-      timestamp: new Date(),
+      timestamp: new Date(time),
     })
     setModalOpen(false)
     setModalType(null)
   }
 
   // Timer save handler
-  const handleTimerSave = (duration: number) => {
+  const handleTimerSave = (duration: number, time: string) => {
     if (!profile) return
     addLog(profile.id, {
       id: generateId(),
@@ -77,7 +77,7 @@ const Dashboard = () => {
       icon: timerLabel === 'Sleep Timer' ? '😴' : timerLabel === 'Nap Timer' ? '🛏️' : '⏱️',
       color: '',
       details: `Duration: ${Math.round(duration/60000)} min`,
-      timestamp: new Date(),
+      timestamp: new Date(time),
       rawDuration: duration
     })
     setTimerOpen(false)
@@ -274,7 +274,8 @@ const Dashboard = () => {
             const form = e.target as any;
             const feedType = form.feedType.value;
             const amount = form.amount.value;
-            handleLog('feed', `${feedType === 'bottle' ? 'Bottle (Formula)' : 'Breast'} Feed, Amount: ${amount} oz`)
+            const time = form.time.value;
+            handleLog('feed', `${feedType === 'bottle' ? 'Bottle (Formula)' : 'Breast'} Feed, Amount: ${amount} oz`, time)
           }} className="space-y-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Feed Type</label>
             <select name="feedType" className="w-full px-3 py-2 border rounded" required>
@@ -283,17 +284,27 @@ const Dashboard = () => {
             </select>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount (oz)</label>
             <input name="amount" type="number" min="0" step="0.1" className="w-full px-3 py-2 border rounded" required />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
             <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">Log Feed</button>
           </form>
         )}
         {modalType === 'diaper' && (
-          <form onSubmit={e => { e.preventDefault(); const type = (e.target as any).type.value; handleLog('diaper', `Type: ${type}`) }} className="space-y-4">
+          <form onSubmit={e => {
+            e.preventDefault();
+            const form = e.target as any;
+            const type = form.type.value;
+            const time = form.time.value;
+            handleLog('diaper', `Type: ${type}`, time)
+          }} className="space-y-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
             <select name="type" className="w-full px-3 py-2 border rounded" required>
               <option value="wet">Wet</option>
               <option value="dirty">Dirty</option>
               <option value="mixed">Mixed</option>
             </select>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
             <button type="submit" className="w-full bg-amber-500 text-white py-2 rounded">Log Diaper</button>
           </form>
         )}
@@ -304,7 +315,7 @@ const Dashboard = () => {
             const weight = form.weight.value;
             const heightFt = form.heightFt.value;
             const heightIn = form.heightIn.value;
-            handleLog('weight', `Weight: ${weight} lbs, Height: ${heightFt}'${heightIn}\"`)
+            handleLog('weight', `Weight: ${weight} lbs, Height: ${heightFt}'${heightIn}\"`, new Date().toISOString())
           }} className="space-y-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Weight (lbs)</label>
             <input name="weight" type="number" min="0" step="0.1" className="w-full px-3 py-2 border rounded" required />
@@ -320,7 +331,7 @@ const Dashboard = () => {
 
       {/* Timer Modal */}
       <Modal isOpen={timerOpen} onClose={() => { setTimerOpen(false); setTimerLabel('') }} title={timerLabel}>
-        <Timer label={timerLabel} onSave={handleTimerSave} onCancel={() => { setTimerOpen(false); setTimerLabel('') }} />
+        <Timer label={timerLabel} onSave={(duration, time) => handleTimerSave(duration, time)} onCancel={() => { setTimerOpen(false); setTimerLabel('') }} />
         <div className="mt-4 border-t pt-4">
           <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 text-center">Missed a log? Enter manually:</div>
           <form onSubmit={e => {
@@ -329,12 +340,14 @@ const Dashboard = () => {
             const mins = parseInt(form.manualMins.value, 10) || 0;
             const hrs = parseInt(form.manualHrs.value, 10) || 0;
             const duration = (hrs * 60 + mins) * 60000;
-            handleTimerSave(duration);
+            const time = form.time.value;
+            handleTimerSave(duration, time);
           }} className="flex flex-col items-center space-y-2">
             <div className="flex space-x-2">
               <input name="manualHrs" type="number" min="0" max="23" placeholder="Hrs" className="w-16 px-2 py-1 border rounded" />
               <input name="manualMins" type="number" min="0" max="59" placeholder="Mins" className="w-16 px-2 py-1 border rounded" />
             </div>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
             <button type="submit" className="bg-blue-500 text-white px-4 py-1 rounded">Log Manually</button>
           </form>
         </div>
@@ -382,20 +395,24 @@ const Dashboard = () => {
             if (editLog.type === 'feed') {
               const feedType = form.feedType.value;
               const amount = form.amount.value;
-              updateLog(currentProfileId!, editLog.id, { details: `${feedType === 'bottle' ? 'Bottle (Formula)' : 'Breast'} Feed, Amount: ${amount} oz` });
+              const time = form.time.value;
+              updateLog(currentProfileId!, editLog.id, { details: `${feedType === 'bottle' ? 'Bottle (Formula)' : 'Breast'} Feed, Amount: ${amount} oz`, timestamp: new Date(time) });
             } else if (editLog.type === 'diaper') {
               const type = form.type.value;
-              updateLog(currentProfileId!, editLog.id, { details: `Type: ${type}` });
+              const time = form.time.value;
+              updateLog(currentProfileId!, editLog.id, { details: `Type: ${type}`, timestamp: new Date(time) });
             } else if (editLog.type === 'weight') {
               const weight = form.weight.value;
               const heightFt = form.heightFt.value;
               const heightIn = form.heightIn.value;
-              updateLog(currentProfileId!, editLog.id, { details: `Weight: ${weight} lbs, Height: ${heightFt}'${heightIn}\"` });
+              const time = form.time.value;
+              updateLog(currentProfileId!, editLog.id, { details: `Weight: ${weight} lbs, Height: ${heightFt}'${heightIn}\"`, timestamp: new Date(time) });
             } else if (editLog.type === 'sleep' || editLog.type === 'nap' || editLog.type === 'tummy') {
               const mins = parseInt(form.manualMins.value, 10) || 0;
               const hrs = parseInt(form.manualHrs.value, 10) || 0;
               const duration = (hrs * 60 + mins) * 60000;
-              updateLog(currentProfileId!, editLog.id, { details: `Duration: ${Math.round(duration/60000)} min`, rawDuration: duration });
+              const time = form.time.value;
+              updateLog(currentProfileId!, editLog.id, { details: `Duration: ${Math.round(duration/60000)} min`, rawDuration: duration, timestamp: new Date(time) });
             }
             setEditLog(null);
           }} className="space-y-4">
@@ -440,6 +457,8 @@ const Dashboard = () => {
                 </div>
               </>
             )}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={editLog.timestamp.toISOString().slice(0,16)} required />
             <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">Save Changes</button>
           </form>
         )}
