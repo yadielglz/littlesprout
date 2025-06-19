@@ -15,9 +15,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     addProfile,
     deleteProfile,
     reminders,
-    setReminders,
     addReminder,
-    updateReminder,
     deleteReminder,
   } = useStore()
   const [newName, setNewName] = useState('')
