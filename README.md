@@ -52,12 +52,11 @@ A beautiful, modern React-based baby tracking application designed to help paren
 ### 🔔 Smart Features
 1. **Intelligent Reminders** - Context-aware notifications
 2. **Voice Input** - Speech-to-text for hands-free logging
-3. **Photo Memories** - Image capture and organization
-4. **Multi-Profile Support** - Track multiple children
-5. **Family Sharing** - Invite family members to view data
-6. **Weather Integration** - Outdoor activity suggestions
-7. **Health Integration** - Connect with health apps
-8. **AI Insights** - Machine learning-powered recommendations
+3. **Multi-Profile Support** - Track multiple children
+4. **Family Sharing** - Invite family members to view data
+5. **Weather Integration** - Outdoor activity suggestions
+6. **Health Integration** - Connect with health apps
+7. **AI Insights** - Machine learning-powered recommendations
 
 ## 🛠️ Technology Stack
 
@@ -135,7 +134,6 @@ src/
 
 ### Advanced Features
 - **Custom Activities**: Create personalized tracking items
-- **Photo Memories**: Capture and organize precious moments
 - **Inventory Management**: Track supplies and low stock alerts
 - **Reminders**: Smart notifications for important events
 - **Data Export**: PDF reports, CSV exports, and sharing
