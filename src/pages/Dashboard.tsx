@@ -136,7 +136,7 @@ const Dashboard = () => {
               className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-colors flex items-center"
             >
               <span className="mr-2">📝</span>
-              Quick Activity
+              Quick Actions
             </button>
             <button 
               onClick={() => setRemindersOpen(true)} 
@@ -186,18 +186,21 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
               Today's Summary
             </h2>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-300">Feeds</span>
-                <span className="font-semibold text-gray-800 dark:text-white">{feedsToday}</span>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col items-center bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 shadow">
+                <div className="text-3xl mb-1">🍼</div>
+                <div className="text-lg font-bold text-blue-700 dark:text-blue-300">{feedsToday}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Feeds</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-300">Sleep</span>
-                <span className="font-semibold text-gray-800 dark:text-white">{Math.round(sleepToday/60000)} min</span>
+              <div className="flex flex-col items-center bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-indigo-800 rounded-lg p-4 shadow">
+                <div className="text-3xl mb-1">😴</div>
+                <div className="text-lg font-bold text-indigo-700 dark:text-indigo-300">{Math.floor(sleepToday/3600000)}h {Math.round((sleepToday%3600000)/60000)}m</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Sleep</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-300">Diapers</span>
-                <span className="font-semibold text-gray-800 dark:text-white">{diapersToday}</span>
+              <div className="flex flex-col items-center bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 rounded-lg p-4 shadow">
+                <div className="text-3xl mb-1">👶</div>
+                <div className="text-lg font-bold text-amber-700 dark:text-amber-300">{diapersToday}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Diapers</div>
               </div>
             </div>
           </div>
