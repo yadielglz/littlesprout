@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 interface TimerProps {
   label: string
-  onSave: (duration: number) => void
+  onSave: (duration: number, time: string) => void
   onCancel: () => void
 }
 
@@ -31,7 +31,7 @@ const Timer: React.FC<TimerProps> = ({ label, onSave, onCancel }) => {
     if (startTime) setElapsed(Date.now() - startTime)
   }
   const handleSave = () => {
-    onSave(elapsed)
+    onSave(elapsed, new Date().toISOString().slice(0,16))
     setIsRunning(false)
     setStartTime(null)
     setElapsed(0)
