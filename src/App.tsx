@@ -11,6 +11,7 @@ import Settings from './pages/Settings'
 import Welcome from './pages/Welcome'
 import Login from './components/Login'
 import FirebaseTest from './components/FirebaseTest'
+import Header from './components/Header'
 
 function App() {
   const [isHydrated, setIsHydrated] = useState(false)
@@ -70,8 +71,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {hasProfiles && <Header />}
       <BottomNavigation />
-      <div className="pt-10 pb-20 px-4">
+      <div className="pb-20">
         <Routes>
           {hasProfiles ? (
             <>
