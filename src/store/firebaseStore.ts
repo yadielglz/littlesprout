@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { DatabaseService } from '../services/firebase';
-import { useStore, BabyProfile, LogEntry, Inventory, Reminder, Appointment } from './store';
+import { useStore, BabyProfile } from './store';
 
 interface FirebaseStore {
   // Firebase-specific methods
@@ -140,8 +140,8 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
 
       // Migrate logs for each profile
       for (const [profileId, logs] of Object.entries(state.logs)) {
-        if (logs.length > 0) {
-          await DatabaseService.batchUpdateLogs(userId, profileId, logs);
+        for (const log of logs) {
+          await DatabaseService.addLog(userId, profileId, log);
         }
       }
 
