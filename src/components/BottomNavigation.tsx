@@ -6,10 +6,8 @@ import {
   BarChart2, 
   BookOpen, 
   Settings, 
-  LogIn, 
   LogOut, 
   User, 
-  Zap, 
   Wifi,
 } from 'lucide-react';
 import { useFirebaseStore } from '../store/firebaseStore';

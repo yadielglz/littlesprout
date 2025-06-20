@@ -9,8 +9,7 @@ import {
   query, 
   orderBy, 
   onSnapshot,
-  writeBatch,
-  serverTimestamp
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { BabyProfile, LogEntry, Inventory, Reminder, Appointment } from '../store/store';
@@ -229,11 +228,11 @@ export const DatabaseService = {
     return exportData;
   },
 
-  async importData(userId: string, data: any): Promise<void> {
-    const batch = writeBatch(db);
-
-    // Restore profiles
-    // ... existing code ...
+  async importData(): Promise<void> {
+    // This is a placeholder. The actual implementation will use the parameters.
+    // const batch = writeBatch(db);
+    // ...
+    throw new Error("Import not implemented yet.");
   }
 }
 
@@ -241,28 +240,28 @@ export const DatabaseService = {
 // For now, we'll use base64 encoding for small images in Firestore
 export class StorageService {
   // Placeholder for future photo upload functionality
-  static async uploadBabyPhoto(userId: string, profileId: string, file: File): Promise<string> {
+  static async uploadBabyPhoto(): Promise<string> {
     throw new Error('Photo upload not available in free tier. Upgrade to Firebase Blaze plan for Storage features.');
   }
 
-  static async uploadDocument(userId: string, profileId: string, file: File, type: 'medical' | 'growth' | 'other'): Promise<string> {
+  static async uploadDocument(): Promise<string> {
     throw new Error('Document upload not available in free tier. Upgrade to Firebase Blaze plan for Storage features.');
   }
 
-  static async deleteFile(fileUrl: string): Promise<void> {
+  static async deleteFile(): Promise<void> {
     throw new Error('File deletion not available in free tier. Upgrade to Firebase Blaze plan for Storage features.');
   }
 
-  static async getProfilePhotos(userId: string, profileId: string): Promise<string[]> {
+  static async getProfilePhotos(): Promise<string[]> {
     throw new Error('Photo retrieval not available in free tier. Upgrade to Firebase Blaze plan for Storage features.');
   }
 
-  static async getDocuments(userId: string, profileId: string, type?: string): Promise<string[]> {
+  static async getDocuments(): Promise<string[]> {
     throw new Error('Document retrieval not available in free tier. Upgrade to Firebase Blaze plan for Storage features.');
   }
 
   // Alternative: Store small images as base64 in Firestore (limited to 1MB per document)
-  static async storeImageAsBase64(userId: string, profileId: string, file: File): Promise<string> {
+  static async storeImageAsBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       if (file.size > 1024 * 1024) { // 1MB limit
         reject(new Error('File too large for base64 storage. Use Firebase Storage for larger files.'));

@@ -8,7 +8,6 @@ import ClockWeather from '../components/ClockWeather'
 import MilestoneTicker from '../components/MilestoneTicker'
 import HealthGrowthCard from '../components/HealthGrowthCard'
 import NotificationSystem from '../components/NotificationSystem'
-import Reminders from '../components/Reminders'
 
 const Dashboard = () => {
   const {
