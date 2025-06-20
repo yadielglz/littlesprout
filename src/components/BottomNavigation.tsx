@@ -1,22 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { 
   Home, 
   BarChart2, 
   BookOpen, 
   Settings, 
-  LogOut, 
-  User, 
-  Wifi,
 } from 'lucide-react';
-import { useFirebaseStore } from '../store/firebaseStore';
-import toast from 'react-hot-toast';
 
 const BottomNavigation: React.FC = () => {
   const location = useLocation();
-  const { currentUser, logout } = useAuth();
-  const { syncWithFirebase } = useFirebaseStore();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -26,28 +18,6 @@ const BottomNavigation: React.FC = () => {
     { path: '/charts', label: 'Charts', icon: BookOpen },
     { path: '/settings', label: 'Settings', icon: Settings },
   ];
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logged out successfully');
-    } catch (error: any) {
-      toast.error('Logout failed: ' + error.message);
-    }
-  };
-
-  const handleSync = async () => {
-    if (!currentUser) {
-      toast.error('You must be logged in to sync data.');
-      return;
-    }
-    try {
-      await syncWithFirebase(currentUser.uid);
-      toast.success('Data synced with cloud');
-    } catch (error: any) {
-      toast.error('Sync failed: ' + error.message);
-    }
-  };
 
   return (
     <>

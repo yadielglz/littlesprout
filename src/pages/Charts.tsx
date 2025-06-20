@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
 import { useStore } from '../store/store'
-import { motion } from 'framer-motion'
 import { 
   BarChart3, 
   TrendingUp, 
