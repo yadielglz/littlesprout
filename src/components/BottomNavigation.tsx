@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   Home, 
-  Activity, 
-  BarChart3, 
+  BarChart2, 
+  BookOpen, 
   Settings, 
-  User,
-  LogOut,
-  Cloud,
-  CloudOff
+  LogIn, 
+  LogOut, 
+  User, 
+  Zap, 
+  Wifi,
 } from 'lucide-react';
 import { useFirebaseStore } from '../store/firebaseStore';
 import toast from 'react-hot-toast';
@@ -23,8 +24,8 @@ const BottomNavigation: React.FC = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/activity-log', label: 'Activities', icon: Activity },
-    { path: '/charts', label: 'Charts', icon: BarChart3 },
+    { path: '/activity-log', label: 'Activities', icon: BarChart2 },
+    { path: '/charts', label: 'Charts', icon: BookOpen },
     { path: '/settings', label: 'Settings', icon: Settings },
   ];
 
@@ -88,7 +89,7 @@ const BottomNavigation: React.FC = () => {
                 className="p-1 rounded hover:bg-blue-700 transition-colors"
                 title="Sync with cloud"
               >
-                <Cloud className="w-4 h-4" />
+                <Wifi className="w-4 h-4" />
               </button>
               <button
                 onClick={handleLogout}

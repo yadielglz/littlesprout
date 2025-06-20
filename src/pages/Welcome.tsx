@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useStore, BabyProfile } from '../store/store'
+import { useStore } from '../store/store'
 import { useFirebaseStore } from '../store/firebaseStore'
 import { useAuth } from '../contexts/AuthContext'
 // @ts-ignore - Linter incorrectly flags this as unused
