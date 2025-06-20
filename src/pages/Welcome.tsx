@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useStore } from '../store/store'
 import { useFirebaseStore } from '../store/firebaseStore'
 import { useAuth } from '../contexts/AuthContext'
 // @ts-ignore - Linter incorrectly flags this as unused
@@ -7,7 +6,6 @@ import { generateId, calculateAge } from '../utils/initialization'
 import toast from 'react-hot-toast'
 
 const Welcome = () => {
-  const { addProfile, setCurrentProfileId } = useStore()
   const { createProfile } = useFirebaseStore()
   const { currentUser } = useAuth()
   const [formData, setFormData] = useState({
