@@ -71,41 +71,9 @@ const BottomNavigation: React.FC = () => {
         </div>
       </nav>
 
-      {/* User Status Bar */}
-      {currentUser && (
-        <div className="fixed top-0 left-0 right-0 bg-blue-600 text-white px-4 py-2 z-40">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <User className="w-4 h-4" />
-              <span className="text-sm font-medium truncate">
-                {currentUser.email}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handleSync}
-                className="p-1 rounded hover:bg-blue-700 transition-colors"
-                title="Sync with cloud"
-              >
-                <Wifi className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleLogout}
-                className="p-1 rounded hover:bg-blue-700 transition-colors"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Bottom Spacer for Navigation */}
       <div className="h-16"></div>
       
-      {/* Top Spacer for User Bar */}
-      {currentUser && <div className="h-10"></div>}
     </>
   );
 };

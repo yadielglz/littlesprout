@@ -1,21 +1,70 @@
 import { useStore } from '../store/store'
 import { calculateAge } from '../utils/initialization'
 import ClockWeather from './ClockWeather'
+import { useAuth } from '../contexts/AuthContext'
+import { LogOut, User, Wifi } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { useFirebaseStore } from '../store/firebaseStore'
 
 const Header = () => {
   const { getCurrentProfile } = useStore()
   const profile = getCurrentProfile()
+  const { currentUser, logout } = useAuth()
+  const { syncWithFirebase } = useFirebaseStore()
 
-  if (!profile) {
+  if (!profile || !currentUser) {
     return null
   }
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+    } catch (error: any) {
+      toast.error('Logout failed: ' + error.message);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!currentUser) {
+      toast.error('You must be logged in to sync data.');
+      return;
+    }
+    try {
+      await syncWithFirebase(currentUser.uid);
+      toast.success('Data synced with cloud');
+    } catch (error: any) {
+      toast.error('Sync failed: ' + error.message);
+    }
+  };
+
   return (
-    <>
-      {/* Mobile-only Sprout Icon */}
-      <div className="sm:hidden flex justify-center items-center py-4 bg-white dark:bg-gray-800">
-        <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-          <span className="text-xl">🌱</span>
+    <div className="fixed top-0 left-0 right-0 z-40">
+      {/* User Status Bar */}
+      <div className="bg-blue-600 text-white px-4 py-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <User className="w-4 h-4" />
+            <span className="text-sm font-medium truncate">
+              {currentUser.email}
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleSync}
+              className="p-1 rounded hover:bg-blue-700 transition-colors"
+              title="Sync with cloud"
+            >
+              <Wifi className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-1 rounded hover:bg-blue-700 transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -30,17 +79,11 @@ const Header = () => {
                 {profile.babyName} is {calculateAge(profile.dob)}
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              {/* Sprout Icon for larger screens */}
-              <div className="hidden sm:flex w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full items-center justify-center">
-                <span className="text-xl">🌱</span>
-              </div>
-              <ClockWeather />
-            </div>
+            <ClockWeather />
           </div>
         </div>
       </header>
-    </>
+    </div>
   )
 }
 

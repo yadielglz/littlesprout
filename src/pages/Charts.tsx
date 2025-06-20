@@ -288,133 +288,21 @@ const Charts = () => {
           </div>
         </div>
 
-        {/* Chart Navigation */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'feeding', label: 'Feeding', icon: '🍼' },
-              { id: 'sleep', label: 'Sleep', icon: '😴' },
-              { id: 'diaper', label: 'Diaper', icon: '👶' },
-              { id: 'weight', label: 'Weight', icon: '📏' },
-              { id: 'distribution', label: 'Activity Distribution', icon: '📊' }
-            ].map((chart) => (
-              <button
-                key={chart.id}
-                onClick={() => setSelectedChart(chart.id)}
-                className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-                  selectedChart === chart.id
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                <span className="mr-2">{chart.icon}</span>
-                {chart.label}
-              </button>
-            ))}
-          </div>
+        {/* Chart Selection */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+          <button onClick={() => setSelectedChart('feeding')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'feeding' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Feeding</button>
+          <button onClick={() => setSelectedChart('sleep')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'sleep' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Sleep</button>
+          <button onClick={() => setSelectedChart('diaper')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'diaper' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Diapers</button>
+          <button onClick={() => setSelectedChart('weight')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'weight' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Weight</button>
+          <button onClick={() => setSelectedChart('distribution')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'distribution' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Distribution</button>
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Main Chart */}
-          <motion.div
-            key={selectedChart}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
-          >
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-              {selectedChart === 'feeding' && 'Feeding Patterns'}
-              {selectedChart === 'sleep' && 'Sleep Duration'}
-              {selectedChart === 'diaper' && 'Diaper Changes'}
-              {selectedChart === 'weight' && 'Weight Tracking'}
-              {selectedChart === 'distribution' && 'Activity Distribution'}
-            </h2>
-            
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                {renderChart()}
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-
-          {/* Summary Cards */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Summary</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">🍼</span>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Feedings</p>
-                    <p className="font-semibold text-gray-800 dark:text-white">
-                      {chartData.feeding.reduce((sum, item) => sum + item.count, 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">😴</span>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Avg Sleep/Day</p>
-                    <p className="font-semibold text-gray-800 dark:text-white">
-                      {chartData.sleep.length > 0 ? 
-                        (chartData.sleep.reduce((sum, item) => sum + item.duration, 0) / chartData.sleep.length).toFixed(1) + 'h' : 
-                        '0h'
-                      }
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                <div className="flex items-center">
-                  <span className="text-2xl mr-3">👶</span>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Diaper Changes</p>
-                    <p className="font-semibold text-gray-800 dark:text-white">
-                      {chartData.diaper.reduce((sum, item) => sum + item.count, 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Insights */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Insights</h3>
-            <div className="space-y-3">
-              {chartData.feeding.length > 0 && (
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    <strong>Feeding Pattern:</strong> Average {chartData.feeding.length > 0 ? 
-                      (chartData.feeding.reduce((sum, item) => sum + item.count, 0) / chartData.feeding.length).toFixed(1) : 0} feedings per day
-                  </p>
-                </div>
-              )}
-              
-              {chartData.sleep.length > 0 && (
-                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    <strong>Sleep Quality:</strong> {chartData.sleep.length > 0 ? 
-                      (chartData.sleep.reduce((sum, item) => sum + item.duration, 0) / chartData.sleep.length).toFixed(1) : 0} hours average sleep duration
-                  </p>
-                </div>
-              )}
-              
-              {chartData.weight.length > 1 && (
-                <div className="p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    <strong>Growth:</strong> Weight change of {(
-                      chartData.weight[chartData.weight.length - 1].weight - chartData.weight[0].weight
-                    ).toFixed(1)} units over this period
-                  </p>
-                </div>
-              )}
-            </div>
+        {/* Chart Display */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
+          <div className="overflow-x-auto">
+            <ResponsiveContainer width="100%" height={400}>
+              {renderChart()}
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
