@@ -16,6 +16,20 @@ import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
 import toast from 'react-hot-toast'
 
+// Helper Components for Settings
+const SettingsRow = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-700/50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    {children}
+  </div>
+);
+
+const ToggleSwitch = ({ checked, onChange }: { checked: boolean, onChange: () => void }) => (
+  <label className="relative inline-flex items-center cursor-pointer">
+    <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
+    <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+  </label>
+);
+
 const Settings = () => {
   const { 
     profiles, 
@@ -25,7 +39,12 @@ const Settings = () => {
     deleteProfile, 
     setCurrentProfileId,
     isDarkMode,
-    toggleDarkMode
+    toggleDarkMode,
+    temperatureUnit,
+    toggleTemperatureUnit,
+    addReminder,
+    deleteReminder,
+    reminders,
   } = useStore()
 
   // State
@@ -39,6 +58,9 @@ const Settings = () => {
     dob: ''
   })
 
+  // State for reminders management
+  const [newReminderText, setNewReminderText] = useState('')
+
   const tabs = [
     { id: 'profiles', label: 'Profiles', icon: Users },
     { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -47,6 +69,20 @@ const Settings = () => {
   ]
 
   // Handlers
+  const handleAddReminder = () => {
+    if (newReminderText.trim() && currentProfileId) {
+      addReminder(currentProfileId, {
+        id: generateId(),
+        text: newReminderText.trim(),
+        time: Date.now(),
+        frequency: 'none',
+        isActive: true,
+      })
+      setNewReminderText('')
+      toast.success('Reminder added successfully!')
+    }
+  }
+
   const handleAddProfile = () => {
     if (!newProfileData.userName.trim() || !newProfileData.babyName.trim() || !newProfileData.dob) {
       toast.error('Please fill in all fields')
@@ -101,6 +137,7 @@ const Settings = () => {
       achievedMilestones: useStore.getState().achievedMilestones,
       appointments: useStore.getState().appointments,
       isDarkMode,
+      temperatureUnit,
       timestamp: new Date().toISOString()
     }
     
@@ -183,6 +220,11 @@ const Settings = () => {
         // Set dark mode if available
         if (typeof importedData.isDarkMode === 'boolean') {
           store.setDarkMode(importedData.isDarkMode)
+        }
+        
+        // Set temperature unit if available
+        if (importedData.temperatureUnit === 'C' || importedData.temperatureUnit === 'F') {
+          store.setTemperatureUnit(importedData.temperatureUnit)
         }
         
         toast.success('Backup restored successfully!')
@@ -340,24 +382,49 @@ const Settings = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
                 >
-                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Notifications</h2>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Browser Notifications</h3>
-                      <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
-                        Enable browser notifications to receive reminders for feeding times, diaper changes, and other important activities.
-                      </p>
+                  <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Reminders Management</h2>
+                  
+                  {/* Current Reminders */}
+                  <div className="mb-6">
+                    <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">Current Reminders</h3>
+                    <div className="space-y-2">
+                      {(reminders[currentProfileId || ''] || []).map(reminder => (
+                        <div key={reminder.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                          <span className="text-gray-700 dark:text-gray-300">{reminder.text}</span>
+                          <button
+                            onClick={() => deleteReminder(currentProfileId!, reminder.id)}
+                            className="text-xs px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))}
+                      {(!reminders[currentProfileId || ''] || reminders[currentProfileId || ''].length === 0) && (
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">No reminders set</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Add New Reminder */}
+                  <div>
+                    <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">Add New Reminder</h3>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newReminderText}
+                        onChange={(e) => setNewReminderText(e.target.value)}
+                        placeholder="Enter reminder text"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddReminder()}
+                      />
                       <button
-                        onClick={() => {
-                          if ('Notification' in window) {
-                            Notification.requestPermission()
-                            toast.success('Notification permission requested!')
-                          }
-                        }}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        onClick={handleAddReminder}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                       >
-                        Enable Notifications
+                        Add
                       </button>
                     </div>
                   </div>
@@ -372,30 +439,25 @@ const Settings = () => {
                 >
                   <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Appearance</h2>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div>
-                        <h3 className="font-medium text-gray-800 dark:text-white">Dark Mode</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Switch between light and dark themes
-                        </p>
+                    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Appearance Settings</h3>
+                    <SettingsRow>
+                      <div className="flex items-center space-x-3">
+                        <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                        <span className="font-medium text-gray-700 dark:text-gray-200">Dark Mode</span>
                       </div>
-                      <button
-                        onClick={toggleDarkMode}
-                        className="flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-                      >
-                        {isDarkMode ? (
-                          <>
-                            <Sun size={20} className="mr-2" />
-                            Light Mode
-                          </>
-                        ) : (
-                          <>
-                            <Moon size={20} className="mr-2" />
-                            Dark Mode
-                          </>
-                        )}
-                      </button>
-                    </div>
+                      <ToggleSwitch checked={isDarkMode} onChange={toggleDarkMode} />
+                    </SettingsRow>
+                    <SettingsRow>
+                      <div className="flex items-center space-x-3">
+                        <span className="font-bold text-lg text-gray-600 dark:text-gray-300">C/F</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-200">Temperature Unit</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`font-semibold ${temperatureUnit === 'C' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500'}`}>°C</span>
+                        <ToggleSwitch checked={temperatureUnit === 'F'} onChange={toggleTemperatureUnit} />
+                        <span className={`font-semibold ${temperatureUnit === 'F' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500'}`}>°F</span>
+                      </div>
+                    </SettingsRow>
                   </div>
                 </motion.div>
               )}

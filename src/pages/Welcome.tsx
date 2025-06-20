@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useStore } from '../store/store'
+import { useFirebaseStore } from '../store/firebaseStore'
 import { generateId, calculateAge } from '../utils/initialization'
 import toast from 'react-hot-toast'
+import { useAuth } from '../contexts/AuthContext'
 
 const Welcome = () => {
   const navigate = useNavigate()
-  const { addProfile } = useStore()
+  const { createProfile } = useFirebaseStore()
+  const { currentUser } = useAuth()
   const [formData, setFormData] = useState({
     userName: '',
     babyName: '',
@@ -25,6 +27,12 @@ const Welcome = () => {
     setIsLoading(true)
     
     try {
+      if (!currentUser) {
+        toast.error('You must be logged in to create a profile.');
+        setIsLoading(false);
+        return;
+      }
+
       const newProfile = {
         id: generateId(),
         userName: formData.userName.trim(),
@@ -33,9 +41,11 @@ const Welcome = () => {
         createdAt: new Date().toISOString()
       }
 
-      addProfile(newProfile)
+      await createProfile(currentUser.uid, newProfile)
+      
       toast.success(`Welcome ${formData.userName}! Let's start tracking ${formData.babyName}'s journey.`)
-      navigate('/dashboard')
+      
+      // The navigation will happen automatically when the state updates
     } catch (error) {
       toast.error('Failed to create profile. Please try again.')
       console.error('Profile creation error:', error)

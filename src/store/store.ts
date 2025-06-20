@@ -76,6 +76,7 @@ interface AppState {
   achievedMilestones: Record<string, AchievedMilestone[]>
   activeTimer: ActiveTimer | null
   isDarkMode: boolean
+  temperatureUnit: 'C' | 'F'
   sidebarOpen: boolean
   appointments: Record<string, Appointment[]>
   setProfiles: (profiles: BabyProfile[]) => void
@@ -101,6 +102,8 @@ interface AppState {
   setActiveTimer: (timer: ActiveTimer | null) => void
   toggleDarkMode: () => void
   setDarkMode: (isDark: boolean) => void
+  toggleTemperatureUnit: () => void
+  setTemperatureUnit: (unit: 'C' | 'F') => void
   toggleSidebar: () => void
   setSidebarOpen: (open: boolean) => void
   getCurrentProfile: () => BabyProfile | null
@@ -112,6 +115,7 @@ interface AppState {
   updateAppointment: (profileId: string, apptId: string, updates: Partial<Appointment>) => void
   deleteAppointment: (profileId: string, apptId: string) => void
   getNextAppointment: (profileId: string) => Appointment | null
+  syncWithFirebase: () => Promise<void>
 }
 
 export const useStore = create<AppState>()(
@@ -126,6 +130,7 @@ export const useStore = create<AppState>()(
       achievedMilestones: {},
       activeTimer: null,
       isDarkMode: false,
+      temperatureUnit: 'C',
       sidebarOpen: false,
       appointments: {},
       setProfiles: (profiles) => set({ profiles }),
@@ -224,6 +229,11 @@ export const useStore = create<AppState>()(
       setActiveTimer: (timer) => set({ activeTimer: timer }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setDarkMode: (isDark) => set({ isDarkMode: isDark }),
+      toggleTemperatureUnit: () =>
+        set((state) => ({
+          temperatureUnit: state.temperatureUnit === 'C' ? 'F' : 'C',
+        })),
+      setTemperatureUnit: (unit) => set({ temperatureUnit: unit }),
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       getCurrentProfile: () => {
@@ -272,6 +282,10 @@ export const useStore = create<AppState>()(
         return (state.appointments[profileId] || [])
           .filter(appt => new Date(`${appt.date}T${appt.time}`) > now)
           .sort((a, b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime())[0] || null
+      },
+      syncWithFirebase: async () => {
+        // Implementation of syncWithFirebase method
+        return Promise.resolve()
       }
     }),
     {

@@ -1,15 +1,29 @@
-import { useStore, Appointment } from '../store/store'
+import { useStore, Appointment, LogEntry } from '../store/store'
 import { calculateAge } from '../utils/initialization'
 import { useState, useRef, useEffect } from 'react'
 import Modal from '../components/Modal'
 import Timer from '../components/Timer'
 import { generateId } from '../utils/initialization'
-import SettingsModal from '../components/SettingsModal'
-import { LogEntry } from '../store/store'
+import { motion } from 'framer-motion'
+import { 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Clock, 
+  Activity, 
+  TrendingUp, 
+  Bell,
+  Settings,
+  User,
+  Baby,
+  Calendar
+} from 'lucide-react'
+import toast from 'react-hot-toast'
 import ClockWeather from '../components/ClockWeather'
 import MilestoneTicker from '../components/MilestoneTicker'
 import HealthGrowthCard from '../components/HealthGrowthCard'
 import NotificationSystem from '../components/NotificationSystem'
+import Reminders from '../components/Reminders'
 
 const Dashboard = () => {
   const {
@@ -32,7 +46,6 @@ const Dashboard = () => {
   const [modalType, setModalType] = useState<'feed'|'sleep'|'diaper'|'weight'|'nap'|'tummy'|'temperature'|'vaccine'|'health'|null>(null)
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerLabel, setTimerLabel] = useState('')
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [editLog, setEditLog] = useState<LogEntry | null>(null)
   const [deleteLogEntry, setDeleteLogEntry] = useState<LogEntry | null>(null)
   const [apptModalOpen, setApptModalOpen] = useState(false)
@@ -195,13 +208,6 @@ const Dashboard = () => {
             >
               <span className="mr-2">🔔</span>
               Reminders
-            </button>
-            <button 
-              onClick={() => setSettingsOpen(true)} 
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center"
-            >
-              <span className="mr-2">⚙️</span>
-              Settings
             </button>
           </div>
         </div>
@@ -490,7 +496,6 @@ const Dashboard = () => {
       </Modal>
 
       <Timer isOpen={timerOpen} onClose={() => setTimerOpen(false)} onSave={handleTimerSave} label={timerLabel} />
-      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <NotificationSystem isOpen={remindersOpen} onClose={() => setRemindersOpen(false)} />
 
       {/* Edit Log Modal */}
