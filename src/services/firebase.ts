@@ -7,15 +7,15 @@ import {
   updateDoc, 
   deleteDoc, 
   query, 
-  where, 
   orderBy, 
-  limit,
   onSnapshot,
   writeBatch,
   Timestamp
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { BabyProfile, LogEntry, Inventory, Reminder, Appointment } from '../store/store';
+
+const PROFILES_COLLECTION = 'profiles';
 
 // Database Service for Firestore operations
 export class DatabaseService {

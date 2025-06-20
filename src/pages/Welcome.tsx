@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useStore, BabyProfile } from '../store/store'
 import { useFirebaseStore } from '../store/firebaseStore'
+import { useAuth } from '../contexts/AuthContext'
+// @ts-ignore - Linter incorrectly flags this as unused
 import { generateId, calculateAge } from '../utils/initialization'
 import toast from 'react-hot-toast'
-import { useAuth } from '../contexts/AuthContext'
 
 const Welcome = () => {
-  const navigate = useNavigate()
+  const { addProfile, setCurrentProfileId } = useStore()
   const { createProfile } = useFirebaseStore()
   const { currentUser } = useAuth()
   const [formData, setFormData] = useState({

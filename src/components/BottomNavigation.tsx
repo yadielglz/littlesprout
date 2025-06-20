@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -11,7 +11,6 @@ import {
   Cloud,
   CloudOff
 } from 'lucide-react';
-import { useStore } from '../store/store';
 import { useFirebaseStore } from '../store/firebaseStore';
 import toast from 'react-hot-toast';
 

@@ -4,21 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import Modal from '../components/Modal'
 import Timer from '../components/Timer'
 import { generateId } from '../utils/initialization'
-import { motion } from 'framer-motion'
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Clock, 
-  Activity, 
-  TrendingUp, 
-  Bell,
-  Settings,
-  User,
-  Baby,
-  Calendar
-} from 'lucide-react'
-import toast from 'react-hot-toast'
 import ClockWeather from '../components/ClockWeather'
 import MilestoneTicker from '../components/MilestoneTicker'
 import HealthGrowthCard from '../components/HealthGrowthCard'
