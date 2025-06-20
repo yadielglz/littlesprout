@@ -80,8 +80,8 @@ const ClockWeather: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-between bg-gradient-to-br from-blue-100 to-green-100 dark:from-slate-700 dark:to-gray-800 p-4 rounded-xl shadow-md">
-      <div className="text-left">
+    <div className="flex flex-wrap items-center justify-between bg-gradient-to-br from-blue-100 to-green-100 dark:from-slate-700 dark:to-gray-800 p-4 rounded-xl shadow-md gap-4">
+      <div className="text-left min-w-[180px]">
         <div className="font-bold text-4xl text-gray-800 dark:text-white tracking-wider">
           {format(time, 'h:mm')}
           <span className="text-xl animate-pulse">{format(time, ':ss')}</span>
