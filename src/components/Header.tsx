@@ -72,11 +72,11 @@ const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                 Hello, {profile.userName}!
               </h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                {profile.babyName} is {calculateAge(profile.dob)}
+              <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">{profile.babyName}</span> is {calculateAge(profile.dob)}
               </p>
             </div>
             <ClockWeather />
