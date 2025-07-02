@@ -8,6 +8,8 @@ import { format } from 'date-fns'
 import MilestoneTicker from '../components/MilestoneTicker'
 import HealthGrowthCard from '../components/HealthGrowthCard'
 import NotificationSystem from '../components/NotificationSystem'
+import { DatabaseService } from '../services/firebase'
+import { useAuth } from '../contexts/AuthContext'
 
 const Dashboard = () => {
   const {
@@ -24,6 +26,7 @@ const Dashboard = () => {
   } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
+  const { currentUser } = useAuth()
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
@@ -76,7 +79,7 @@ const Dashboard = () => {
   // Log submit handlers
   const handleLog = (type: string, details: string, time: string, amount?: number) => {
     if (!profile) return
-    addLog(profile.id, {
+    const newLog = {
       id: generateId(),
       type,
       icon: type === 'feed' ? '🍼' : type === 'diaper' ? '👶' : type === 'weight' ? '📏' : '',
@@ -84,7 +87,11 @@ const Dashboard = () => {
       details,
       timestamp: new Date(time),
       rawAmount: amount
-    })
+    }
+    addLog(profile.id, newLog)
+    if(currentUser){
+      DatabaseService.addLog(currentUser.uid, profile.id, newLog).catch(console.error)
+    }
     setModalOpen(false)
     setModalType(null)
   }
@@ -92,7 +99,7 @@ const Dashboard = () => {
   // Timer save handler
   const handleTimerSave = (duration: number, time: string) => {
     if (!profile) return
-    addLog(profile.id, {
+    const logEntry = {
       id: generateId(),
       type: timerLabel.toLowerCase().replace(' timer',''),
       icon: timerLabel === 'Sleep Timer' ? '😴' : timerLabel === 'Nap Timer' ? '🛏️' : '⏱️',
@@ -100,7 +107,11 @@ const Dashboard = () => {
       details: `Duration: ${Math.round(duration/60000)} min`,
       timestamp: new Date(time),
       rawDuration: duration
-    })
+    }
+    addLog(profile.id, logEntry)
+    if(currentUser){
+      DatabaseService.addLog(currentUser.uid, profile.id, logEntry).catch(console.error)
+    }
     setTimerOpen(false)
     setTimerLabel('')
   }

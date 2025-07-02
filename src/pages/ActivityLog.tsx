@@ -15,11 +15,14 @@ import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
 import toast from 'react-hot-toast'
 import { formatLocalDateTimeInput } from '../utils/datetime'
+import { DatabaseService } from '../services/firebase'
+import { useAuth } from '../contexts/AuthContext'
 
 const ActivityLog = () => {
   const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog, setActiveTimer, activeTimer } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
+  const { currentUser } = useAuth()
 
   // Timer state
   const [timerOpen, setTimerOpen] = useState(false)
@@ -117,6 +120,9 @@ const ActivityLog = () => {
     }
 
     addLog(profile.id, log)
+    if(currentUser){
+      DatabaseService.addLog(currentUser.uid, profile.id, log).catch(console.error)
+    }
     setShowAddModal(false)
     setNewLogData({ type: 'feed', details: '', notes: '', time: formatLocalDateTimeInput() })
     toast.success('Activity logged successfully!')
@@ -134,6 +140,12 @@ const ActivityLog = () => {
       notes: editLog.notes,
       timestamp: new Date(editLog.timestamp)
     })
+    if(currentUser){
+      DatabaseService.updateLog(currentUser.uid, profile.id, editLog.id, {
+        ...editLog,
+        timestamp: editLog.timestamp
+      }).catch(console.error)
+    }
     setEditLog(null)
     toast.success('Activity updated successfully!')
   }
@@ -142,6 +154,9 @@ const ActivityLog = () => {
     if (!profile || !deleteLogEntry) return
 
     deleteLog(profile.id, deleteLogEntry.id)
+    if(currentUser){
+      DatabaseService.deleteLog(currentUser.uid, profile.id, deleteLogEntry.id).catch(console.error)
+    }
     setDeleteLogEntry(null)
     toast.success('Activity deleted successfully!')
   }
