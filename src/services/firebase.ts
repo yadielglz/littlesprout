@@ -62,7 +62,14 @@ export const DatabaseService = {
     const logsRef = collection(db, 'users', userId, 'profiles', profileId, 'logs');
     const q = query(logsRef, orderBy('timestamp', 'desc'));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as LogEntry));
+    return snapshot.docs.map(doc => {
+      const data:any = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : data.timestamp
+      } as LogEntry
+    });
   },
 
   async updateLog(userId: string, profileId: string, logId: string, updates: Partial<LogEntry>) {
@@ -171,7 +178,14 @@ export const DatabaseService = {
     const logsRef = collection(db, 'users', userId, 'profiles', profileId, 'logs');
     const q = query(logsRef, orderBy('timestamp', 'desc'));
     return onSnapshot(q, (snapshot) => {
-      const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as LogEntry));
+      const logs = snapshot.docs.map(doc => {
+        const data:any = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : data.timestamp
+        } as LogEntry
+      });
       callback(logs);
     });
   },
