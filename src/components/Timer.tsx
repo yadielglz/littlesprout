@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Modal from './Modal'
+import { formatLocalDateTimeInput } from '../utils/datetime'
 
 interface TimerProps {
   label: string
@@ -43,7 +44,7 @@ const Timer: React.FC<TimerProps> = ({ label, onSave, onClose, isOpen }) => {
   }
 
   const handleSave = () => {
-    onSave(elapsed, new Date().toISOString().slice(0,16))
+    onSave(elapsed, formatLocalDateTimeInput())
     setIsRunning(false)
     setStartTime(null)
     setElapsed(0)

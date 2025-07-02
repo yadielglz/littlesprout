@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from 'react'
 import Modal from '../components/Modal'
 import Timer from '../components/Timer'
 import { generateId } from '../utils/initialization'
+import { formatLocalDateTimeInput } from '../utils/datetime'
+import { format } from 'date-fns'
 import MilestoneTicker from '../components/MilestoneTicker'
 import HealthGrowthCard from '../components/HealthGrowthCard'
 import NotificationSystem from '../components/NotificationSystem'
@@ -185,7 +187,9 @@ const Dashboard = () => {
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">Next Doctor's Appointment</h2>
               {nextAppt ? (
                 <div>
-                  <div className="font-bold text-blue-700 dark:text-blue-300">{nextAppt.date} at {nextAppt.time}</div>
+                  <div className="font-bold text-blue-700 dark:text-blue-300">
+                    {format(new Date(`${nextAppt.date}T${nextAppt.time}`), 'MMMM d')} at {format(new Date(`${nextAppt.date}T${nextAppt.time}`), 'h:mm a')}
+                  </div>
                   <div className="text-gray-700 dark:text-gray-200">Dr. {nextAppt.doctor} &mdash; {nextAppt.location}</div>
                   <div className="text-gray-500 dark:text-gray-400 text-sm">Reason: {nextAppt.reason}</div>
                   {nextAppt.notes && <div className="text-xs text-gray-400 mt-1">Notes: {nextAppt.notes}</div>}
@@ -290,7 +294,7 @@ const Dashboard = () => {
                   type="datetime-local"
                   name="time"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-                  defaultValue={new Date().toISOString().slice(0, 16)}
+                  defaultValue={formatLocalDateTimeInput()}
                   required
                 />
               </div>
@@ -327,7 +331,7 @@ const Dashboard = () => {
               <option value="mixed">Mixed</option>
             </select>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
-            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={formatLocalDateTimeInput()} required />
             <button type="submit" className="w-full bg-amber-500 text-white py-2 rounded">Log Diaper</button>
           </form>
         )}
@@ -338,7 +342,7 @@ const Dashboard = () => {
             const weight = form.weight.value;
             const heightFt = form.heightFt.value;
             const heightIn = form.heightIn.value;
-            handleLog('weight', `Weight: ${weight} lbs, Height: ${heightFt}'${heightIn}\"`, new Date().toISOString())
+            handleLog('weight', `Weight: ${weight} lbs, Height: ${heightFt}'${heightIn}\"`, formatLocalDateTimeInput())
           }} className="space-y-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Weight (lbs)</label>
             <input name="weight" type="number" min="0" step="0.1" className="w-full px-3 py-2 border rounded" required />
@@ -373,7 +377,7 @@ const Dashboard = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
             <textarea name="notes" className="w-full px-3 py-2 border rounded" placeholder="Any symptoms or concerns..." />
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
-            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={formatLocalDateTimeInput()} required />
             <button type="submit" className="w-full bg-red-500 text-white py-2 rounded">Log Temperature</button>
           </form>
         )}
@@ -411,7 +415,7 @@ const Dashboard = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
             <textarea name="notes" className="w-full px-3 py-2 border rounded" placeholder="Any reactions or notes..." />
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
-            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={formatLocalDateTimeInput()} required />
             <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">Log Vaccine</button>
           </form>
         )}
@@ -451,7 +455,7 @@ const Dashboard = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
             <textarea name="notes" className="w-full px-3 py-2 border rounded" placeholder="Additional details, medications, etc..." />
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
-            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={new Date().toISOString().slice(0,16)} required />
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={formatLocalDateTimeInput()} required />
             <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">Add Health Note</button>
           </form>
         )}
@@ -542,7 +546,7 @@ const Dashboard = () => {
               </>
             )}
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
-            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={editLog.timestamp.toISOString().slice(0,16)} required />
+            <input name="time" type="datetime-local" className="w-full px-3 py-2 border rounded" defaultValue={formatLocalDateTimeInput(new Date(editLog.timestamp))} required />
             <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">Save Changes</button>
           </form>
         )}

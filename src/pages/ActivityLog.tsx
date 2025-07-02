@@ -14,6 +14,7 @@ import {
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
 import toast from 'react-hot-toast'
+import { formatLocalDateTimeInput } from '../utils/datetime'
 
 const ActivityLog = () => {
   const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog, setActiveTimer, activeTimer } = useStore()
@@ -35,7 +36,7 @@ const ActivityLog = () => {
     type: 'feed',
     details: '',
     notes: '',
-    time: new Date().toISOString().slice(0, 16)
+    time: formatLocalDateTimeInput()
   })
 
   // Filter and search logs
@@ -117,7 +118,7 @@ const ActivityLog = () => {
 
     addLog(profile.id, log)
     setShowAddModal(false)
-    setNewLogData({ type: 'feed', details: '', notes: '', time: new Date().toISOString().slice(0, 16) })
+    setNewLogData({ type: 'feed', details: '', notes: '', time: formatLocalDateTimeInput() })
     toast.success('Activity logged successfully!')
   }
 
@@ -490,7 +491,7 @@ const ActivityLog = () => {
                 </label>
                 <input
                   type="datetime-local"
-                  value={new Date(editLog.timestamp).toISOString().slice(0, 16)}
+                  value={formatLocalDateTimeInput(new Date(editLog.timestamp))}
                   onChange={(e) => setEditLog({ ...editLog, timestamp: new Date(e.target.value) })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                 />
