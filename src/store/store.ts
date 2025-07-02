@@ -130,7 +130,7 @@ export const useStore = create<AppState>()(
       achievedMilestones: {},
       activeTimer: null,
       isDarkMode: false,
-      temperatureUnit: 'C',
+      temperatureUnit: 'F',
       sidebarOpen: false,
       appointments: {},
       setProfiles: (profiles) => set({ profiles }),

@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/store'
 import { useFirebaseStore } from './store/firebaseStore'
 import { useAuth } from './contexts/AuthContext'
 import BottomNavigation from './components/BottomNavigation'
-import Dashboard from './pages/Dashboard'
-import ActivityLog from './pages/ActivityLog'
-import Charts from './pages/Charts'
-import Settings from './pages/Settings'
-import Welcome from './pages/Welcome'
 import Login from './components/Login'
-import FirebaseTest from './components/FirebaseTest'
 import Header from './components/Header'
+
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const ActivityLog = lazy(() => import('./pages/ActivityLog'))
+const Charts = lazy(() => import('./pages/Charts'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Welcome = lazy(() => import('./pages/Welcome'))
+const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
   const [isHydrated, setIsHydrated] = useState(false)
@@ -56,8 +58,8 @@ function App() {
   if (!isHydrated || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-center" aria-live="polite">
+          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" role="status" aria-label="Loading"></div>
           <p className="text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
@@ -74,6 +76,11 @@ function App() {
       {hasProfiles && <Header />}
       <BottomNavigation />
       <div className="pb-20">
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading"></div>
+          </div>
+        }>
         <Routes>
           {hasProfiles ? (
             <>
@@ -83,17 +90,18 @@ function App() {
               <Route path="/charts" element={<Charts />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/firebase-test" element={<FirebaseTest />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<NotFound />} />
             </>
           ) : (
             <>
               <Route path="/" element={<Welcome />} />
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/firebase-test" element={<FirebaseTest />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<NotFound />} />
             </>
           )}
         </Routes>
+        </Suspense>
       </div>
     </div>
   )

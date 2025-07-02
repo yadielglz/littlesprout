@@ -252,7 +252,7 @@ const Dashboard = () => {
             const details = form.details.value
             const time = form.time.value
             const amount = parseFloat(form.amount.value)
-            handleLog('feed', `${details} - ${amount}ml`, time, amount)
+            handleLog('feed', `${details} - ${amount}oz`, time, amount)
           }}>
             <div className="space-y-4">
               <div>
@@ -271,13 +271,13 @@ const Dashboard = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Amount (ml)
+                  Amount (oz)
                 </label>
                 <input
                   type="number"
                   name="amount"
                   min="0"
-                  step="5"
+                  step="0.5"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
                   required
                 />
@@ -473,7 +473,7 @@ const Dashboard = () => {
               const feedTypeText = feedType === 'bottle' ? 'Bottle (Formula)' : 
                                  feedType === 'breast' ? 'Breast Feed' : 'Food (Solids)';
               updateLog(currentProfileId!, editLog.id, { 
-                details: `${feedTypeText} - ${amount}ml`, 
+                details: `${feedTypeText} - ${amount}oz`, 
                 timestamp: new Date(time),
                 rawAmount: parseFloat(amount)
               });
@@ -507,8 +507,8 @@ const Dashboard = () => {
                   <option value="breast">Breast Feed</option>
                   <option value="food">Food (Solids)</option>
                 </select>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount (ml)</label>
-                <input name="amount" type="number" min="0" step="5" className="w-full px-3 py-2 border rounded" defaultValue={editLog.details.match(/Amount: ([\d.]+)/)?.[1] || ''} required />
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount (oz)</label>
+                <input name="amount" type="number" min="0" step="0.5" className="w-full px-3 py-2 border rounded" defaultValue={editLog.details.match(/Amount: ([\d.]+)/)?.[1] || ''} required />
               </>
             )}
             {editLog.type === 'diaper' && (

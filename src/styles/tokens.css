@@ -1,0 +1,23 @@
+:root {
+  /* Brand colors */
+  --color-primary: #6366f1; /* indigo-500 */
+  --color-primary-foreground: #ffffff;
+  /* Surface & neutrals */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f9fafb; /* gray-50 */
+  --color-border: #e5e7eb; /* gray-200 */
+  --color-text: #111827; /* gray-900 */
+
+  /* Activity tints */
+  --tint-feed: #ede9fe; /* purple-50 */
+  --tint-diaper: #fefce8; /* yellow-50 */
+  --tint-sleep: #ecfdf5; /* emerald-50 */
+  --tint-temperature: #fef2f2; /* red-50 */
+}
+
+html.dark {
+  --color-surface: #1f2937; /* gray-800 */
+  --color-surface-muted: #111827; /* gray-900 */
+  --color-border: #374151; /* gray-700 */
+  --color-text: #f9fafb; /* gray-50 */
+} 
