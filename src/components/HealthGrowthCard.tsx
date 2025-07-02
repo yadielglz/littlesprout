@@ -17,12 +17,8 @@ const HealthGrowthCard: React.FC<HealthGrowthCardProps> = ({
   const logs = useStore((state: { getCurrentLogs: () => LogEntry[] }) => state.getCurrentLogs())
 
   // Get latest measurements
-  const latestWeight = logs
-    .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'weight' && l.notes?.includes('Weight:'))
-    .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
-
-  const latestHeight = logs
-    .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'height' && l.notes?.includes('Height:'))
+  const latestGrowth = logs
+    .filter((l: LogEntry) => l.type === 'weight' && l.details?.includes('Weight:'))
     .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
 
   const latestTemp = logs
@@ -32,6 +28,9 @@ const HealthGrowthCard: React.FC<HealthGrowthCardProps> = ({
   const latestVaccine = logs
     .filter((l: LogEntry) => l.type === 'custom' && l.customActivity === 'vaccine')
     .sort((a: LogEntry, b: LogEntry) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
+
+  const parsedWeight = latestGrowth?.details.match(/Weight:\s*(\d+(?:\.\d+)?)\s*lbs/i)?.[1]
+  const parsedHeight = latestGrowth?.details.match(/Height:\s*(\d+)'(\d+)/i)
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -47,10 +46,10 @@ const HealthGrowthCard: React.FC<HealthGrowthCardProps> = ({
           </div>
           <div className="flex-grow space-y-2">
             <div className="text-sm text-gray-600 dark:text-gray-300">
-              Weight: {latestWeight ? latestWeight.notes?.split('Weight:')[1]?.trim().split(' ')[0] : 'Not recorded'}
+              Weight: {parsedWeight ? `${parsedWeight} lbs` : 'Not recorded'}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-300">
-              Height: {latestHeight ? latestHeight.notes?.split('Height:')[1]?.trim().split(' ')[0] : 'Not recorded'}
+              Height: {parsedHeight ? `${parsedHeight[1]}'${parsedHeight[2]}"` : 'Not recorded'}
             </div>
           </div>
           <button

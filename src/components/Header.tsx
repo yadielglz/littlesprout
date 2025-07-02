@@ -42,11 +42,11 @@ const Header = () => {
     <>
       <div className="fixed top-0 left-0 right-0 z-40">
         {/* User Status Bar */}
-        <div className="bg-blue-600 text-white px-4 py-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <User className="w-4 h-4" />
-              <span className="text-sm font-medium truncate">
+        <div className="bg-blue-600 text-white px-4 py-2 text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-1 max-w-[150px] sm:max-w-none truncate">
+              <User className="w-4 h-4 flex-shrink-0" />
+              <span className="font-medium truncate">
                 {currentUser.email}
               </span>
             </div>
@@ -71,16 +71,18 @@ const Header = () => {
 
         <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 py-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white leading-tight">
                   Hello, {profile.userName}!
                 </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">
+                <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
                   <span className="font-semibold text-indigo-600 dark:text-indigo-400">{profile.babyName}</span> is {calculateAge(profile.dob)}
                 </p>
               </div>
-              <ClockWeather />
+              <div className="w-full sm:w-auto">
+                <ClockWeather />
+              </div>
             </div>
           </div>
         </header>
