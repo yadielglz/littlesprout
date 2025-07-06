@@ -6,6 +6,7 @@ import { useAuth } from './contexts/AuthContext'
 import BottomNavigation from './components/BottomNavigation'
 import Login from './components/Login'
 import Header from './components/Header'
+import OfflineIndicator from './components/OfflineIndicator'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const ActivityLog = lazy(() => import('./pages/ActivityLog'))
@@ -52,8 +53,11 @@ function App() {
       return () => {
         unsubscribeFromUpdates()
       }
+    } else {
+      // Clean up listeners when user logs out
+      unsubscribeFromUpdates()
     }
-  }, [currentUser])
+  }, [currentUser, syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates])
 
   if (!isHydrated || authLoading) {
     return (
@@ -73,6 +77,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <OfflineIndicator />
       {hasProfiles && <Header />}
       <BottomNavigation />
       <div className="pb-20">

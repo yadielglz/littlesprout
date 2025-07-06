@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { DatabaseService } from '../services/firebase';
 import { useStore, BabyProfile } from './store';
+import { withErrorHandling } from '../utils/errorHandler';
+import toast from 'react-hot-toast';
 
 interface FirebaseStore {
   // Firebase-specific methods
@@ -16,12 +18,23 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
   _unsubscribers: null,
   
   createProfile: async (userId: string, profile: BabyProfile) => {
-    await DatabaseService.createProfile(userId, profile);
-    // The real-time listener will update the local state automatically
+    return withErrorHandling(async () => {
+      await DatabaseService.createProfile(userId, profile);
+      // The real-time listener will update the local state automatically
+    }, 'Create profile');
   },
 
   syncWithFirebase: async (userId: string) => {
-    try {
+    // Check online status before attempting sync
+    if (!navigator.onLine) {
+      toast('Working offline. Data will sync when you\'re back online.', {
+        icon: '📱',
+        duration: 3000,
+      });
+      return;
+    }
+
+    return withErrorHandling(async () => {
       const { profiles: localProfiles, currentProfileId: localCurrentProfileId } = useStore.getState();
 
       // Only fetch profiles if they are not already populated
@@ -47,13 +60,24 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
           appointments: { [currentProfileId]: appointments }
         });
       }
-    } catch (error) {
-      console.error('Firebase sync error:', error);
-      throw error;
-    }
+    }, 'Firebase sync', undefined, true); // Enable retry for sync operations
   },
 
   subscribeToRealTimeUpdates: (userId: string) => {
+    // Clean up any existing listeners first
+    const { _unsubscribers } = get();
+    if (_unsubscribers) {
+      Object.values(_unsubscribers).forEach(unsub => {
+        if (typeof unsub === 'function') {
+          try {
+            unsub();
+          } catch (error) {
+            console.warn('Error unsubscribing from Firebase listener:', error);
+          }
+        }
+      });
+    }
+
     // Subscribe to the list of profiles
     const unsubscribeProfiles = DatabaseService.subscribeToProfiles(userId, (profiles: BabyProfile[]) => {
       const { profiles: localProfiles, currentProfileId } = useStore.getState();
@@ -124,7 +148,15 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
   unsubscribeFromUpdates: () => {
     const { _unsubscribers } = get();
     if (_unsubscribers) {
-      Object.values(_unsubscribers).forEach(unsub => unsub());
+      Object.values(_unsubscribers).forEach(unsub => {
+        if (typeof unsub === 'function') {
+          try {
+            unsub();
+          } catch (error) {
+            console.warn('Error unsubscribing from Firebase listener:', error);
+          }
+        }
+      });
       set({ _unsubscribers: null });
     }
   },
@@ -132,7 +164,7 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
   migrateLocalData: async (userId: string) => {
     const state = useStore.getState();
     
-    try {
+    return withErrorHandling(async () => {
       // Migrate profiles
       for (const profile of state.profiles) {
         await DatabaseService.createProfile(userId, profile);
@@ -165,9 +197,6 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
       }
 
       console.log('Local data migration completed');
-    } catch (error) {
-      console.error('Migration error:', error);
-      throw error;
-    }
+    }, 'Local data migration');
   }
 })); 

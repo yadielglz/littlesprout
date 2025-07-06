@@ -89,9 +89,12 @@ const ActivityLog = () => {
     { value: 'feed', label: 'Feeding', icon: '🍼' },
     { value: 'sleep', label: 'Sleep', icon: '😴' },
     { value: 'diaper', label: 'Diaper', icon: '👶' },
-    { value: 'weight', label: 'Weight', icon: '📏' },
     { value: 'nap', label: 'Nap', icon: '🛏️' },
-    { value: 'tummy', label: 'Tummy Time', icon: '⏱️' }
+    { value: 'tummy', label: 'Tummy Time', icon: '⏱️' },
+    { value: 'weight', label: 'Weight & Height', icon: '📏' },
+    { value: 'temperature', label: 'Temperature', icon: '🌡️' },
+    { value: 'vaccine', label: 'Vaccine', icon: '💉' },
+    { value: 'health', label: 'Health Note', icon: '📝' }
   ]
 
   // Date filters

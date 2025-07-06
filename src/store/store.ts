@@ -77,6 +77,7 @@ interface AppState {
   activeTimer: ActiveTimer | null
   isDarkMode: boolean
   temperatureUnit: 'C' | 'F'
+  measurementUnit: 'oz' | 'ml'
   sidebarOpen: boolean
   appointments: Record<string, Appointment[]>
   setProfiles: (profiles: BabyProfile[]) => void
@@ -104,6 +105,8 @@ interface AppState {
   setDarkMode: (isDark: boolean) => void
   toggleTemperatureUnit: () => void
   setTemperatureUnit: (unit: 'C' | 'F') => void
+  toggleMeasurementUnit: () => void
+  setMeasurementUnit: (unit: 'oz' | 'ml') => void
   toggleSidebar: () => void
   setSidebarOpen: (open: boolean) => void
   getCurrentProfile: () => BabyProfile | null
@@ -131,6 +134,7 @@ export const useStore = create<AppState>()(
       activeTimer: null,
       isDarkMode: false,
       temperatureUnit: 'F',
+      measurementUnit: 'oz',
       sidebarOpen: false,
       appointments: {},
       setProfiles: (profiles) => set({ profiles }),
@@ -234,6 +238,11 @@ export const useStore = create<AppState>()(
           temperatureUnit: state.temperatureUnit === 'C' ? 'F' : 'C',
         })),
       setTemperatureUnit: (unit) => set({ temperatureUnit: unit }),
+      toggleMeasurementUnit: () =>
+        set((state) => ({
+          measurementUnit: state.measurementUnit === 'oz' ? 'ml' : 'oz',
+        })),
+      setMeasurementUnit: (unit) => set({ measurementUnit: unit }),
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       getCurrentProfile: () => {
