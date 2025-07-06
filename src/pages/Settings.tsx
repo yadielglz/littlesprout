@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useStore, BabyProfile } from '../store/store'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { 
   Users, 
   Bell, 
@@ -12,18 +12,15 @@ import {
   Download,
   Upload,
   Shield,
-  Clock,
   RefreshCw,
   CheckCircle,
   AlertCircle,
   Database,
-  History,
-  Smartphone
+  History
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
 import { 
-  dataBackupService, 
   createDataBackup, 
   restoreFromBackup, 
   exportAppData, 
@@ -108,7 +105,6 @@ const Settings = () => {
   const [backups, setBackups] = useState<BackupData[]>([])
   const [recoveryInfo, setRecoveryInfo] = useState<any>(null)
   const [isCreatingBackup, setIsCreatingBackup] = useState(false)
-  const [selectedBackup, setSelectedBackup] = useState<BackupData | null>(null)
   const [showBackupHistory, setShowBackupHistory] = useState(false)
 
   // State for reminders management
@@ -360,7 +356,7 @@ const Settings = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {backups.slice(0, 3).map((backup, index) => (
+            {backups.slice(0, 3).map((backup) => (
               <div
                 key={backup.timestamp}
                 className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
@@ -626,12 +622,6 @@ const Settings = () => {
                     </div>
                   </div>
                   <div className="flex space-x-2 ml-4">
-                    <button
-                      onClick={() => setSelectedBackup(backup)}
-                      className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                    >
-                      Details
-                    </button>
                     <button
                       onClick={() => {
                         handleRestoreBackup(backup)

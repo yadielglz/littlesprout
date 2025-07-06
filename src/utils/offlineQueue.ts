@@ -1,4 +1,4 @@
-import { useStore } from '../store/store';
+// import { useStore } from '../store/store';
 import { DatabaseService } from '../services/firebase';
 import { dataBackupService } from './dataBackup';
 import toast from 'react-hot-toast';
@@ -28,7 +28,7 @@ class OfflineQueueManager {
   private isProcessing = false;
   private syncInterval: NodeJS.Timeout | null = null;
   private maxAttempts = 3;
-  private baseDelay = 1000; // 1 second
+  // private baseDelay = 1000; // 1 second
   
   private constructor() {
     this.loadQueue();

@@ -1,5 +1,5 @@
 import { useStore } from '../store/store';
-import { DatabaseService } from '../services/firebase';
+// import { DatabaseService } from '../services/firebase';
 import toast from 'react-hot-toast';
 
 export interface BackupData {
@@ -108,9 +108,11 @@ class DataBackupService {
   }
 
   // Save backup to Firebase
-  private async saveBackupToFirebase(userId: string, backup: BackupData) {
+  private async saveBackupToFirebase(_userId: string, _backup: BackupData) {
     try {
-      await DatabaseService.saveBackup(userId, backup);
+      // TODO: Implement backup saving to Firebase when needed
+      // await DatabaseService.saveBackup(userId, backup);
+      console.log('Backup saved locally (Firebase backup not implemented yet)');
     } catch (error) {
       console.error('Failed to save backup to Firebase:', error);
       throw error;
@@ -313,7 +315,7 @@ class DataBackupService {
   }
 
   // Process individual sync item
-  private async processSyncItem(userId: string, item: { action: string; data: any; timestamp: string }) {
+  private async processSyncItem(_userId: string, item: { action: string; data: any; timestamp: string }) {
     // This would implement the actual sync logic based on the action type
     // For now, it's a placeholder
     console.log('Processing sync item:', item);
