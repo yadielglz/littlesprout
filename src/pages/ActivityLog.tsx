@@ -218,48 +218,52 @@ const ActivityLog = () => {
   }
 
   return (
-    <div className="p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Activity Log</h1>
-            <p className="text-gray-600 dark:text-gray-300">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 lg:mb-8">
+          <div className="mb-4 lg:mb-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">Activity Log</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
               Track and manage {profile.babyName}'s daily activities
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {/* Timer Buttons */}
             <button
               onClick={() => handleStartTimer('sleep')}
-              className="flex items-center px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm sm:text-base disabled:opacity-50"
               disabled={!!activeTimer}
             >
-              <Clock size={20} className="mr-2" />
-              Sleep Timer
+              <Clock size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Sleep Timer</span>
+              <span className="sm:hidden">Sleep</span>
             </button>
             <button
               onClick={() => handleStartTimer('nap')}
-              className="flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm sm:text-base disabled:opacity-50"
               disabled={!!activeTimer}
             >
-              <Clock size={20} className="mr-2" />
-              Nap Timer
+              <Clock size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Nap Timer</span>
+              <span className="sm:hidden">Nap</span>
             </button>
             <button
               onClick={() => handleStartTimer('tummy')}
-              className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm sm:text-base disabled:opacity-50"
               disabled={!!activeTimer}
             >
-              <Clock size={20} className="mr-2" />
-              Tummy Time
+              <Clock size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Tummy Time</span>
+              <span className="sm:hidden">Tummy</span>
             </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base"
             >
-              <Plus size={20} className="mr-2" />
-              Add Activity
+              <Plus size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Add Activity</span>
+              <span className="sm:hidden">Add</span>
             </button>
           </div>
         </div>
@@ -277,8 +281,8 @@ const ActivityLog = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 mb-6 border border-white/20 dark:border-gray-700/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -320,7 +324,7 @@ const ActivityLog = () => {
         </div>
 
         {/* Activity List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/50">
           {filteredLogs.length === 0 ? (
             <div className="p-8 text-center">
               <div className="text-4xl mb-4">📋</div>

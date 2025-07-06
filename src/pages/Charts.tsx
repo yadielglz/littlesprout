@@ -240,24 +240,24 @@ const Charts = () => {
   }
 
   return (
-    <div className="p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Charts & Analytics</h1>
-            <p className="text-gray-600 dark:text-gray-300">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 lg:mb-8">
+          <div className="mb-4 lg:mb-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">Charts & Analytics</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
               Visualize {profile.babyName}'s growth and patterns
             </p>
           </div>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
             {/* Time Range Filter */}
             <div className="flex items-center space-x-2">
-              <Calendar className="text-gray-500 dark:text-gray-400" size={20} />
+              <Calendar className="text-gray-500 dark:text-gray-400" size={18} />
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm sm:text-base"
               >
                 <option value="week">Last Week</option>
                 <option value="month">Last Month</option>
@@ -266,11 +266,11 @@ const Charts = () => {
             </div>
             {/* Chart Type Filter */}
             <div className="flex items-center space-x-2">
-              <Filter className="text-gray-500 dark:text-gray-400" size={20} />
+              <Filter className="text-gray-500 dark:text-gray-400" size={18} />
               <select
                 value={selectedChart}
                 onChange={(e) => setSelectedChart(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm sm:text-base"
               >
                 <option value="feeding">Feeding</option>
                 <option value="sleep">Sleep</option>
@@ -280,7 +280,7 @@ const Charts = () => {
               </select>
             </div>
             {/* Chart Icons */}
-            <div className="flex items-center space-x-2">
+            <div className="hidden sm:flex items-center space-x-2">
               <BarChart3 className="text-blue-500" size={20} />
               <TrendingUp className="text-green-500" size={20} />
             </div>
@@ -288,16 +288,16 @@ const Charts = () => {
         </div>
 
         {/* Chart Selection */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-          <button onClick={() => setSelectedChart('feeding')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'feeding' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Feeding</button>
-          <button onClick={() => setSelectedChart('sleep')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'sleep' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Sleep</button>
-          <button onClick={() => setSelectedChart('diaper')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'diaper' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Diapers</button>
-          <button onClick={() => setSelectedChart('weight')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'weight' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Weight</button>
-          <button onClick={() => setSelectedChart('distribution')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'distribution' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-700'}`}>Distribution</button>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6">
+          <button onClick={() => setSelectedChart('feeding')} className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'feeding' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/80 dark:bg-gray-700/80 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>Feeding</button>
+          <button onClick={() => setSelectedChart('sleep')} className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'sleep' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/80 dark:bg-gray-700/80 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>Sleep</button>
+          <button onClick={() => setSelectedChart('diaper')} className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'diaper' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/80 dark:bg-gray-700/80 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>Diapers</button>
+          <button onClick={() => setSelectedChart('weight')} className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'weight' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/80 dark:bg-gray-700/80 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>Weight</button>
+          <button onClick={() => setSelectedChart('distribution')} className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors ${selectedChart === 'distribution' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/80 dark:bg-gray-700/80 hover:bg-gray-50 dark:hover:bg-gray-600'}`}>Distribution</button>
         </div>
 
         {/* Chart Display */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4 md:p-6">
+        <div className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50">
           <div className="overflow-x-auto">
             <ResponsiveContainer width="100%" height={400}>
               {renderChart()}

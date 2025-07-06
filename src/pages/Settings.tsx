@@ -260,14 +260,14 @@ const Settings = () => {
   }
 
   const renderDataTab = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Recovery Status */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20">
         <div className="flex items-center mb-4">
-          <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Data Protection Status</h3>
+          <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mr-2 sm:mr-3" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Data Protection Status</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="space-y-2">
             <StatusIndicator status={recoveryInfo?.isOnline ? 'success' : 'warning'}>
               {recoveryInfo?.isOnline ? 'Connected' : 'Offline Mode'}
@@ -288,25 +288,25 @@ const Settings = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <button
           onClick={handleCreateBackup}
           disabled={isCreatingBackup}
-          className="flex items-center justify-center p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+          className="flex items-center justify-center p-3 sm:p-4 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
         >
           {isCreatingBackup ? (
-            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+            <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
           ) : (
-            <Shield className="w-5 h-5 mr-2" />
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
           )}
           {isCreatingBackup ? 'Creating Backup...' : 'Create Backup Now'}
         </button>
         
         <button
           onClick={() => setShowBackupHistory(true)}
-          className="flex items-center justify-center p-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          className="flex items-center justify-center p-3 sm:p-4 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors text-sm sm:text-base"
         >
-          <History className="w-5 h-5 mr-2" />
+          <History className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
           View Backup History
         </button>
       </div>
@@ -543,32 +543,33 @@ const Settings = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Settings</h1>
-          <p className="text-gray-600 dark:text-gray-400">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">Settings</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Manage your profiles, preferences, and data
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-8 bg-gray-200 dark:bg-gray-800 rounded-lg p-1">
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 lg:mb-8 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-2 backdrop-blur-sm border border-white/20 dark:border-gray-700/50">
           {tabs.map((tab) => {
             const Icon = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center px-4 py-2 rounded-md transition-colors ${
+                className={`flex items-center px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors text-sm sm:text-base ${
                   activeTab === tab.id
-                    ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <Icon className="w-4 h-4 mr-2" />
-                {tab.label}
+                <Icon className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
               </button>
             )
           })}

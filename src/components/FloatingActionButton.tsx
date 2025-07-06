@@ -59,15 +59,15 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const getPositionClasses = () => {
     switch (position) {
       case 'bottom-right':
-        return 'bottom-4 right-4 sm:bottom-6 sm:right-6';
+        return 'bottom-20 right-4 sm:bottom-24 sm:right-6';
       case 'bottom-left':
-        return 'bottom-4 left-4 sm:bottom-6 sm:left-6';
+        return 'bottom-20 left-4 sm:bottom-24 sm:left-6';
       case 'top-right':
         return 'top-4 right-4 sm:top-6 sm:right-6';
       case 'top-left':
         return 'top-4 left-4 sm:top-6 sm:left-6';
       default:
-        return 'bottom-4 right-4 sm:bottom-6 sm:right-6';
+        return 'bottom-20 right-4 sm:bottom-24 sm:right-6';
     }
   };
 

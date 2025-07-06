@@ -59,7 +59,7 @@ const Welcome = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-slate-800">
+    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-slate-800">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -73,8 +73,8 @@ const Welcome = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div>
               <label htmlFor="userName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Your Name
@@ -141,26 +141,26 @@ const Welcome = () => {
           </form>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-4">
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-            <div className="text-2xl mb-2">🍼</div>
-            <h3 className="font-semibold text-sm text-gray-800 dark:text-white">Feeding</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Track feeds & amounts</p>
+        <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="text-center p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 dark:border-gray-700/50">
+            <div className="text-xl sm:text-2xl mb-2">🍼</div>
+            <h3 className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-white">Feeding</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">Track feeds & amounts</p>
           </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-            <div className="text-2xl mb-2">😴</div>
-            <h3 className="font-semibold text-sm text-gray-800 dark:text-white">Sleep</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Monitor sleep patterns</p>
+          <div className="text-center p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 dark:border-gray-700/50">
+            <div className="text-xl sm:text-2xl mb-2">😴</div>
+            <h3 className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-white">Sleep</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">Monitor sleep patterns</p>
           </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-            <div className="text-2xl mb-2">📏</div>
-            <h3 className="font-semibold text-sm text-gray-800 dark:text-white">Growth</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Weight & height tracking</p>
+          <div className="text-center p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 dark:border-gray-700/50">
+            <div className="text-xl sm:text-2xl mb-2">📏</div>
+            <h3 className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-white">Growth</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">Weight & height tracking</p>
           </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-            <div className="text-2xl mb-2">🏆</div>
-            <h3 className="font-semibold text-sm text-gray-800 dark:text-white">Milestones</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Celebrate achievements</p>
+          <div className="text-center p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 dark:border-gray-700/50">
+            <div className="text-xl sm:text-2xl mb-2">🏆</div>
+            <h3 className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-white">Milestones</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">Celebrate achievements</p>
           </div>
         </div>
       </div>
