@@ -6,4 +6,103 @@ export function formatLocalDateTimeInput(date: Date = new Date()): string {
   const hh = pad(date.getHours());
   const mi = pad(date.getMinutes());
   return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+}
+
+/**
+ * Format date for dashboard widgets - shows month and day (e.g., "July 25")
+ */
+export function formatDashboardDate(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  } catch (error) {
+    return dateString; // fallback to original if parsing fails
+  }
+}
+
+/**
+ * Format date for appointment pages - shows full readable date (e.g., "Monday, July 25, 2025")
+ */
+export function formatAppointmentDate(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long', 
+      day: 'numeric' 
+    });
+  } catch (error) {
+    return dateString; // fallback to original if parsing fails
+  }
+}
+
+/**
+ * Format time in 12-hour format (e.g., "9:00 AM")
+ */
+export function formatTime(timeString: string): string {
+  try {
+    // Handle both "HH:MM" and "HH:MM:SS" formats
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  } catch (error) {
+    return timeString; // fallback to original if parsing fails
+  }
+}
+
+/**
+ * Format date and time together for appointments (e.g., "Monday, July 25, 2025 at 9:00 AM")
+ */
+export function formatAppointmentDateTime(dateString: string, timeString: string): string {
+  const formattedDate = formatAppointmentDate(dateString);
+  const formattedTime = formatTime(timeString);
+  return `${formattedDate} at ${formattedTime}`;
+}
+
+/**
+ * Format compact date and time for dashboard (e.g., "July 25 at 9:00 AM")
+ */
+export function formatDashboardDateTime(dateString: string, timeString: string): string {
+  const formattedDate = formatDashboardDate(dateString);
+  const formattedTime = formatTime(timeString);
+  return `${formattedDate} at ${formattedTime}`;
+}
+
+/**
+ * Check if a date is today
+ */
+export function isToday(dateString: string): boolean {
+  try {
+    const date = new Date(dateString);
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Check if a date is in the future
+ */
+export function isFuture(dateString: string, timeString?: string): boolean {
+  try {
+    let date = new Date(dateString);
+    if (timeString) {
+      const [hours, minutes] = timeString.split(':').map(Number);
+      date.setHours(hours, minutes, 0, 0);
+    }
+    return date > new Date();
+  } catch (error) {
+    return false;
+  }
 } 

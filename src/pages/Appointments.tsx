@@ -7,6 +7,7 @@ import { Edit, Trash2, Plus } from 'lucide-react';
 import Modal from '../components/Modal';
 import { useModal } from '../contexts/ModalContext';
 import toast from 'react-hot-toast';
+import { formatAppointmentDate, formatTime, isToday, isFuture } from '../utils/datetime';
 
 const Appointments = () => {
   const { getCurrentProfile, appointments } = useStore();
@@ -21,6 +22,13 @@ const Appointments = () => {
   const [editData, setEditData] = useState({ date: '', time: '', doctor: '', location: '', reason: '', notes: '' });
 
   const appts = profile ? appointments[profile.id] || [] : [];
+
+  // Sort appointments by date, with future appointments first
+  const sortedAppts = appts.sort((a, b) => {
+    const dateA = new Date(`${a.date}T${a.time}`);
+    const dateB = new Date(`${b.date}T${b.time}`);
+    return dateB.getTime() - dateA.getTime(); // Most recent/future first
+  });
 
   const handleEdit = (appt: Appointment) => {
     setEditAppt(appt);
@@ -58,55 +66,176 @@ const Appointments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">Appointments</h1>
-          <button
-            onClick={() => openModal('appointment')}
-            className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Add Appointment
-          </button>
-        </div>
-        {appts.length === 0 ? (
-          <div className="text-center text-gray-500 dark:text-gray-400 py-12">No appointments found.</div>
+    <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Appointments</h1>
+        <button
+          onClick={() => openModal('appointment')}
+          className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add Appointment
+        </button>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        {sortedAppts.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-6xl mb-4">📅</div>
+            <p className="text-lg">No appointments scheduled</p>
+            <p className="text-sm">Add your first appointment to get started!</p>
+          </div>
         ) : (
           <div className="space-y-4">
-            {appts.map(appt => (
-              <motion.div
-                key={appt.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between"
-                whileHover={{ scale: 1.01 }}
-              >
-                <div>
-                  <div className="font-bold text-lg text-blue-700 dark:text-blue-300">{appt.date} {appt.time}</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">Doctor: {appt.doctor}</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">Location: {appt.location}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Reason: {appt.reason}</div>
-                  {appt.notes && <div className="text-xs text-gray-400 mt-1">Notes: {appt.notes}</div>}
-                </div>
-                <div className="flex space-x-2 mt-3 sm:mt-0">
-                  <button onClick={() => handleEdit(appt)} className="p-2 text-gray-500 hover:text-blue-500"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => handleDelete(appt)} className="p-2 text-gray-500 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                </div>
-              </motion.div>
-            ))}
+            {sortedAppts.map(appt => {
+              const isUpcoming = isFuture(appt.date, appt.time);
+              const isTodayAppt = isToday(appt.date);
+              
+              return (
+                <motion.div
+                  key={appt.id}
+                  className={`rounded-xl shadow p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between border-l-4 ${
+                    isTodayAppt 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500' 
+                      : isUpcoming 
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-500' 
+                        : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                  }`}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`text-lg font-bold ${
+                        isTodayAppt 
+                          ? 'text-blue-700 dark:text-blue-300' 
+                          : isUpcoming 
+                            ? 'text-green-700 dark:text-green-300' 
+                            : 'text-gray-700 dark:text-gray-300'
+                      }`}>
+                        {formatAppointmentDate(appt.date)}
+                      </div>
+                      {isTodayAppt && (
+                        <span className="px-2 py-1 bg-blue-500 text-white text-xs rounded-full">Today</span>
+                      )}
+                      {isUpcoming && !isTodayAppt && (
+                        <span className="px-2 py-1 bg-green-500 text-white text-xs rounded-full">Upcoming</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      <strong>Time:</strong> {formatTime(appt.time)}
+                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      <strong>Doctor:</strong> {appt.doctor}
+                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      <strong>Location:</strong> {appt.location}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <strong>Reason:</strong> {appt.reason}
+                    </div>
+                    {appt.notes && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        <strong>Notes:</strong> {appt.notes}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex space-x-2 mt-3 sm:mt-0">
+                    <button 
+                      onClick={() => handleEdit(appt)} 
+                      className="p-2 text-gray-500 hover:text-blue-500 transition-colors"
+                      title="Edit appointment"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(appt)} 
+                      className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                      title="Delete appointment"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>
+
       {/* Edit Appointment Modal */}
       <Modal isOpen={!!editAppt} onClose={() => setEditAppt(null)} title="Edit Appointment">
         <div className="space-y-4">
-          <input type="date" value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} className="w-full px-3 py-2 border rounded" />
-          <input type="time" value={editData.time} onChange={e => setEditData({ ...editData, time: e.target.value })} className="w-full px-3 py-2 border rounded" />
-          <input type="text" value={editData.doctor} onChange={e => setEditData({ ...editData, doctor: e.target.value })} className="w-full px-3 py-2 border rounded" placeholder="Doctor" />
-          <input type="text" value={editData.location} onChange={e => setEditData({ ...editData, location: e.target.value })} className="w-full px-3 py-2 border rounded" placeholder="Location" />
-          <input type="text" value={editData.reason} onChange={e => setEditData({ ...editData, reason: e.target.value })} className="w-full px-3 py-2 border rounded" placeholder="Reason" />
-          <textarea value={editData.notes} onChange={e => setEditData({ ...editData, notes: e.target.value })} className="w-full px-3 py-2 border rounded" placeholder="Notes (optional)" />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+            <input 
+              type="date" 
+              value={editData.date} 
+              onChange={e => setEditData({ ...editData, date: e.target.value })} 
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Time</label>
+            <input 
+              type="time" 
+              value={editData.time} 
+              onChange={e => setEditData({ ...editData, time: e.target.value })} 
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Doctor</label>
+            <input 
+              type="text" 
+              value={editData.doctor} 
+              onChange={e => setEditData({ ...editData, doctor: e.target.value })} 
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" 
+              placeholder="Doctor's name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+            <input 
+              type="text" 
+              value={editData.location} 
+              onChange={e => setEditData({ ...editData, location: e.target.value })} 
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" 
+              placeholder="Clinic or hospital"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
+            <input 
+              type="text" 
+              value={editData.reason} 
+              onChange={e => setEditData({ ...editData, reason: e.target.value })} 
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" 
+              placeholder="Reason for visit"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes (optional)</label>
+            <textarea 
+              value={editData.notes} 
+              onChange={e => setEditData({ ...editData, notes: e.target.value })} 
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white" 
+              placeholder="Additional notes"
+              rows={3}
+            />
+          </div>
           <div className="flex space-x-3 pt-4">
-            <button onClick={handleSave} className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">Save</button>
-            <button onClick={() => setEditAppt(null)} className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">Cancel</button>
+            <button 
+              onClick={handleSave} 
+              className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Save Changes
+            </button>
+            <button 
+              onClick={() => setEditAppt(null)} 
+              className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>

@@ -11,6 +11,7 @@ import { Edit, Trash2 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { Reminder } from '../store/store'
 import toast from 'react-hot-toast'
+import { formatDashboardDateTime, formatTime, isToday } from '../utils/datetime'
 
 const Dashboard = () => {
   const {
@@ -53,7 +54,7 @@ const Dashboard = () => {
   const lastHeightLog = logs.filter(l => l.type === 'height').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
 
   // Appointments and reminders for today
-  const todaysAppointments = appointments.filter(appt => isSameDay(new Date(appt.date), today));
+  const todaysAppointments = appointments.filter(appt => isToday(appt.date));
   const todaysReminders = reminders.filter(r => r.isActive)
 
   // Edit reminder logic
@@ -230,7 +231,7 @@ const Dashboard = () => {
                 <div className="text-3xl mb-2">📅</div>
                 {nextAppointment ? (
                   <>
-                    <div className="text-lg font-semibold mb-1">{nextAppointment.date} {nextAppointment.time}</div>
+                    <div className="text-lg font-semibold mb-1">{formatDashboardDateTime(nextAppointment.date, nextAppointment.time)}</div>
                     <div className="text-xs">{nextAppointment.location}</div>
                   </>
                 ) : (
@@ -250,7 +251,7 @@ const Dashboard = () => {
                 <div className="text-3xl mr-4">📅</div>
                 <div>
                   <div className="font-bold text-blue-800 dark:text-blue-200">Doctor's Appointment</div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">{appt.time} @ {appt.location}</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">{formatTime(appt.time)} @ {appt.location}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">{appt.reason}</div>
                 </div>
               </div>
