@@ -17,7 +17,8 @@ const Dashboard = () => {
   const {
     getCurrentProfile,
     getCurrentLogs,
-    getCurrentReminders
+    getCurrentReminders,
+    measurementUnit
   } = useStore()
   const {
     updateReminderInFirebase,
@@ -46,7 +47,21 @@ const Dashboard = () => {
     d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
-  const feedsToday = logs.filter(l => l.type === 'feed' && isSameDay(new Date(l.timestamp), today)).length;
+  
+  // Enhanced feeds calculation
+  const todaysFeeds = logs.filter(l => l.type === 'feed' && isSameDay(new Date(l.timestamp), today));
+  const feedsToday = todaysFeeds.length;
+  
+  // Calculate total liquid intake (bottle + breast feeds only, exclude solids)
+  const liquidIntakeToday = todaysFeeds
+    .filter(feed => {
+      // Check if it's a liquid feed (bottle or breast) by looking at the details
+      const isBottle = feed.details.includes('Bottle (Formula)');
+      const isBreast = feed.details.includes('Breast Feed');
+      return isBottle || isBreast;
+    })
+    .reduce((total, feed) => total + (feed.rawAmount || 0), 0);
+
   const sleepToday = logs.filter(l => (l.type === 'sleep' || l.type === 'nap') && isSameDay(new Date(l.timestamp), today)).reduce((acc, l) => acc + (l.rawDuration || 0), 0);
   const diapersToday = logs.filter(l => l.type === 'diaper' && isSameDay(new Date(l.timestamp), today)).length;
 
@@ -144,16 +159,29 @@ const Dashboard = () => {
                 className="flex flex-col items-center bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4 sm:p-6 shadow-lg cursor-pointer relative overflow-hidden min-h-[120px] sm:min-h-[140px]"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-transparent"></div>
-                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🍼</div>
-                <motion.div 
-                  key={feedsToday}
-                  initial={{ scale: 1.2, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-2xl sm:text-3xl font-bold"
-                >
-                  {feedsToday}
-                </motion.div>
-                <div className="text-xs sm:text-sm opacity-90 font-medium">Feeds</div>
+                <div className="text-3xl sm:text-4xl mb-2">🍼</div>
+                <div className="text-center">
+                  <motion.div 
+                    key={feedsToday}
+                    initial={{ scale: 1.2, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-2xl sm:text-3xl font-bold"
+                  >
+                    {feedsToday}
+                  </motion.div>
+                  <div className="text-xs sm:text-sm opacity-90 font-medium mb-1">Feeds</div>
+                  {liquidIntakeToday > 0 && (
+                    <motion.div
+                      key={liquidIntakeToday}
+                      initial={{ scale: 1.1, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="text-sm font-semibold opacity-95"
+                    >
+                      {liquidIntakeToday.toFixed(1)} {measurementUnit}
+                    </motion.div>
+                  )}
+                </div>
               </motion.div>
               
               <motion.div 
