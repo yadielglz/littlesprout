@@ -87,7 +87,8 @@ const Header = () => {
           </div>
         </header>
       </div>
-      <div className="h-36" /> {/* Spacer for fixed header */}
+      {/* Spacer for fixed header - increased height for mobile */}
+      <div className="h-44 sm:h-40" />
     </>
   )
 }
