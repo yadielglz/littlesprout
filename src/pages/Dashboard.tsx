@@ -118,7 +118,7 @@ const Dashboard = () => {
       animate={{ opacity: 1 }}
       className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20"
     >
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6 lg:space-y-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-12 pb-4 sm:py-6 lg:py-8 space-y-6 lg:space-y-8">
         {/* Today's Summary */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
