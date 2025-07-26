@@ -70,6 +70,13 @@ const StatusIndicator = ({ status, children }: { status: 'success' | 'warning' |
 };
 
 const Settings = () => {
+  // Debug log for mobile testing
+  console.log('[Settings] Component loaded on:', {
+    userAgent: navigator.userAgent,
+    viewport: { width: window.innerWidth, height: window.innerHeight },
+    isMobile: window.innerWidth < 768
+  });
+
   const { 
     profiles, 
     currentProfileId, 
@@ -565,7 +572,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-12 pb-4 sm:py-6 lg:py-8">
         {/* Header */}
         <div className="mb-6 lg:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">Settings</h1>
@@ -575,7 +582,7 @@ const Settings = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 lg:mb-8 bg-white/80 dark:bg-gray-800/80 rounded-2xl p-2 backdrop-blur-sm border border-white/20 dark:border-gray-700/50">
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 lg:mb-8 bg-white/90 dark:bg-gray-800/90 rounded-2xl p-2 shadow-lg border border-gray-200 dark:border-gray-700">
           {tabs.map((tab) => {
             const Icon = tab.icon
             return (
@@ -597,17 +604,23 @@ const Settings = () => {
         </div>
 
         {/* Tab Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {activeTab === 'profiles' && renderProfiles()}
-          {activeTab === 'notifications' && renderNotifications()}
-          {activeTab === 'appearance' && renderAppearance()}
-          {activeTab === 'data' && renderDataTab()}
-        </motion.div>
+        <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {(() => {
+              console.log('[Settings] Rendering tab:', activeTab);
+              if (activeTab === 'profiles') return renderProfiles();
+              if (activeTab === 'notifications') return renderNotifications();
+              if (activeTab === 'appearance') return renderAppearance();
+              if (activeTab === 'data') return renderDataTab();
+              return <div className="p-8 text-center text-gray-500">No content available for this tab.</div>;
+            })()}
+          </motion.div>
+        </div>
       </div>
 
       {/* Backup History Modal */}
