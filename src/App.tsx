@@ -12,6 +12,7 @@ import Timer from './components/Timer'
 import BottomNavigation from './components/BottomNavigation'
 import Login from './components/Login'
 import FloatingActionButton, { ActionItem } from './components/FloatingActionButton'
+import SplashScreen from './components/SplashScreen'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const ActivityLog = lazy(() => import('./pages/ActivityLog'))
@@ -33,9 +34,40 @@ function App() {
   const [isHydrated, setIsHydrated] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerLabel, setTimerLabel] = useState('')
+  const [showSplash, setShowSplash] = useState(true)
+  const [appInitialized, setAppInitialized] = useState(false)
 
   const profile = getCurrentProfile()
   const hasProfiles = profiles.length > 0
+
+  // Splash screen and app initialization
+  useEffect(() => {
+    const initializeApp = async () => {
+      // Ensure splash screen shows for at least 2.5 seconds
+      const minSplashTime = new Promise(resolve => setTimeout(resolve, 2500))
+      
+      // Wait for store hydration and auth
+      const appReady = new Promise<void>((resolve) => {
+        const checkReady = () => {
+          if (isHydrated && !authLoading) {
+            resolve()
+          } else {
+            setTimeout(checkReady, 100)
+          }
+        }
+        checkReady()
+      })
+
+      await Promise.all([minSplashTime, appReady])
+      setAppInitialized(true)
+    }
+
+    initializeApp()
+  }, [isHydrated, authLoading])
+
+  const handleSplashComplete = () => {
+    setShowSplash(false)
+  }
 
   // Mobile-specific route fix
   useEffect(() => {
@@ -60,14 +92,14 @@ function App() {
   }, [location.pathname, currentUser, hasProfiles, navigate])
 
   const fabActions: ActionItem[] = [
-    { id: 'feed', label: 'Log Feeding', icon: '🍼', color: 'bg-blue-500', category: 'care', action: () => openModal('feed') },
-    { id: 'diaper', label: 'Diaper Change', icon: '👶', color: 'bg-amber-500', category: 'care', action: () => openModal('diaper') },
-    { id: 'sleep', label: 'Sleep', icon: '😴', color: 'bg-indigo-500', category: 'care', action: () => openModal('sleep'), requiresTimer: true },
-    { id: 'nap', label: 'Nap', icon: '🛏️', color: 'bg-yellow-500', category: 'care', action: () => openModal('nap'), requiresTimer: true },
-    { id: 'tummy', label: 'Tummy Time', icon: '⏱️', color: 'bg-green-500', category: 'care', action: () => openModal('tummy'), requiresTimer: true },
-    { id: 'weight', label: 'Log Weight', icon: '⚖️', color: 'bg-red-500', category: 'health', action: () => openModal('weight') },
-    { id: 'height', label: 'Log Height', icon: '📏', color: 'bg-blue-500', category: 'health', action: () => openModal('height') },
-    { id: 'temperature', label: 'Temperature', icon: '🌡️', color: 'bg-purple-500', category: 'health', action: () => openModal('temperature') },
+    { id: 'feed', label: 'Feeding', icon: '🍼', color: 'bg-blue-600', category: 'care', action: () => openModal('feed') },
+    { id: 'diaper', label: 'Diaper Change', icon: '👶', color: 'bg-yellow-500', category: 'care', action: () => openModal('diaper') },
+    { id: 'sleep', label: 'Sleep', icon: '😴', color: 'bg-purple-600', category: 'care', action: () => openModal('sleep') },
+    { id: 'weight', label: 'Weight', icon: '⚖️', color: 'bg-red-500', category: 'health', action: () => openModal('weight') },
+    { id: 'height', label: 'Height', icon: '📏', color: 'bg-green-600', category: 'health', action: () => openModal('height') },
+    { id: 'temperature', label: 'Temperature', icon: '🌡️', color: 'bg-orange-500', category: 'health', action: () => openModal('temperature') },
+    { id: 'vaccine', label: 'Vaccination', icon: '💉', color: 'bg-teal-600', category: 'health', action: () => openModal('vaccine') },
+    { id: 'milestone', label: 'Milestone', icon: '🎉', color: 'bg-pink-600', category: 'other', action: () => openModal('health') },
     { id: 'appointment', label: 'Doctor\'s Appointment', icon: '📅', color: 'bg-blue-600', category: 'schedule', action: () => openModal('appointment') },
     { id: 'reminder', label: 'Add Reminder', icon: '🔔', color: 'bg-orange-500', category: 'schedule', action: () => openModal('reminder') }
   ]
@@ -93,7 +125,7 @@ function App() {
   }, [isDarkMode])
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && appInitialized) {
       syncWithFirebase(currentUser.uid).catch(console.error)
       subscribeToRealTimeUpdates(currentUser.uid)
       
@@ -103,41 +135,18 @@ function App() {
     } else {
       unsubscribeFromUpdates()
     }
-  }, [currentUser, syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates])
+  }, [currentUser, syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates, appInitialized])
 
-
-  if (!isHydrated || authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center" aria-live="polite">
-          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" role="status" aria-label="Loading"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!currentUser) {
-    return <Login />
-  }
-
-  const handleStartTimer = (type: 'sleep' | 'nap' | 'tummy') => {
-    setActiveTimer({ type, startTime: Date.now() })
-    setTimerLabel(type === 'sleep' ? 'Sleep Timer' : type === 'nap' ? 'Nap Timer' : 'Tummy Time Timer')
-    setTimerOpen(true)
-    closeModal()
-  }
-
-  const handleTimerSave = (duration: number, time: string) => {
+  const handleTimerSave = (duration: number) => {
     if (!profile) return
-    const timerType = timerLabel.toLowerCase().replace(' timer', '')
+    
     const logEntry = {
-      id: `timer_${Date.now()}`,
-      type: timerType,
-      icon: timerLabel === 'Sleep Timer' ? '😴' : timerLabel === 'Nap Timer' ? '🛏️' : '⏱️',
-      color: '',
-      details: `Duration: ${Math.round(duration / 60000)} min`,
-      timestamp: new Date(time),
+      id: Date.now().toString(),
+      type: timerLabel.includes('Sleep') ? 'sleep' : timerLabel.includes('Nap') ? 'nap' : 'tummy',
+      icon: timerLabel.includes('Sleep') ? '😴' : timerLabel.includes('Nap') ? '🛏️' : '⏱️',
+      color: timerLabel.includes('Sleep') ? 'bg-purple-600' : timerLabel.includes('Nap') ? 'bg-yellow-500' : 'bg-green-500',
+      timestamp: new Date(),
+      details: `${Math.floor(duration / 60)}m ${duration % 60}s`,
       rawDuration: duration,
     }
     addLog(profile.id, logEntry)
@@ -148,6 +157,22 @@ function App() {
     setTimerOpen(false)
     setTimerLabel('')
     setActiveTimer(null)
+  }
+
+  const handleStartTimer = (type: 'sleep' | 'nap' | 'tummy') => {
+    setActiveTimer({ type, startTime: Date.now() })
+    setTimerLabel(type === 'sleep' ? 'Sleep Timer' : type === 'nap' ? 'Nap Timer' : 'Tummy Time Timer')
+    setTimerOpen(true)
+    closeModal()
+  }
+
+  // Show splash screen while app is initializing
+  if (showSplash || !appInitialized) {
+    return <SplashScreen show={true} onComplete={handleSplashComplete} />
+  }
+
+  if (!currentUser) {
+    return <Login />
   }
 
   return (
