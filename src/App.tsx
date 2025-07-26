@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useStore } from './store/store'
 import { useFirebaseStore } from './store/firebaseStore'
@@ -23,15 +23,41 @@ const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
-  const [isHydrated, setIsHydrated] = useState(false)
-  const { profiles, isDarkMode } = useStore()
-  const { currentUser, loading: authLoading } = useAuth()
+  const { getCurrentProfile, isDarkMode, profiles, setActiveTimer, addLog } = useStore()
   const { syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates } = useFirebaseStore()
+  const { currentUser, loading: authLoading } = useAuth()
   const { isModalOpen, actionType, closeModal, openModal } = useModal()
-  const { setActiveTimer, addLog } = useStore()
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  const [isHydrated, setIsHydrated] = useState(false)
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerLabel, setTimerLabel] = useState('')
-  const profile = useStore(state => state.getCurrentProfile())
+
+  const profile = getCurrentProfile()
+  const hasProfiles = profiles.length > 0
+
+  // Mobile-specific route fix
+  useEffect(() => {
+    // Check if we're on a mobile device and handle potential routing issues
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    
+    if (isMobile && currentUser && hasProfiles) {
+      // If mobile user is on root and should be on dashboard, redirect
+      if (location.pathname === '/' || location.pathname === '/littlesprout/' || location.pathname === '/littlesprout') {
+        navigate('/dashboard', { replace: true })
+      }
+      
+      // Handle any malformed paths that might occur on mobile
+      const validPaths = ['/dashboard', '/activity-log', '/appointments', '/charts', '/settings', '/firebase-test']
+      const currentPath = location.pathname
+      
+      if (!validPaths.includes(currentPath) && currentPath !== '/' && !currentPath.includes('welcome')) {
+        console.warn('Mobile: Invalid path detected, redirecting to dashboard:', currentPath)
+        navigate('/dashboard', { replace: true })
+      }
+    }
+  }, [location.pathname, currentUser, hasProfiles, navigate])
 
   const fabActions: ActionItem[] = [
     { id: 'feed', label: 'Log Feeding', icon: '🍼', color: 'bg-blue-500', category: 'care', action: () => openModal('feed') },
@@ -123,8 +149,6 @@ function App() {
     setTimerLabel('')
     setActiveTimer(null)
   }
-
-  const hasProfiles = profiles.length > 0
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">

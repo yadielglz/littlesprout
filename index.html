@@ -45,6 +45,15 @@
       // Single Page Apps for GitHub Pages
       // MIT License
       // https://github.com/rafgraph/spa-github-pages
+      // Enhanced version with mobile browser compatibility
+      
+      // Debug function (only active in development)
+      function debugLog(message) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.log('SPA redirect:', message);
+        }
+      }
+      
       // This script checks to see if a redirect is present in the query string,
       // converts it back into the correct url and adds it to the
       // browser's history using window.history.replaceState(...),
@@ -52,14 +61,35 @@
       // When the single page app is loaded further down in this file,
       // the correct url will be waiting in the browser's history for
       // the single page app to route accordingly.
+      
       (function(l) {
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
+        try {
+          debugLog('Original location: ' + l.href);
+          debugLog('Search string: ' + l.search);
+          
+          if (l.search && l.search[1] === '/') {
+            var decoded = l.search.slice(1).split('&').map(function(s) { 
+              return s.replace(/~and~/g, '&')
+            }).join('?');
+            
+            var newPath = l.pathname.slice(0, -1) + decoded + l.hash;
+            
+            debugLog('Decoded path: ' + decoded);
+            debugLog('New path: ' + newPath);
+            
+            // Use try-catch for mobile browser compatibility
+            try {
+              window.history.replaceState(null, null, newPath);
+              debugLog('Successfully replaced state');
+            } catch (historyError) {
+              debugLog('History replaceState failed: ' + historyError.message);
+              // Fallback for older mobile browsers
+              window.location.replace(newPath);
+            }
+          }
+        } catch (error) {
+          debugLog('SPA redirect error: ' + error.message);
+          // Silent fail for production
         }
       }(window.location))
     </script>
