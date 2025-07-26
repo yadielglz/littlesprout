@@ -1,17 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useStore, Reminder } from '../store/store'
-import { motion } from 'framer-motion'
-import { 
-  Bell, 
-  Clock, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  CheckCircle,
-  AlertCircle
-} from 'lucide-react'
-import Modal from './Modal'
+import { useFirebaseStore } from '../store/firebaseStore'
+import { useAuth } from '../contexts/AuthContext'
 import { generateId } from '../utils/initialization'
+import { motion } from 'framer-motion'
+import { Edit, Trash2, Bell, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import Modal from './Modal'
 import toast from 'react-hot-toast'
 
 interface RemindersProps {
@@ -20,7 +14,13 @@ interface RemindersProps {
 }
 
 const Reminders = ({ isOpen, onClose }: RemindersProps) => {
-  const { getCurrentProfile, getCurrentReminders, addReminder, updateReminder, deleteReminder } = useStore()
+  const { getCurrentProfile, getCurrentReminders } = useStore()
+  const { 
+    addReminderToFirebase, 
+    updateReminderInFirebase, 
+    deleteReminderFromFirebase 
+  } = useFirebaseStore()
+  const { currentUser } = useAuth()
   const profile = getCurrentProfile()
   const reminders = getCurrentReminders()
 
@@ -36,51 +36,42 @@ const Reminders = ({ isOpen, onClose }: RemindersProps) => {
   })
 
   // Check for due reminders
-  useEffect(() => {
-    if (!profile) return
+  // useEffect(() => {
+  //   if (!profile) return
 
-    const checkReminders = () => {
-      const now = new Date()
-      const currentTime = now.getHours() * 60 + now.getMinutes()
+  //   const checkReminders = () => {
+  //     const now = new Date()
+  //     const currentTime = now.getHours() * 60 + now.getMinutes()
 
-      reminders.forEach(reminder => {
-        if (!reminder.isActive) return
+  //     reminders.forEach(reminder => {
+  //       if (!reminder.isActive) return
 
-        const reminderTime = new Date(reminder.time)
-        const reminderMinutes = reminderTime.getHours() * 60 + reminderTime.getMinutes()
+  //       const reminderTime = new Date(reminder.time)
+  //       const reminderMinutes = reminderTime.getHours() * 60 + reminderTime.getMinutes()
 
-        if (Math.abs(currentTime - reminderMinutes) < 5) {
-          showNotification(reminder.text)
-        }
-      })
-    }
+  //       if (Math.abs(currentTime - reminderMinutes) < 5) {
+  //         showNotification(reminder.text)
+  //       }
+  //     })
+  //   }
 
-    const interval = setInterval(checkReminders, 60000)
-    checkReminders()
+  //   const interval = setInterval(checkReminders, 60000)
+  //   checkReminders()
 
-    return () => clearInterval(interval)
-  }, [reminders, profile])
+  //   return () => clearInterval(interval)
+  // }, [reminders, profile])
 
   // Request notification permission
-  useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission()
-    }
-  }, [])
+  // useEffect(() => {
+  //   if ('Notification' in window && Notification.permission === 'default') {
+  //     Notification.requestPermission()
+  //   }
+  // }, [])
 
-  const showNotification = (text: string) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('LittleSprout Reminder', {
-        body: text,
-        icon: '/favicon.svg'
-      })
-    } else {
-      toast(text, { duration: 5000, icon: '🔔' })
-    }
-  }
 
-  const handleAddReminder = () => {
-    if (!profile || !newReminderData.text.trim()) {
+
+  const handleAddReminder = async () => {
+    if (!profile || !currentUser || !newReminderData.text.trim()) {
       toast.error('Please fill in all required fields')
       return
     }
@@ -93,43 +84,63 @@ const Reminders = ({ isOpen, onClose }: RemindersProps) => {
       isActive: newReminderData.isActive
     }
 
-    addReminder(profile.id, reminder)
-    setShowAddModal(false)
-    setNewReminderData({
-      text: '',
-      time: new Date().getTime(),
-      frequency: 'daily',
-      isActive: true
-    })
-    toast.success('Reminder added successfully!')
+    try {
+      await addReminderToFirebase(currentUser.uid, profile.id, reminder)
+      setShowAddModal(false)
+      setNewReminderData({
+        text: '',
+        time: new Date().getTime(),
+        frequency: 'daily',
+        isActive: true
+      })
+      toast.success('Reminder added successfully!')
+    } catch (error) {
+      toast.error('Failed to add reminder. Please try again.')
+    }
   }
 
-  const handleUpdateReminder = () => {
-    if (!profile || !editReminder || !editReminder.text.trim()) {
+  const handleUpdateReminder = async () => {
+    if (!profile || !currentUser || !editReminder || !editReminder.text.trim()) {
       toast.error('Please fill in all required fields')
       return
     }
 
-    updateReminder(profile.id, editReminder.id, {
-      text: editReminder.text,
-      time: editReminder.time,
-      frequency: editReminder.frequency,
-      isActive: editReminder.isActive
-    })
-    setEditReminder(null)
-    toast.success('Reminder updated successfully!')
+    try {
+      await updateReminderInFirebase(currentUser.uid, profile.id, editReminder.id, {
+        text: editReminder.text,
+        time: editReminder.time,
+        frequency: editReminder.frequency,
+        isActive: editReminder.isActive
+      })
+      setEditReminder(null)
+      toast.success('Reminder updated successfully!')
+    } catch (error) {
+      toast.error('Failed to update reminder. Please try again.')
+    }
   }
 
-  const handleDeleteReminder = () => {
-    if (!profile || !deleteReminderItem) return
+  const handleDeleteReminder = async () => {
+    if (!profile || !currentUser || !deleteReminderItem) return
 
-    deleteReminder(profile.id, deleteReminderItem.id)
-    setDeleteReminderItem(null)
-    toast.success('Reminder deleted successfully!')
+    try {
+      await deleteReminderFromFirebase(currentUser.uid, profile.id, deleteReminderItem.id)
+      setDeleteReminderItem(null)
+      toast.success('Reminder deleted successfully!')
+    } catch (error) {
+      toast.error('Failed to delete reminder. Please try again.')
+    }
   }
 
-  const toggleReminder = (reminder: Reminder) => {
-    updateReminder(profile?.id || '', reminder.id, { isActive: !reminder.isActive })
+  const toggleReminder = async (reminder: Reminder) => {
+    if (!profile || !currentUser) return
+
+    try {
+      await updateReminderInFirebase(currentUser.uid, profile.id, reminder.id, { 
+        isActive: !reminder.isActive 
+      })
+    } catch (error) {
+      toast.error('Failed to update reminder. Please try again.')
+    }
   }
 
   const formatTime = (timestamp: number) => {

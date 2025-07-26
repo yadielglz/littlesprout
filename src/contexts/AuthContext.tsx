@@ -8,6 +8,8 @@ import {
   UserCredential
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { useStore } from '../store/store';
+import { useFirebaseStore } from '../store/firebaseStore';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -37,7 +39,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Clear all local data before logging out
+    const { unsubscribeFromUpdates } = useFirebaseStore.getState();
+    
+    // Unsubscribe from Firebase listeners
+    unsubscribeFromUpdates();
+    
+    // Clear the store state (this will also clear localStorage due to persist)
+    useStore.setState({
+      profiles: [],
+      currentProfileId: null,
+      logs: {},
+      inventories: {},
+      reminders: {},
+      appointments: {},
+      achievedMilestones: {},
+      activeTimer: null,
+      customActivities: []
+      // Keep user preferences like isDarkMode, temperatureUnit, measurementUnit
+    });
+    
+    // Sign out from Firebase
     return signOut(auth);
   };
 

@@ -3,6 +3,7 @@ import { DatabaseService } from '../services/firebase';
 import { useStore, BabyProfile } from './store';
 import { withErrorHandling } from '../utils/errorHandler';
 import toast from 'react-hot-toast';
+import { Reminder, Appointment } from './store';
 
 interface FirebaseStore {
   // Firebase-specific methods
@@ -12,6 +13,16 @@ interface FirebaseStore {
   migrateLocalData: (userId: string) => Promise<void>;
   createProfile: (userId: string, profile: BabyProfile) => Promise<void>;
   _unsubscribers: { [key: string]: () => void } | null;
+
+  // Firebase-aware reminder operations
+  addReminderToFirebase: (userId: string, profileId: string, reminder: Reminder) => Promise<void>;
+  updateReminderInFirebase: (userId: string, profileId: string, reminderId: string, updates: Partial<Reminder>) => Promise<void>;
+  deleteReminderFromFirebase: (userId: string, profileId: string, reminderId: string) => Promise<void>;
+
+  // Firebase-aware appointment operations
+  addAppointmentToFirebase: (userId: string, profileId: string, appointment: Appointment) => Promise<void>;
+  updateAppointmentInFirebase: (userId: string, profileId: string, appointmentId: string, updates: Partial<Appointment>) => Promise<void>;
+  deleteAppointmentFromFirebase: (userId: string, profileId: string, appointmentId: string) => Promise<void>;
 }
 
 export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
@@ -22,6 +33,62 @@ export const useFirebaseStore = create<FirebaseStore>((set, get) => ({
       await DatabaseService.createProfile(userId, profile);
       // The real-time listener will update the local state automatically
     }, 'Create profile');
+  },
+
+  // Firebase-aware reminder operations
+  addReminderToFirebase: async (userId: string, profileId: string, reminder: Reminder) => {
+    return withErrorHandling(async () => {
+      // Add to local store first for immediate UI feedback
+      useStore.getState().addReminder(profileId, reminder);
+      // Then sync to Firebase
+      await DatabaseService.addReminder(userId, profileId, reminder);
+    }, 'Add reminder');
+  },
+
+  updateReminderInFirebase: async (userId: string, profileId: string, reminderId: string, updates: Partial<Reminder>) => {
+    return withErrorHandling(async () => {
+      // Update local store first for immediate UI feedback
+      useStore.getState().updateReminder(profileId, reminderId, updates);
+      // Then sync to Firebase
+      await DatabaseService.updateReminder(userId, profileId, reminderId, updates);
+    }, 'Update reminder');
+  },
+
+  deleteReminderFromFirebase: async (userId: string, profileId: string, reminderId: string) => {
+    return withErrorHandling(async () => {
+      // Delete from local store first for immediate UI feedback
+      useStore.getState().deleteReminder(profileId, reminderId);
+      // Then delete from Firebase
+      await DatabaseService.deleteReminder(userId, profileId, reminderId);
+    }, 'Delete reminder');
+  },
+
+  // Firebase-aware appointment operations
+  addAppointmentToFirebase: async (userId: string, profileId: string, appointment: Appointment) => {
+    return withErrorHandling(async () => {
+      // Add to local store first for immediate UI feedback
+      useStore.getState().addAppointment(profileId, appointment);
+      // Then sync to Firebase
+      await DatabaseService.addAppointment(userId, profileId, appointment);
+    }, 'Add appointment');
+  },
+
+  updateAppointmentInFirebase: async (userId: string, profileId: string, appointmentId: string, updates: Partial<Appointment>) => {
+    return withErrorHandling(async () => {
+      // Update local store first for immediate UI feedback
+      useStore.getState().updateAppointment(profileId, appointmentId, updates);
+      // Then sync to Firebase
+      await DatabaseService.updateAppointment(userId, profileId, appointmentId, updates);
+    }, 'Update appointment');
+  },
+
+  deleteAppointmentFromFirebase: async (userId: string, profileId: string, appointmentId: string) => {
+    return withErrorHandling(async () => {
+      // Delete from local store first for immediate UI feedback
+      useStore.getState().deleteAppointment(profileId, appointmentId);
+      // Then delete from Firebase
+      await DatabaseService.deleteAppointment(userId, profileId, appointmentId);
+    }, 'Delete appointment');
   },
 
   syncWithFirebase: async (userId: string) => {

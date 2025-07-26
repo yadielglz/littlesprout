@@ -1,4 +1,6 @@
 import { useStore } from '../store/store'
+import { useFirebaseStore } from '../store/firebaseStore'
+import { useAuth } from '../contexts/AuthContext'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import MilestoneTicker from '../components/MilestoneTicker'
@@ -8,15 +10,19 @@ import ValueDisplayCard from '../components/ValueDisplayCard'
 import { Edit, Trash2 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { Reminder } from '../store/store'
+import toast from 'react-hot-toast'
 
 const Dashboard = () => {
   const {
     getCurrentProfile,
     getCurrentLogs,
-    updateReminder,
-    deleteReminder,
     getCurrentReminders
   } = useStore()
+  const {
+    updateReminderInFirebase,
+    deleteReminderFromFirebase
+  } = useFirebaseStore()
+  const { currentUser } = useAuth()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
   const reminders = getCurrentReminders()
@@ -55,15 +61,27 @@ const Dashboard = () => {
     setEditReminder(rem)
     setEditReminderText(rem.text)
   }
-  const handleSaveReminder = () => {
-    if (editReminder && profile) {
-      updateReminder(profile.id, editReminder.id, { text: editReminderText })
-      setEditReminder(null)
+  
+  const handleSaveReminder = async () => {
+    if (editReminder && profile && currentUser) {
+      try {
+        await updateReminderInFirebase(currentUser.uid, profile.id, editReminder.id, { text: editReminderText })
+        setEditReminder(null)
+        toast.success('Reminder updated successfully!')
+      } catch (error) {
+        toast.error('Failed to update reminder. Please try again.')
+      }
     }
   }
-  const handleDeleteReminder = (rem: Reminder) => {
-    if (profile) {
-      deleteReminder(profile.id, rem.id)
+  
+  const handleDeleteReminder = async (rem: Reminder) => {
+    if (profile && currentUser) {
+      try {
+        await deleteReminderFromFirebase(currentUser.uid, profile.id, rem.id)
+        toast.success('Reminder deleted successfully!')
+      } catch (error) {
+        toast.error('Failed to delete reminder. Please try again.')
+      }
     }
   }
 

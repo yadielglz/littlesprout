@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { useStore, Appointment } from '../store/store';
+import { useFirebaseStore } from '../store/firebaseStore';
+import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Edit, Trash2, Plus } from 'lucide-react';
 import Modal from '../components/Modal';
 import { useModal } from '../contexts/ModalContext';
+import toast from 'react-hot-toast';
 
 const Appointments = () => {
-  const { getCurrentProfile, appointments, updateAppointment, deleteAppointment } = useStore();
+  const { getCurrentProfile, appointments } = useStore();
+  const { 
+    updateAppointmentInFirebase, 
+    deleteAppointmentFromFirebase 
+  } = useFirebaseStore();
+  const { currentUser } = useAuth();
   const profile = getCurrentProfile();
   const { openModal } = useModal();
   const [editAppt, setEditAppt] = useState<Appointment | null>(null);
@@ -26,16 +34,26 @@ const Appointments = () => {
     });
   };
 
-  const handleSave = () => {
-    if (editAppt && profile) {
-      updateAppointment(profile.id, editAppt.id, editData);
-      setEditAppt(null);
+  const handleSave = async () => {
+    if (editAppt && profile && currentUser) {
+      try {
+        await updateAppointmentInFirebase(currentUser.uid, profile.id, editAppt.id, editData);
+        setEditAppt(null);
+        toast.success('Appointment updated successfully!');
+      } catch (error) {
+        toast.error('Failed to update appointment. Please try again.');
+      }
     }
   };
 
-  const handleDelete = (appt: Appointment) => {
-    if (profile) {
-      deleteAppointment(profile.id, appt.id);
+  const handleDelete = async (appt: Appointment) => {
+    if (profile && currentUser) {
+      try {
+        await deleteAppointmentFromFirebase(currentUser.uid, profile.id, appt.id);
+        toast.success('Appointment deleted successfully!');
+      } catch (error) {
+        toast.error('Failed to delete appointment. Please try again.');
+      }
     }
   };
 
