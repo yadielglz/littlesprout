@@ -86,6 +86,9 @@ const Settings = () => {
     addReminder,
     deleteReminder,
     reminders,
+    setLogs,
+    setReminders,
+    setAppointments,
   } = useStore()
 
   const { currentUser } = useAuth()
@@ -106,6 +109,7 @@ const Settings = () => {
   const [recoveryInfo, setRecoveryInfo] = useState<any>(null)
   const [isCreatingBackup, setIsCreatingBackup] = useState(false)
   const [showBackupHistory, setShowBackupHistory] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
 
   // State for reminders management
   const [newReminderText, setNewReminderText] = useState('')
@@ -250,6 +254,16 @@ const Settings = () => {
     reader.readAsText(file)
   }
 
+  const handleResetData = () => {
+    profiles.forEach(profile => {
+      setLogs(profile.id, [])
+      setReminders(profile.id, [])
+      setAppointments(profile.id, [])
+    })
+    toast.success('All activity, reminders, and appointments erased!')
+    setShowResetModal(false)
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString()
   }
@@ -308,6 +322,13 @@ const Settings = () => {
         >
           <History className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
           View Backup History
+        </button>
+        <button
+          onClick={() => setShowResetModal(true)}
+          className="flex items-center justify-center p-3 sm:p-4 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm sm:text-base"
+        >
+          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+          Reset All Data
         </button>
       </div>
 
@@ -774,6 +795,29 @@ const Settings = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Reset Data Modal */}
+      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset All Data?">
+        <div className="space-y-4">
+          <p className="text-gray-700 dark:text-gray-300">
+            Are you sure you want to erase <b>all activity, reminders, and appointments</b> for all profiles? This cannot be undone.
+          </p>
+          <div className="flex space-x-3 pt-4">
+            <button
+              onClick={handleResetData}
+              className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Yes, Reset Everything
+            </button>
+            <button
+              onClick={() => setShowResetModal(false)}
+              className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   )

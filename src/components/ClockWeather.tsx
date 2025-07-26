@@ -8,20 +8,32 @@ interface Weather {
   temperature: number
   windspeed: number
   weathercode: number
+  apparentTemperature: number
 }
 
 const getWeather = async (latitude: number, longitude: number): Promise<Weather> => {
   const response = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=apparent_temperature&timezone=auto`
   )
   if (!response.ok) {
     throw new Error('Failed to fetch weather data')
   }
   const data = await response.json()
+  // Find the current hour's apparent temperature
+  let apparentTemperature = data.current_weather.temperature;
+  if (data.hourly && data.hourly.time && data.hourly.apparent_temperature) {
+    const now = new Date();
+    const currentHour = now.toISOString().slice(0, 13); // e.g., '2024-07-26T15'
+    const idx = data.hourly.time.findIndex((t: string) => t.startsWith(currentHour));
+    if (idx !== -1) {
+      apparentTemperature = data.hourly.apparent_temperature[idx];
+    }
+  }
   return {
     temperature: data.current_weather.temperature,
     windspeed: data.current_weather.windspeed,
     weathercode: data.current_weather.weathercode,
+    apparentTemperature,
   }
 }
 
@@ -71,7 +83,6 @@ const ClockWeather: React.FC = () => {
 
   const getFormattedTemperature = () => {
     if (!weather) return '--';
-
     if (temperatureUnit === 'F') {
       const tempF = (weather.temperature * 9) / 5 + 32;
       return `${Math.round(tempF)}°F`;
@@ -79,12 +90,29 @@ const ClockWeather: React.FC = () => {
     return `${Math.round(weather.temperature)}°C`;
   };
 
+  const getFormattedFeelsLike = () => {
+    if (!weather) return '--';
+    if (temperatureUnit === 'F') {
+      const tempF = (weather.apparentTemperature * 9) / 5 + 32;
+      return `${Math.round(tempF)}°F`;
+    }
+    return `${Math.round(weather.apparentTemperature)}°C`;
+  };
+
+  // Add a function to map weather codes to descriptions
+  const getWeatherDescription = (code: number) => {
+    if (code >= 0 && code <= 1) return 'Sunny';
+    if (code >= 2 && code <= 3) return 'Cloudy';
+    if (code >= 51 && code <= 67) return 'Rain';
+    if (code >= 71 && code <= 77) return 'Snow';
+    return 'Windy';
+  };
+
   return (
     <div className="flex flex-wrap items-center justify-between bg-gradient-to-br from-blue-100 to-green-100 dark:from-slate-700 dark:to-gray-800 p-4 rounded-xl shadow-md gap-4">
       <div className="text-left min-w-[180px]">
         <div className="font-bold text-4xl text-gray-800 dark:text-white tracking-wider">
           {format(time, 'h:mm')}
-          <span className="text-xl animate-pulse">{format(time, ':ss')}</span>
           <span className="text-2xl ml-2">{format(time, 'a')}</span>
         </div>
         <div className="text-sm text-gray-600 dark:text-gray-300">
@@ -95,12 +123,20 @@ const ClockWeather: React.FC = () => {
         {loading ? (
           <div className="text-sm text-gray-500">Loading Weather...</div>
         ) : weather ? (
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center">
-              <Thermometer className="w-5 h-5 mr-1 text-red-500" />
-              <span className="font-semibold">{getFormattedTemperature()}</span>
+          <div className="flex flex-col items-end space-y-1">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center">
+                <Thermometer className="w-5 h-5 mr-1 text-red-500" />
+                <span className="font-semibold">{getFormattedTemperature()}</span>
+              </div>
+              <WeatherIcon code={weather.weathercode} />
             </div>
-            <WeatherIcon code={weather.weathercode} />
+            <div className="text-xs text-gray-600 dark:text-gray-300">
+              Feels like: {getFormattedFeelsLike()}
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-300">
+              {getWeatherDescription(weather.weathercode)}
+            </div>
           </div>
         ) : (
           <div className="flex items-center text-sm text-gray-500">

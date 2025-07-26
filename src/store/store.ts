@@ -119,6 +119,7 @@ interface AppState {
   deleteAppointment: (profileId: string, apptId: string) => void
   getNextAppointment: (profileId: string) => Appointment | null
   syncWithFirebase: () => Promise<void>
+  setAppointments: (profileId: string, appointments: Appointment[]) => void
 }
 
 export const useStore = create<AppState>()(
@@ -295,7 +296,10 @@ export const useStore = create<AppState>()(
       syncWithFirebase: async () => {
         // Implementation of syncWithFirebase method
         return Promise.resolve()
-      }
+      },
+      setAppointments: (profileId, appointments) => set((state) => ({
+        appointments: { ...state.appointments, [profileId]: appointments }
+      }))
     }),
     {
       name: 'baby-tracker-storage',

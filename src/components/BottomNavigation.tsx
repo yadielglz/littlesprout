@@ -5,6 +5,7 @@ import {
   BarChart2, 
   BookOpen, 
   Settings, 
+  Calendar,
 } from 'lucide-react';
 
 const BottomNavigation: React.FC = () => {
@@ -15,6 +16,7 @@ const BottomNavigation: React.FC = () => {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/activity-log', label: 'Activities', icon: BarChart2 },
+    { path: '/appointments', label: 'Appointments', icon: Calendar },
     { path: '/charts', label: 'Charts', icon: BookOpen },
     { path: '/settings', label: 'Settings', icon: Settings },
   ];

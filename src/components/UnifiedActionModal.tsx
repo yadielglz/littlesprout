@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 
 export type ActionType = 
   | 'feed' | 'diaper' | 'sleep' | 'nap' | 'tummy' | 'weight' 
-  | 'temperature' | 'vaccine' | 'health' | 'appointment' | 'reminder';
+  | 'height' | 'temperature' | 'vaccine' | 'health' | 'appointment' | 'reminder';
 
 interface UnifiedActionModalProps {
   isOpen: boolean;
@@ -53,7 +53,8 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
       sleep: { useTimer: true },
       nap: { useTimer: true },
       tummy: { useTimer: true },
-      weight: { weight: '', heightFt: '', heightIn: '', notes: '' },
+      weight: { weight: '', notes: '', weightUnit: 'kg' },
+      height: { height: '', notes: '' },
       temperature: { temperature: '', method: 'oral', notes: '' },
       vaccine: { vaccine: '', dose: '', location: '', notes: '' },
       health: { category: '', symptoms: '', severity: 'mild', notes: '' },
@@ -83,6 +84,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
       nap: 1,
       tummy: 1,
       weight: 1,
+      height: 1,
       temperature: 1,
       vaccine: 2,
       health: 2,
@@ -100,6 +102,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
       nap: { title: 'Log Nap', icon: '🛏️', color: 'bg-yellow-500' },
       tummy: { title: 'Log Tummy Time', icon: '⏱️', color: 'bg-green-500' },
       weight: { title: 'Log Weight & Height', icon: '📏', color: 'bg-red-500' },
+      height: { title: 'Log Height', icon: '📏', color: 'bg-purple-500' },
       temperature: { title: 'Log Temperature', icon: '🌡️', color: 'bg-purple-500' },
       vaccine: { title: 'Log Vaccine', icon: '💉', color: 'bg-pink-500' },
       health: { title: 'Add Health Note', icon: '📝', color: 'bg-teal-500' },
@@ -154,7 +157,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         if (formData.useTimer) return true;
         return formData.time && (formData.hours || formData.minutes);
       case 'weight':
-        return formData.weight && formData.heightFt && formData.heightIn && formData.time;
+        return formData.weight && formData.time;
+      case 'height':
+        return formData.height && formData.time;
       case 'temperature':
         return formData.temperature && formData.time;
       case 'vaccine':
@@ -253,15 +258,31 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const weightLog = {
           id: generateId(),
           type: 'weight',
-          icon: '📏',
+          icon: '⚖️',
           color: '',
-          details: `Weight: ${data.weight} lbs, Height: ${data.heightFt}'${data.heightIn}"`,
+          details: `Weight: ${data.weight} ${data.weightUnit || 'kg'}`,
           timestamp: new Date(timeValue),
           ...(data.notes && { notes: data.notes })
         };
         addLog(profile.id, weightLog);
         if (currentUser) {
           await DatabaseService.addLog(currentUser.uid, profile.id, weightLog);
+        }
+        break;
+
+      case 'height':
+        const heightLog = {
+          id: generateId(),
+          type: 'height',
+          icon: '📏',
+          color: '',
+          details: `Height: ${data.height} ${data.heightUnit || 'cm'}`,
+          timestamp: new Date(timeValue),
+          ...(data.notes && { notes: data.notes })
+        };
+        addLog(profile.id, heightLog);
+        if (currentUser) {
+          await DatabaseService.addLog(currentUser.uid, profile.id, heightLog);
         }
         break;
 
@@ -581,50 +602,91 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           <div className="space-y-4">
             <div className="text-center mb-4">
               <div className="text-6xl mb-2">{config.icon}</div>
-              <h3 className="text-lg font-medium text-gray-800 dark:text-white">Growth Tracking</h3>
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white">Weight Tracking</h3>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Weight (lbs)
+                Weight
+              </label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="number"
+                  value={formData.weight || ''}
+                  onChange={(e) => handleInputChange('weight', e.target.value)}
+                  min="0"
+                  step="0.1"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  placeholder={`Enter weight in ${formData.weightUnit || 'kg'}`}
+                  required
+                />
+                <select
+                  value={formData.weightUnit || 'kg'}
+                  onChange={(e) => handleInputChange('weightUnit', e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="kg">kg</option>
+                  <option value="lbs">lbs</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Time
               </label>
               <input
-                type="number"
-                value={formData.weight || ''}
-                onChange={(e) => handleInputChange('weight', e.target.value)}
-                min="0"
-                step="0.1"
+                type="datetime-local"
+                value={formData.time || ''}
+                onChange={(e) => handleInputChange('time', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter weight"
                 required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Notes (optional)
+              </label>
+              <textarea
+                value={formData.notes || ''}
+                onChange={(e) => handleInputChange('notes', e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                placeholder="Additional notes..."
+              />
+            </div>
+          </div>
+        );
+
+      case 'height':
+        const isCm = formData.heightUnit === 'cm';
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <div className="text-6xl mb-2">{config.icon}</div>
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white">Height Tracking</h3>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Height
               </label>
-              <div className="flex space-x-2">
+              <div className="flex items-center space-x-2">
                 <input
                   type="number"
-                  value={formData.heightFt || ''}
-                  onChange={(e) => handleInputChange('heightFt', e.target.value)}
+                  value={formData.height || ''}
+                  onChange={(e) => handleInputChange('height', e.target.value)}
                   min="0"
-                  max="8"
-                  placeholder="ft"
-                  className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  step={isCm ? "0.1" : "0.1"}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  placeholder={`Enter height in ${isCm ? 'cm' : 'in'}`}
                   required
                 />
-                <span className="self-center text-gray-500">ft</span>
-                <input
-                  type="number"
-                  value={formData.heightIn || ''}
-                  onChange={(e) => handleInputChange('heightIn', e.target.value)}
-                  min="0"
-                  max="11"
-                  placeholder="in"
-                  className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <span className="self-center text-gray-500">in</span>
+                <select
+                  value={formData.heightUnit || 'cm'}
+                  onChange={(e) => handleInputChange('heightUnit', e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="cm">cm</option>
+                  <option value="in">in</option>
+                </select>
               </div>
             </div>
             <div>

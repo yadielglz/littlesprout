@@ -17,12 +17,15 @@ import toast from 'react-hot-toast'
 import { formatLocalDateTimeInput } from '../utils/datetime'
 import { DatabaseService } from '../services/firebase'
 import { useAuth } from '../contexts/AuthContext'
+import { useModal } from '../contexts/ModalContext'
+import { ActionType } from '../components/UnifiedActionModal'
 
 const ActivityLog = () => {
   const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog, setActiveTimer, activeTimer } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
   const { currentUser } = useAuth()
+  const { openModal } = useModal()
 
   // Timer state
   const [timerOpen, setTimerOpen] = useState(false)
@@ -34,13 +37,6 @@ const ActivityLog = () => {
   const [dateFilter, setDateFilter] = useState<string>('all')
   const [editLog, setEditLog] = useState<LogEntry | null>(null)
   const [deleteLogEntry, setDeleteLogEntry] = useState<LogEntry | null>(null)
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [newLogData, setNewLogData] = useState({
-    type: 'feed',
-    details: '',
-    notes: '',
-    time: formatLocalDateTimeInput()
-  })
 
   // Filter and search logs
   const filteredLogs = useMemo(() => {
@@ -106,32 +102,7 @@ const ActivityLog = () => {
   ]
 
   // Handlers
-  const handleAddLog = () => {
-    if (!profile || !newLogData.details.trim()) {
-      toast.error('Please fill in all required fields')
-      return
-    }
-
-    const log: LogEntry = {
-      id: generateId(),
-      type: newLogData.type,
-      icon: activityTypes.find(t => t.value === newLogData.type)?.icon || '📋',
-      color: '',
-      details: newLogData.details,
-      timestamp: new Date(newLogData.time),
-      notes: newLogData.notes || undefined
-    }
-
-    addLog(profile.id, log)
-    if(currentUser){
-      DatabaseService.addLog(currentUser.uid, profile.id, log).catch(console.error)
-    }
-    setShowAddModal(false)
-    setNewLogData({ type: 'feed', details: '', notes: '', time: formatLocalDateTimeInput() })
-    toast.success('Activity logged successfully!')
-  }
-
-  const handleUpdateLog = () => {
+  const handleEditLog = () => {
     if (!profile || !editLog || !editLog.details.trim()) {
       toast.error('Please fill in all required fields')
       return
@@ -228,44 +199,7 @@ const ActivityLog = () => {
               Track and manage {profile.babyName}'s daily activities
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            {/* Timer Buttons */}
-            <button
-              onClick={() => handleStartTimer('sleep')}
-              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm sm:text-base disabled:opacity-50"
-              disabled={!!activeTimer}
-            >
-              <Clock size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Sleep Timer</span>
-              <span className="sm:hidden">Sleep</span>
-            </button>
-            <button
-              onClick={() => handleStartTimer('nap')}
-              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm sm:text-base disabled:opacity-50"
-              disabled={!!activeTimer}
-            >
-              <Clock size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Nap Timer</span>
-              <span className="sm:hidden">Nap</span>
-            </button>
-            <button
-              onClick={() => handleStartTimer('tummy')}
-              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm sm:text-base disabled:opacity-50"
-              disabled={!!activeTimer}
-            >
-              <Clock size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Tummy Time</span>
-              <span className="sm:hidden">Tummy</span>
-            </button>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm sm:text-base"
-            >
-              <Plus size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline">Add Activity</span>
-              <span className="sm:hidden">Add</span>
-            </button>
-          </div>
+          {/* Removed redundant activity buttons; FAB is now global */}
         </div>
 
         {/* Active Timer Display */}
@@ -405,77 +339,6 @@ const ActivityLog = () => {
           </div>
         )}
 
-        {/* Add Activity Modal */}
-        <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Activity">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Activity Type
-              </label>
-              <select
-                value={newLogData.type}
-                onChange={(e) => setNewLogData({ ...newLogData, type: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              >
-                {activityTypes.slice(1).map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.icon} {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Details *
-              </label>
-              <input
-                type="text"
-                value={newLogData.details}
-                onChange={(e) => setNewLogData({ ...newLogData, details: e.target.value })}
-                placeholder="e.g., 4 oz formula, wet diaper, etc."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Time
-              </label>
-              <input
-                type="datetime-local"
-                value={newLogData.time}
-                onChange={(e) => setNewLogData({ ...newLogData, time: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Notes (optional)
-              </label>
-              <textarea
-                value={newLogData.notes}
-                onChange={(e) => setNewLogData({ ...newLogData, notes: e.target.value })}
-                placeholder="Additional notes..."
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-              />
-            </div>
-            <div className="flex space-x-3 pt-4">
-              <button
-                onClick={handleAddLog}
-                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Add Activity
-              </button>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </Modal>
-
         {/* Edit Activity Modal */}
         <Modal isOpen={!!editLog} onClose={() => setEditLog(null)} title="Edit Activity">
           {editLog && (
@@ -531,7 +394,7 @@ const ActivityLog = () => {
               </div>
               <div className="flex space-x-3 pt-4">
                 <button
-                  onClick={handleUpdateLog}
+                  onClick={handleEditLog}
                   className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   Update Activity

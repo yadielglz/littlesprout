@@ -1,15 +1,22 @@
-import { Suspense, useEffect, useState, lazy } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Suspense, lazy, useEffect, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { useStore } from './store/store'
 import { useFirebaseStore } from './store/firebaseStore'
 import { useAuth } from './contexts/AuthContext'
-import BottomNavigation from './components/BottomNavigation'
-import Login from './components/Login'
+import { useTheme } from './contexts/ThemeContext'
+import { useModal } from './contexts/ModalContext'
 import Header from './components/Header'
 import OfflineIndicator from './components/OfflineIndicator'
+import UnifiedActionModal, { ActionType } from './components/UnifiedActionModal'
+import Timer from './components/Timer'
+import BottomNavigation from './components/BottomNavigation'
+import Login from './components/Login'
+import FloatingActionButton, { ActionItem } from './components/FloatingActionButton'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const ActivityLog = lazy(() => import('./pages/ActivityLog'))
+const Appointments = lazy(() => import('./pages/Appointments'))
 const Charts = lazy(() => import('./pages/Charts'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Welcome = lazy(() => import('./pages/Welcome'))
@@ -18,10 +25,27 @@ const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
   const [isHydrated, setIsHydrated] = useState(false)
-  const { profiles, isDarkMode } = useStore()
+  const { profiles, isDarkMode, updateLog } = useStore()
   const { currentUser, loading: authLoading } = useAuth()
   const { syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates } = useFirebaseStore()
-  const hasProfiles = profiles.length > 0
+  const { isModalOpen, actionType, closeModal, openModal } = useModal()
+  const { setActiveTimer, addLog } = useStore()
+  const [timerOpen, setTimerOpen] = useState(false)
+  const [timerLabel, setTimerLabel] = useState('')
+  const profile = useStore(state => state.getCurrentProfile())
+
+  const fabActions: ActionItem[] = [
+    { id: 'feed', label: 'Log Feeding', icon: '🍼', color: 'bg-blue-500', category: 'care', action: () => openModal('feed') },
+    { id: 'diaper', label: 'Diaper Change', icon: '👶', color: 'bg-amber-500', category: 'care', action: () => openModal('diaper') },
+    { id: 'sleep', label: 'Sleep', icon: '😴', color: 'bg-indigo-500', category: 'care', action: () => openModal('sleep'), requiresTimer: true },
+    { id: 'nap', label: 'Nap', icon: '🛏️', color: 'bg-yellow-500', category: 'care', action: () => openModal('nap'), requiresTimer: true },
+    { id: 'tummy', label: 'Tummy Time', icon: '⏱️', color: 'bg-green-500', category: 'care', action: () => openModal('tummy'), requiresTimer: true },
+    { id: 'weight', label: 'Log Weight', icon: '⚖️', color: 'bg-red-500', category: 'health', action: () => openModal('weight') },
+    { id: 'height', label: 'Log Height', icon: '📏', color: 'bg-blue-500', category: 'health', action: () => openModal('height') },
+    { id: 'temperature', label: 'Temperature', icon: '🌡️', color: 'bg-purple-500', category: 'health', action: () => openModal('temperature') },
+    { id: 'appointment', label: 'Doctor\'s Appointment', icon: '📅', color: 'bg-blue-600', category: 'schedule', action: () => openModal('appointment') },
+    { id: 'reminder', label: 'Add Reminder', icon: '🔔', color: 'bg-orange-500', category: 'schedule', action: () => openModal('reminder') }
+  ]
 
   useEffect(() => {
     const unsubHydrate = useStore.persist.onHydrate(() => setIsHydrated(false))
@@ -35,16 +59,14 @@ function App() {
     }
   }, [])
 
-  // Handle dark mode
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add('dark')
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('dark')
     }
-  }, [isDarkMode]);
+  }, [isDarkMode])
 
-  // Sync with Firebase when user is authenticated
   useEffect(() => {
     if (currentUser) {
       syncWithFirebase(currentUser.uid).catch(console.error)
@@ -54,10 +76,10 @@ function App() {
         unsubscribeFromUpdates()
       }
     } else {
-      // Clean up listeners when user logs out
       unsubscribeFromUpdates()
     }
   }, [currentUser, syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates])
+
 
   if (!isHydrated || authLoading) {
     return (
@@ -67,47 +89,98 @@ function App() {
           <p className="text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  // Show login if not authenticated
   if (!currentUser) {
     return <Login />
   }
 
+  const handleStartTimer = (type: 'sleep' | 'nap' | 'tummy') => {
+    setActiveTimer({ type, startTime: Date.now() })
+    setTimerLabel(type === 'sleep' ? 'Sleep Timer' : type === 'nap' ? 'Nap Timer' : 'Tummy Time Timer')
+    setTimerOpen(true)
+    closeModal()
+  }
+
+  const handleTimerSave = (duration: number, time: string) => {
+    if (!profile) return
+    const timerType = timerLabel.toLowerCase().replace(' timer', '')
+    const logEntry = {
+      id: `timer_${Date.now()}`,
+      type: timerType,
+      icon: timerLabel === 'Sleep Timer' ? '😴' : timerLabel === 'Nap Timer' ? '🛏️' : '⏱️',
+      color: '',
+      details: `Duration: ${Math.round(duration / 60000)} min`,
+      timestamp: new Date(time),
+      rawDuration: duration,
+    }
+    addLog(profile.id, logEntry)
+    if (currentUser) {
+      // Assuming you have a DatabaseService for this
+      // DatabaseService.addLog(currentUser.uid, profile.id, logEntry).catch(console.error)
+    }
+    setTimerOpen(false)
+    setTimerLabel('')
+    setActiveTimer(null)
+  }
+
+  const hasProfiles = profiles.length > 0
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <Toaster position="bottom-center" reverseOrder={false} />
       <OfflineIndicator />
       {hasProfiles && <Header />}
-      <BottomNavigation />
-      <div className="pb-20">
+      
+      <main className="pb-20">
         <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center">
             <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading"></div>
           </div>
         }>
-        <Routes>
-          {hasProfiles ? (
-            <>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/activity-log" element={<ActivityLog />} />
-              <Route path="/charts" element={<Charts />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/firebase-test" element={<FirebaseTest />} />
-              <Route path="*" element={<NotFound />} />
-            </>
-          ) : (
-            <>
-              <Route path="/" element={<Welcome />} />
-              <Route path="/welcome" element={<Welcome />} />
-              <Route path="/firebase-test" element={<FirebaseTest />} />
-              <Route path="*" element={<NotFound />} />
-            </>
-          )}
-        </Routes>
+          <Routes>
+            {hasProfiles ? (
+              <>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/activity-log" element={<ActivityLog />} />
+                <Route path="/appointments" element={<Appointments />} />
+                <Route path="/charts" element={<Charts />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/firebase-test" element={<FirebaseTest />} />
+                <Route path="*" element={<NotFound />} />
+              </>
+            ) : (
+              <>
+                <Route path="/" element={<Welcome />} />
+                <Route path="*" element={<Navigate to="/welcome" replace />} />
+              </>
+            )}
+          </Routes>
         </Suspense>
-      </div>
+      </main>
+
+      {hasProfiles && <BottomNavigation />}
+
+      <FloatingActionButton
+        actions={fabActions}
+        position="bottom-right"
+        onActionSelect={(action) => console.log('Action selected:', action)}
+      />
+
+      <UnifiedActionModal
+        isOpen={isModalOpen}
+        actionType={actionType}
+        onClose={closeModal}
+        onStartTimer={handleStartTimer}
+      />
+      <Timer
+        isOpen={timerOpen}
+        onClose={() => setTimerOpen(false)}
+        onSave={handleTimerSave}
+        label={timerLabel}
+      />
     </div>
   )
 }
