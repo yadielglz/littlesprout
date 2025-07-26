@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import MilestoneTicker from '../components/MilestoneTicker'
 import NotificationSystem from '../components/NotificationSystem'
-import { useAuth } from '../contexts/AuthContext'
 import { useModal } from '../contexts/ModalContext'
 import ValueDisplayCard from '../components/ValueDisplayCard'
 import { Edit, Trash2 } from 'lucide-react'
@@ -13,9 +12,7 @@ import { Reminder } from '../store/store'
 const Dashboard = () => {
   const {
     getCurrentProfile,
-    addLog,
     getCurrentLogs,
-    setActiveTimer,
     updateReminder,
     deleteReminder,
     getCurrentReminders

@@ -8,8 +8,7 @@ import {
   Edit, 
   Trash2, 
   Calendar,
-  Clock,
-  Plus
+  Clock
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
@@ -17,15 +16,14 @@ import toast from 'react-hot-toast'
 import { formatLocalDateTimeInput } from '../utils/datetime'
 import { DatabaseService } from '../services/firebase'
 import { useAuth } from '../contexts/AuthContext'
-import { useModal } from '../contexts/ModalContext'
-import { ActionType } from '../components/UnifiedActionModal'
+// import { useModal } from '../contexts/ModalContext'
 
 const ActivityLog = () => {
   const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog, setActiveTimer, activeTimer } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
   const { currentUser } = useAuth()
-  const { openModal } = useModal()
+  // const { openModal } = useModal()
 
   // Timer state
   const [timerOpen, setTimerOpen] = useState(false)
@@ -145,12 +143,6 @@ const ActivityLog = () => {
   }
 
   // Handle timer actions
-  const handleStartTimer = (type: 'sleep' | 'nap' | 'tummy') => {
-    setActiveTimer({ type, startTime: Date.now() })
-    setTimerType(type)
-    setTimerOpen(true)
-  }
-
   const handleStopTimer = (duration: number, time: string) => {
     if (!profile || !timerType) return
 

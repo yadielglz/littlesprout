@@ -1,14 +1,13 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useStore } from './store/store'
 import { useFirebaseStore } from './store/firebaseStore'
 import { useAuth } from './contexts/AuthContext'
-import { useTheme } from './contexts/ThemeContext'
 import { useModal } from './contexts/ModalContext'
 import Header from './components/Header'
 import OfflineIndicator from './components/OfflineIndicator'
-import UnifiedActionModal, { ActionType } from './components/UnifiedActionModal'
+import UnifiedActionModal from './components/UnifiedActionModal'
 import Timer from './components/Timer'
 import BottomNavigation from './components/BottomNavigation'
 import Login from './components/Login'
@@ -25,7 +24,7 @@ const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
   const [isHydrated, setIsHydrated] = useState(false)
-  const { profiles, isDarkMode, updateLog } = useStore()
+  const { profiles, isDarkMode } = useStore()
   const { currentUser, loading: authLoading } = useAuth()
   const { syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates } = useFirebaseStore()
   const { isModalOpen, actionType, closeModal, openModal } = useModal()
