@@ -23,9 +23,17 @@ const MILESTONES = [
 ]
 
 function getAgeInMonths(dob: string) {
-  const birth = new Date(dob)
-  const now = new Date()
-  return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth())
+  try {
+    const [birthYear, birthMonth] = dob.split('-').map(Number);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // Convert to 1-indexed
+    
+    return (currentYear - birthYear) * 12 + (currentMonth - birthMonth);
+  } catch (error) {
+    console.warn('Invalid date format in getAgeInMonths:', dob);
+    return 0;
+  }
 }
 
 interface MilestoneTickerProps {

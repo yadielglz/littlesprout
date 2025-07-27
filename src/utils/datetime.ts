@@ -9,6 +9,66 @@ export function formatLocalDateTimeInput(date: Date = new Date()): string {
 }
 
 /**
+ * Parse a date string (YYYY-MM-DD) without timezone conversion
+ * This prevents the common issue where "2025-02-10" becomes Feb 9 in local timezone
+ */
+export function parseDateSafe(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed in Date constructor
+}
+
+/**
+ * Format a date string (YYYY-MM-DD) for display without timezone issues
+ * Use this instead of new Date(dateString).toLocaleDateString()
+ */
+export function formatDateSafe(dateString: string): string {
+  try {
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric',
+      month: 'long', 
+      day: 'numeric' 
+    });
+  } catch (error) {
+    return dateString; // fallback to original if parsing fails
+  }
+}
+
+/**
+ * Calculate age from birth date string without timezone issues
+ * Use this instead of new Date(dob) calculations
+ */
+export function calculateAgeSafe(dobString: string): string {
+  try {
+    const [birthYear, birthMonth, birthDay] = dobString.split('-').map(Number);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // Convert to 1-indexed
+    const currentDay = now.getDate();
+    
+    let years = currentYear - birthYear;
+    let months = currentMonth - birthMonth;
+    let days = currentDay - birthDay;
+    
+    if (days < 0) {
+      months--;
+      const daysInPrevMonth = new Date(currentYear, currentMonth - 1, 0).getDate();
+      days += daysInPrevMonth;
+    }
+    
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    
+    return `${years > 0 ? years + 'y ' : ''}${months > 0 ? months + 'm ' : ''}${days}d`;
+  } catch (error) {
+    return 'Invalid date';
+  }
+}
+
+/**
  * Format date for dashboard widgets - shows month and day (e.g., "July 25")
  */
 export function formatDashboardDate(dateString: string): string {

@@ -31,6 +31,7 @@ import {
 } from '../utils/dataBackup'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
+import { formatDateSafe } from '../utils/datetime'
 
 // Helper Components for Settings
 const SettingsRow = ({ children }: { children: React.ReactNode }) => (
@@ -440,7 +441,7 @@ const Settings = () => {
               <div>
                 <h4 className="font-medium text-gray-800 dark:text-white">{profile.babyName}</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Parent: {profile.userName} • Born: {new Date(profile.dob).toLocaleDateString()}
+                  Parent: {profile.userName} • Born: {formatDateSafe(profile.dob)}
                 </p>
               </div>
             </div>
