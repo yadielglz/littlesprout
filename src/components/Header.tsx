@@ -73,12 +73,22 @@ const Header = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 py-4">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white leading-tight">
-                  Hello, {profile.userName}!
+                {/* Mobile: Single line with child info */}
+                <h1 className="block sm:hidden text-lg font-bold text-gray-800 dark:text-white leading-tight">
+                  Hello, {profile.userName}! 
+                  <span className="ml-2 font-semibold text-indigo-600 dark:text-indigo-400">{profile.babyName}</span>
+                  <span className="ml-1 text-sm font-normal text-gray-600 dark:text-gray-300">({calculateAge(profile.dob)})</span>
                 </h1>
-                <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
-                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">{profile.babyName}</span> is {calculateAge(profile.dob)}
-                </p>
+                
+                {/* Desktop: Separate lines */}
+                <div className="hidden sm:block">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white leading-tight">
+                    Hello, {profile.userName}!
+                  </h1>
+                  <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">{profile.babyName}</span> is {calculateAge(profile.dob)}
+                  </p>
+                </div>
               </div>
               <div className="w-full sm:w-auto">
                 <ClockWeather />
