@@ -6,6 +6,7 @@ import { generateId } from '../utils/initialization';
 import { formatLocalDateTimeInput } from '../utils/datetime';
 import { DatabaseService } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
+import { useTimer } from '../contexts/TimerContext';
 import toast from 'react-hot-toast';
 
 export type ActionType = 
@@ -16,17 +17,16 @@ interface UnifiedActionModalProps {
   isOpen: boolean;
   actionType: ActionType | null;
   onClose: () => void;
-  onStartTimer?: (type: 'sleep' | 'nap' | 'tummy') => void;
 }
 
 const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
   isOpen,
   actionType,
-  onClose,
-  onStartTimer
+  onClose
 }) => {
   const { getCurrentProfile, addLog, addAppointment, addReminder, measurementUnit } = useStore();
   const { currentUser } = useAuth();
+  const { startTimer } = useTimer();
   const profile = getCurrentProfile();
 
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -195,8 +195,8 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
     setIsSubmitting(true);
     try {
       if (actionType === 'sleep' || actionType === 'nap' || actionType === 'tummy') {
-        if (formData.useTimer && onStartTimer) {
-          onStartTimer(actionType);
+        if (formData.useTimer) {
+          startTimer(actionType);
           onClose();
           return;
         }

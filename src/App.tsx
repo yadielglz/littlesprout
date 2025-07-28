@@ -5,10 +5,12 @@ import { useStore } from './store/store'
 import { useFirebaseStore } from './store/firebaseStore'
 import { useAuth } from './contexts/AuthContext'
 import { useModal } from './contexts/ModalContext'
+import { TimerProvider } from './contexts/TimerContext'
 import Header from './components/Header'
 import OfflineIndicator from './components/OfflineIndicator'
 import UnifiedActionModal from './components/UnifiedActionModal'
-import Timer from './components/Timer'
+
+import TimerWidget from './components/TimerWidget'
 import BottomNavigation from './components/BottomNavigation'
 import Login from './components/Login'
 import FloatingActionButton, { ActionItem } from './components/FloatingActionButton'
@@ -24,7 +26,7 @@ const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
-  const { getCurrentProfile, isDarkMode, profiles, setActiveTimer, addLog } = useStore()
+  const { getCurrentProfile, isDarkMode, profiles } = useStore()
   const { syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates } = useFirebaseStore()
   const { currentUser, loading: authLoading } = useAuth()
   const { isModalOpen, actionType, closeModal, openModal } = useModal()
@@ -32,8 +34,7 @@ function App() {
   const navigate = useNavigate()
   
   const [isHydrated, setIsHydrated] = useState(false)
-  const [timerOpen, setTimerOpen] = useState(false)
-  const [timerLabel, setTimerLabel] = useState('')
+
   const [showSplash, setShowSplash] = useState(true)
   const [appInitialized, setAppInitialized] = useState(false)
 
@@ -137,34 +138,7 @@ function App() {
     }
   }, [currentUser, syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates, appInitialized])
 
-  const handleTimerSave = (duration: number) => {
-    if (!profile) return
-    
-    const logEntry = {
-      id: Date.now().toString(),
-      type: timerLabel.includes('Sleep') ? 'sleep' : timerLabel.includes('Nap') ? 'nap' : 'tummy',
-      icon: timerLabel.includes('Sleep') ? '😴' : timerLabel.includes('Nap') ? '🛏️' : '⏱️',
-      color: timerLabel.includes('Sleep') ? 'bg-purple-600' : timerLabel.includes('Nap') ? 'bg-yellow-500' : 'bg-green-500',
-      timestamp: new Date(),
-      details: `${Math.floor(duration / 60)}m ${duration % 60}s`,
-      rawDuration: duration,
-    }
-    addLog(profile.id, logEntry)
-    if (currentUser) {
-      // Assuming you have a DatabaseService for this
-      // DatabaseService.addLog(currentUser.uid, profile.id, logEntry).catch(console.error)
-    }
-    setTimerOpen(false)
-    setTimerLabel('')
-    setActiveTimer(null)
-  }
 
-  const handleStartTimer = (type: 'sleep' | 'nap' | 'tummy') => {
-    setActiveTimer({ type, startTime: Date.now() })
-    setTimerLabel(type === 'sleep' ? 'Sleep Timer' : type === 'nap' ? 'Nap Timer' : 'Tummy Time Timer')
-    setTimerOpen(true)
-    closeModal()
-  }
 
   // Show splash screen while app is initializing
   if (showSplash || !appInitialized) {
@@ -176,60 +150,57 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <Toaster position="bottom-center" reverseOrder={false} />
-      <OfflineIndicator />
-      {hasProfiles && <Header />}
-      
-      <main className="pb-20">
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading"></div>
-          </div>
-        }>
-          <Routes>
-            {hasProfiles ? (
-              <>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/activity-log" element={<ActivityLog />} />
-                <Route path="/appointments" element={<Appointments />} />
-                <Route path="/charts" element={<Charts />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/firebase-test" element={<FirebaseTest />} />
-                <Route path="*" element={<NotFound />} />
-              </>
-            ) : (
-              <>
-                <Route path="/" element={<Welcome />} />
-                <Route path="*" element={<Navigate to="/welcome" replace />} />
-              </>
-            )}
-          </Routes>
-        </Suspense>
-      </main>
+    <TimerProvider>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <Toaster position="bottom-center" reverseOrder={false} />
+        <OfflineIndicator />
+        {hasProfiles && <Header />}
+        
+        <main className="pb-20">
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading"></div>
+            </div>
+          }>
+            <Routes>
+              {hasProfiles ? (
+                <>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/activity-log" element={<ActivityLog />} />
+                  <Route path="/appointments" element={<Appointments />} />
+                  <Route path="/charts" element={<Charts />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/firebase-test" element={<FirebaseTest />} />
+                  <Route path="*" element={<NotFound />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/" element={<Welcome />} />
+                  <Route path="*" element={<Navigate to="/welcome" replace />} />
+                </>
+              )}
+            </Routes>
+          </Suspense>
+        </main>
 
-      {hasProfiles && <BottomNavigation />}
+        {hasProfiles && <BottomNavigation />}
 
-      <FloatingActionButton
-        actions={fabActions}
-        position="bottom-right"
-        onActionSelect={(action) => console.log('Action selected:', action)}
-      />
+        <FloatingActionButton
+          actions={fabActions}
+          position="bottom-right"
+          onActionSelect={(action) => console.log('Action selected:', action)}
+        />
 
-      <UnifiedActionModal
-        isOpen={isModalOpen}
-        actionType={actionType}
-        onClose={closeModal}
-        onStartTimer={handleStartTimer}
-      />
-      <Timer
-        isOpen={timerOpen}
-        onClose={() => setTimerOpen(false)}
-        onSave={handleTimerSave}
-        label={timerLabel}
-      />
-    </div>
+        <UnifiedActionModal
+          isOpen={isModalOpen}
+          actionType={actionType}
+          onClose={closeModal}
+        />
+        
+        <TimerWidget />
+      </div>
+    </TimerProvider>
   )
 }
 
