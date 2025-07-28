@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Pause } from 'lucide-react';
+import { X, Pause, Play, Save, Clock } from 'lucide-react';
 import { useTimer } from '../contexts/TimerContext';
 import { useStore } from '../store/store';
 import { DatabaseService } from '../services/firebase';
@@ -10,10 +10,14 @@ import { formatLocalDateTimeInput } from '../utils/datetime';
 import toast from 'react-hot-toast';
 
 const TimerCard: React.FC = () => {
-  const { activeTimers, stopTimer, getTimerElapsed } = useTimer();
+  const { activeTimers, stopTimer, getTimerElapsed, startTimer } = useTimer();
   const { getCurrentProfile, addLog } = useStore();
   const { currentUser } = useAuth();
   const profile = getCurrentProfile();
+  
+  // State for confirmation dialog
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [timerToStop, setTimerToStop] = useState<any>(null);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -23,20 +27,25 @@ const TimerCard: React.FC = () => {
     return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
   };
 
-  const handleStopTimer = async (timer: any) => {
-    if (!profile) return;
+  const handleStopTimerClick = (timer: any) => {
+    setTimerToStop(timer);
+    setShowConfirmDialog(true);
+  };
 
-    const elapsed = getTimerElapsed(timer.id);
+  const handleSaveTimer = async () => {
+    if (!timerToStop || !profile) return;
+
+    const elapsed = getTimerElapsed(timerToStop.id);
     const duration = elapsed;
     
     // Create log entry
     const log = {
       id: generateId(),
-      type: timer.type,
-      icon: timer.icon,
+      type: timerToStop.type,
+      icon: timerToStop.icon,
       color: '',
       details: `Duration: ${formatTime(duration)}`,
-      timestamp: new Date(timer.startTime),
+      timestamp: new Date(timerToStop.startTime),
       rawDuration: duration,
       notes: `Timer stopped at ${formatLocalDateTimeInput()}`
     };
@@ -51,13 +60,26 @@ const TimerCard: React.FC = () => {
       }
       
       // Stop the timer
-      stopTimer(timer.id);
+      stopTimer(timerToStop.id);
       
-      toast.success(`${timer.label} logged successfully!`);
+      toast.success(`${timerToStop.label} logged successfully!`);
     } catch (error) {
       toast.error('Failed to save timer. Please try again.');
       console.error('Timer save error:', error);
+    } finally {
+      setShowConfirmDialog(false);
+      setTimerToStop(null);
     }
+  };
+
+  const handleCancelTimer = () => {
+    if (!timerToStop) return;
+    
+    // Just stop the timer without saving
+    stopTimer(timerToStop.id);
+    toast.info(`${timerToStop.label} timer cancelled`);
+    setShowConfirmDialog(false);
+    setTimerToStop(null);
   };
 
   const getTimerConfig = (type: string) => {
@@ -130,9 +152,9 @@ const TimerCard: React.FC = () => {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => handleStopTimer(timer)}
+                    onClick={() => handleStopTimerClick(timer)}
                     className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                    title="Stop and save timer"
+                    title="Stop timer (will prompt to save)"
                   >
                     <Pause className="w-4 h-4" />
                   </motion.button>
@@ -163,6 +185,40 @@ const TimerCard: React.FC = () => {
           );
         })}
       </div>
+
+      {showConfirmDialog && timerToStop && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">
+              Stop {timerToStop.label} Timer?
+            </h3>
+            <div className="mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-2">
+                Timer has been running for:
+              </p>
+              <div className="text-2xl font-mono font-bold text-blue-600 dark:text-blue-400">
+                {formatTime(getTimerElapsed(timerToStop.id))}
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <button
+                onClick={handleSaveTimer}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Save className="w-4 h-4" />
+                Save & Stop
+              </button>
+              <button
+                onClick={handleCancelTimer}
+                className="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors flex items-center justify-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                Cancel Timer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
