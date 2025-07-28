@@ -152,7 +152,6 @@ function App() {
     <TimerProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <Toaster position="bottom-center" reverseOrder={false} />
-        <OfflineIndicator />
         {hasProfiles && <Header />}
         
         <main className="pb-20">

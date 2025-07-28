@@ -22,6 +22,7 @@ import {
   Key
 } from 'lucide-react'
 import Modal from '../components/Modal'
+import OfflineIndicator from '../components/OfflineIndicator'
 import { generateId } from '../utils/initialization'
 import { 
   createDataBackup, 
@@ -385,6 +386,12 @@ const Settings = () => {
             <p>Data Retention: 5 local backups</p>
           </div>
         </div>
+      </div>
+
+      {/* Online Status & Sync Management */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Online Status & Sync</h3>
+        <OfflineIndicator position="bottom" showOnlineStatus={true} />
       </div>
 
       {/* Quick Actions */}
