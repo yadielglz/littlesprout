@@ -7,7 +7,6 @@ import { useAuth } from './contexts/AuthContext'
 import { useModal } from './contexts/ModalContext'
 import { TimerProvider } from './contexts/TimerContext'
 import Header from './components/Header'
-import OfflineIndicator from './components/OfflineIndicator'
 import UnifiedActionModal from './components/UnifiedActionModal'
 
 import BottomNavigation from './components/BottomNavigation'
