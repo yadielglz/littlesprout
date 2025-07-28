@@ -26,7 +26,7 @@ const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
-  const { getCurrentProfile, isDarkMode, profiles } = useStore()
+  const { isDarkMode, profiles } = useStore()
   const { syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates } = useFirebaseStore()
   const { currentUser, loading: authLoading } = useAuth()
   const { isModalOpen, actionType, closeModal, openModal } = useModal()
