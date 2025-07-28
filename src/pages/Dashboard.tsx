@@ -7,6 +7,7 @@ import MilestoneTicker from '../components/MilestoneTicker'
 import NotificationSystem from '../components/NotificationSystem'
 import { useModal } from '../contexts/ModalContext'
 import ValueDisplayCard from '../components/ValueDisplayCard'
+import TimerCard from '../components/TimerCard'
 import { Edit, Trash2 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { Reminder } from '../store/store'
@@ -61,6 +62,20 @@ const Dashboard = () => {
       return isBottle || isBreast;
     })
     .reduce((total, feed) => total + (feed.rawAmount || 0), 0);
+
+  // Get last feed information
+  const allFeeds = logs.filter(l => l.type === 'feed').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  const lastFeed = allFeeds[0];
+  const timeSinceLastFeed = lastFeed ? Date.now() - new Date(lastFeed.timestamp).getTime() : null;
+  
+  const formatTimeSince = (ms: number) => {
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ago`;
+    }
+    return `${minutes}m ago`;
+  };
 
   const sleepToday = logs.filter(l => (l.type === 'sleep' || l.type === 'nap') && isSameDay(new Date(l.timestamp), today)).reduce((acc, l) => acc + (l.rawDuration || 0), 0);
   const diapersToday = logs.filter(l => l.type === 'diaper' && isSameDay(new Date(l.timestamp), today)).length;
@@ -152,6 +167,27 @@ const Dashboard = () => {
               </h2>
               <div className="text-xl sm:text-2xl">📊</div>
             </div>
+            
+            {/* Feeding Summary */}
+            {lastFeed && (
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-blue-800 dark:text-blue-200">Last Feed</div>
+                    <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
+                      {formatTime(new Date(lastFeed.timestamp).toLocaleTimeString())}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-blue-600 dark:text-blue-300">Time Since</div>
+                    <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
+                      {timeSinceLastFeed ? formatTimeSince(timeSinceLastFeed) : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <motion.div 
                 whileHover={{ scale: 1.05 }}
@@ -222,53 +258,56 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Health & Growth Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50"
-          >
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
-                Health & Growth
-              </h2>
-              <div className="text-xl sm:text-2xl">❤️‍🩹</div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <ValueDisplayCard
-                label="Weight"
-                value={lastWeightLog ? lastWeightLog.details : '-'}
-                icon="⚖️"
-                color="from-red-400 to-red-500"
-                onClick={() => openModal('weight')}
-              />
-              <ValueDisplayCard
-                label="Height"
-                value={lastHeightLog ? lastHeightLog.details : '-'}
-                icon="📏"
-                color="from-blue-400 to-blue-500"
-                onClick={() => openModal('height')}
-              />
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => openModal('appointment')}
-                className="flex flex-col items-center justify-center text-center p-4 rounded-2xl text-white shadow-lg bg-gradient-to-br from-blue-400 to-blue-600 min-h-[140px] cursor-pointer"
-              >
-                <div className="text-3xl mb-2">📅</div>
-                {nextAppointment ? (
-                  <>
-                    <div className="text-lg font-semibold mb-1">{formatDashboardDateTime(nextAppointment.date, nextAppointment.time)}</div>
-                    <div className="text-xs">{nextAppointment.location}</div>
-                  </>
-                ) : (
-                  <div className="text-sm">No upcoming appointments</div>
-                )}
-                <div className="text-xs mt-2 font-semibold">Appointment</div>
-              </motion.button>
-            </div>
-          </motion.div>
+          {/* Timer Card */}
+          <TimerCard />
+        </motion.div>
+
+        {/* Health & Growth Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50"
+        >
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
+              Health & Growth
+            </h2>
+            <div className="text-xl sm:text-2xl">❤️‍🩹</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <ValueDisplayCard
+              label="Weight"
+              value={lastWeightLog ? lastWeightLog.details : '-'}
+              icon="⚖️"
+              color="from-red-400 to-red-500"
+              onClick={() => openModal('weight')}
+            />
+            <ValueDisplayCard
+              label="Height"
+              value={lastHeightLog ? lastHeightLog.details : '-'}
+              icon="📏"
+              color="from-blue-400 to-blue-500"
+              onClick={() => openModal('height')}
+            />
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => openModal('appointment')}
+              className="flex flex-col items-center justify-center text-center p-4 rounded-2xl text-white shadow-lg bg-gradient-to-br from-blue-400 to-blue-600 min-h-[140px] cursor-pointer"
+            >
+              <div className="text-3xl mb-2">📅</div>
+              {nextAppointment ? (
+                <>
+                  <div className="text-lg font-semibold mb-1">{formatDashboardDateTime(nextAppointment.date, nextAppointment.time)}</div>
+                  <div className="text-xs">{nextAppointment.location}</div>
+                </>
+              ) : (
+                <div className="text-sm">No upcoming appointments</div>
+              )}
+              <div className="text-xs mt-2 font-semibold">Appointment</div>
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Appointments & Reminders for Today */}

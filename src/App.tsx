@@ -10,7 +10,6 @@ import Header from './components/Header'
 import OfflineIndicator from './components/OfflineIndicator'
 import UnifiedActionModal from './components/UnifiedActionModal'
 
-import TimerWidget from './components/TimerWidget'
 import BottomNavigation from './components/BottomNavigation'
 import Login from './components/Login'
 import FloatingActionButton, { ActionItem } from './components/FloatingActionButton'
@@ -198,7 +197,6 @@ function App() {
           onClose={closeModal}
         />
         
-        <TimerWidget />
       </div>
     </TimerProvider>
   )
