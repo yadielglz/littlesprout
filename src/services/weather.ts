@@ -161,11 +161,11 @@ export class WeatherService {
               const { latitude, longitude } = position.coords
               const weather = await this.openMeteo.getWeather(latitude, longitude)
               resolve(weather)
-            } catch (error) {
-              reject(error)
+            } catch {
+              reject(new Error('Failed to fetch weather data'))
             }
           },
-          (error) => {
+          () => {
             reject(new Error('Location access denied'))
           }
         )
