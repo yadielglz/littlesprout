@@ -16,7 +16,10 @@ import {
   CheckCircle,
   AlertCircle,
   Database,
-  History
+  History,
+  Cloud,
+  MapPin,
+  Key
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import { generateId } from '../utils/initialization'
@@ -32,6 +35,7 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
 import { formatDateSafe } from '../utils/datetime'
+import { WeatherService } from '../services/weather'
 
 // Helper Components for Settings
 const SettingsRow = ({ children }: { children: React.ReactNode }) => (
@@ -97,6 +101,8 @@ const Settings = () => {
     setLogs,
     setReminders,
     setAppointments,
+    weatherSettings,
+    updateWeatherSettings,
   } = useStore()
 
   const { currentUser } = useAuth()
@@ -112,6 +118,13 @@ const Settings = () => {
     dob: ''
   })
 
+  // Weather settings state
+  const [weatherApiKey, setWeatherApiKey] = useState(weatherSettings.apiKey || '')
+  const [weatherCity, setWeatherCity] = useState(weatherSettings.city || '')
+  const [weatherProvider, setWeatherProvider] = useState(weatherSettings.provider)
+  const [isTestingWeather, setIsTestingWeather] = useState(false)
+  const [weatherTestResult, setWeatherTestResult] = useState<{ success: boolean; message: string } | null>(null)
+
   // Enhanced backup state
   const [backups, setBackups] = useState<BackupData[]>([])
   const [recoveryInfo, setRecoveryInfo] = useState<any>(null)
@@ -126,7 +139,8 @@ const Settings = () => {
     { id: 'profiles', label: 'Profiles', icon: Users },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'appearance', label: 'Appearance', icon: isDarkMode ? Moon : Sun },
-    { id: 'data', label: 'Data & Backup', icon: Database }
+    { id: 'data', label: 'Data & Backup', icon: Database },
+    { id: 'weather', label: 'Weather', icon: Cloud }
   ]
 
   // Load backup information on component mount
@@ -270,6 +284,70 @@ const Settings = () => {
     })
     toast.success('All activity, reminders, and appointments erased!')
     setShowResetModal(false)
+  }
+
+  // Weather settings handlers
+  const handleSaveWeatherSettings = () => {
+    const newSettings = {
+      provider: weatherProvider,
+      apiKey: weatherApiKey || undefined,
+      city: weatherCity || undefined,
+      latitude: weatherSettings.latitude,
+      longitude: weatherSettings.longitude,
+    }
+    
+    updateWeatherSettings(newSettings)
+    toast.success('Weather settings saved!')
+  }
+
+  const handleTestWeather = async () => {
+    setIsTestingWeather(true)
+    setWeatherTestResult(null)
+    
+    try {
+      const testSettings = {
+        provider: weatherProvider,
+        apiKey: weatherApiKey || undefined,
+        city: weatherCity || undefined,
+        latitude: weatherSettings.latitude,
+        longitude: weatherSettings.longitude,
+      }
+      
+      const weatherService = new WeatherService(testSettings)
+      const weather = await weatherService.getWeather()
+      
+      setWeatherTestResult({
+        success: true,
+        message: `Weather test successful! Current weather in ${weather.city}: ${weather.description}, ${Math.round(weather.temperature)}°C`
+      })
+    } catch (error) {
+      setWeatherTestResult({
+        success: false,
+        message: `Weather test failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      })
+    } finally {
+      setIsTestingWeather(false)
+    }
+  }
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          updateWeatherSettings({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            city: undefined // Clear city when using coordinates
+          })
+          toast.success('Location updated!')
+        },
+        (error) => {
+          toast.error('Could not get location. Please enable location services.')
+        }
+      )
+    } else {
+      toast.error('Geolocation is not supported by this browser.')
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -571,6 +649,132 @@ const Settings = () => {
     </div>
   )
 
+  const renderWeather = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Weather Settings</h3>
+      
+      <SettingsRow>
+        <div>
+          <h4 className="font-medium text-gray-800 dark:text-white">Weather Provider</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Choose your weather data source</p>
+        </div>
+        <select
+          value={weatherProvider}
+          onChange={(e) => setWeatherProvider(e.target.value as 'openweathermap' | 'open-meteo')}
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+        >
+          <option value="open-meteo">Open-Meteo (Free)</option>
+          <option value="openweathermap">OpenWeatherMap (API Key Required)</option>
+        </select>
+      </SettingsRow>
+
+      {weatherProvider === 'openweathermap' && (
+        <SettingsRow>
+          <div>
+            <h4 className="font-medium text-gray-800 dark:text-white">OpenWeatherMap API Key</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Get your free API key from openweathermap.org</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="password"
+              value={weatherApiKey}
+              onChange={(e) => setWeatherApiKey(e.target.value)}
+              placeholder="Enter API key"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white w-48"
+            />
+            <Key className="w-4 h-4 text-gray-400" />
+          </div>
+        </SettingsRow>
+      )}
+
+      <SettingsRow>
+        <div>
+          <h4 className="font-medium text-gray-800 dark:text-white">Location</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {weatherCity ? `City: ${weatherCity}` : 
+             weatherSettings.latitude && weatherSettings.longitude ? 
+             `Coordinates: ${weatherSettings.latitude.toFixed(4)}, ${weatherSettings.longitude.toFixed(4)}` : 
+             'No location set'}
+          </p>
+        </div>
+        <div className="flex space-x-2">
+          <button
+            onClick={handleGetLocation}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            <MapPin className="w-4 h-4" />
+          </button>
+          <input
+            type="text"
+            value={weatherCity}
+            onChange={(e) => setWeatherCity(e.target.value)}
+            placeholder="Enter city name"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white w-32"
+          />
+        </div>
+      </SettingsRow>
+
+      {/* Test Weather Connection */}
+      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+        <h4 className="font-medium text-gray-800 dark:text-white mb-3">Test Weather Connection</h4>
+        <div className="flex space-x-2 mb-3">
+          <button
+            onClick={handleTestWeather}
+            disabled={isTestingWeather}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors disabled:opacity-50"
+          >
+            {isTestingWeather ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Testing...
+              </>
+            ) : (
+              <>
+                <Cloud className="w-4 h-4 mr-2" />
+                Test Connection
+              </>
+            )}
+          </button>
+          <button
+            onClick={handleSaveWeatherSettings}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            Save Settings
+          </button>
+        </div>
+        
+        {weatherTestResult && (
+          <div className={`p-3 rounded-lg ${
+            weatherTestResult.success 
+              ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200' 
+              : 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200'
+          }`}>
+            <div className="flex items-center">
+              {weatherTestResult.success ? (
+                <CheckCircle className="w-4 h-4 mr-2" />
+              ) : (
+                <AlertCircle className="w-4 h-4 mr-2" />
+              )}
+              <span className="text-sm">{weatherTestResult.message}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Current Settings Info */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+        <h4 className="font-medium text-gray-800 dark:text-white mb-2">Current Settings</h4>
+        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+          <p>Provider: {weatherSettings.provider === 'openweathermap' ? 'OpenWeatherMap' : 'Open-Meteo'}</p>
+          <p>API Key: {weatherSettings.apiKey ? '✓ Configured' : '✗ Not configured'}</p>
+          <p>City: {weatherSettings.city || 'Not set'}</p>
+          <p>Coordinates: {weatherSettings.latitude && weatherSettings.longitude ? 
+            `${weatherSettings.latitude.toFixed(4)}, ${weatherSettings.longitude.toFixed(4)}` : 'Not set'}</p>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-12 pb-4 sm:py-6 lg:py-8">
@@ -618,6 +822,7 @@ const Settings = () => {
               if (activeTab === 'notifications') return renderNotifications();
               if (activeTab === 'appearance') return renderAppearance();
               if (activeTab === 'data') return renderDataTab();
+              if (activeTab === 'weather') return renderWeather();
               return <div className="p-8 text-center text-gray-500">No content available for this tab.</div>;
             })()}
           </motion.div>

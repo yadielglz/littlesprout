@@ -3,83 +3,66 @@ import { format } from 'date-fns'
 import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, MapPin } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useStore } from '../store/store'
+import { WeatherService, WeatherData } from '../services/weather'
 
-interface Weather {
-  temperature: number
-  windspeed: number
-  weathercode: number
-  apparentTemperature: number
-}
-
-const getWeather = async (latitude: number, longitude: number): Promise<Weather> => {
-  const response = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=apparent_temperature&timezone=auto`
-  )
-  if (!response.ok) {
-    throw new Error('Failed to fetch weather data')
-  }
-  const data = await response.json()
-  // Find the current hour's apparent temperature
-  let apparentTemperature = data.current_weather.temperature;
-  if (data.hourly && data.hourly.time && data.hourly.apparent_temperature) {
-    const now = new Date();
-    const currentHour = now.toISOString().slice(0, 13); // e.g., '2024-07-26T15'
-    const idx = data.hourly.time.findIndex((t: string) => t.startsWith(currentHour));
-    if (idx !== -1) {
-      apparentTemperature = data.hourly.apparent_temperature[idx];
-    }
-  }
-  return {
-    temperature: data.current_weather.temperature,
-    windspeed: data.current_weather.windspeed,
-    weathercode: data.current_weather.weathercode,
-    apparentTemperature,
-  }
-}
-
-const WeatherIcon: React.FC<{ code: number }> = ({ code }) => {
-  if (code >= 0 && code <= 1) return <Sun className="w-8 h-8 text-yellow-500" /> // Clear, mainly clear
-  if (code >= 2 && code <= 3) return <Cloud className="w-8 h-8 text-gray-400" /> // Partly cloudy, overcast
-  if (code >= 51 && code <= 67) return <CloudRain className="w-8 h-8 text-blue-500" /> // Drizzle, Rain
-  if (code >= 71 && code <= 77) return <CloudSnow className="w-8 h-8 text-white" /> // Snow
+const WeatherIcon: React.FC<{ icon: string }> = ({ icon }) => {
+  // OpenWeatherMap icons
+  if (icon.startsWith('01')) return <Sun className="w-8 h-8 text-yellow-500" /> // Clear sky
+  if (icon.startsWith('02')) return <Cloud className="w-8 h-8 text-gray-400" /> // Partly cloudy
+  if (icon.startsWith('03') || icon.startsWith('04')) return <Cloud className="w-8 h-8 text-gray-500" /> // Cloudy
+  if (icon.startsWith('09') || icon.startsWith('10')) return <CloudRain className="w-8 h-8 text-blue-500" /> // Rain
+  if (icon.startsWith('11')) return <CloudRain className="w-8 h-8 text-purple-500" /> // Thunderstorm
+  if (icon.startsWith('13')) return <CloudSnow className="w-8 h-8 text-white" /> // Snow
+  if (icon.startsWith('50')) return <Wind className="w-8 h-8 text-gray-400" /> // Mist
+  
   return <Wind className="w-8 h-8 text-gray-500" /> // Default
 }
 
 const ClockWeather: React.FC = () => {
   const [time, setTime] = useState(new Date())
-  const [weather, setWeather] = useState<Weather | null>(null)
+  const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
-  const { temperatureUnit } = useStore()
+  const { temperatureUnit, weatherSettings, updateWeatherSettings } = useStore()
+  const [weatherService, setWeatherService] = useState<WeatherService | null>(null)
+
+  // Initialize weather service when settings change
+  useEffect(() => {
+    const service = new WeatherService(weatherSettings)
+    setWeatherService(service)
+  }, [weatherSettings])
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000)
 
-    const fetchWeather = () => {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const { latitude, longitude } = position.coords
-            const weatherData = await getWeather(latitude, longitude)
-            setWeather(weatherData)
-          } catch (error) {
-            toast.error('Could not fetch weather data.')
-            console.error(error)
-          } finally {
-            setLoading(false)
-          }
-        },
-        (error) => {
-          toast.error('Could not get location. Please enable location services.')
-          console.error(error)
-          setLoading(false)
+    const fetchWeather = async () => {
+      if (!weatherService) return
+
+      try {
+        const weatherData = await weatherService.getWeather()
+        setWeather(weatherData)
+        
+        // Update location in settings if we got coordinates
+        if (weatherData.city && weatherData.city !== 'Current Location') {
+          updateWeatherSettings({ city: weatherData.city })
         }
-      )
+      } catch (error) {
+        console.error('Weather fetch error:', error)
+        toast.error('Could not fetch weather data.')
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchWeather()
 
-    return () => clearInterval(interval)
-  }, [])
+    // Refresh weather every 10 minutes
+    const weatherInterval = setInterval(fetchWeather, 10 * 60 * 1000)
+
+    return () => {
+      clearInterval(interval)
+      clearInterval(weatherInterval)
+    }
+  }, [weatherService, updateWeatherSettings])
 
   const getFormattedTemperature = () => {
     if (!weather) return '--';
@@ -93,19 +76,10 @@ const ClockWeather: React.FC = () => {
   const getFormattedFeelsLike = () => {
     if (!weather) return '--';
     if (temperatureUnit === 'F') {
-      const tempF = (weather.apparentTemperature * 9) / 5 + 32;
+      const tempF = (weather.feelsLike * 9) / 5 + 32;
       return `${Math.round(tempF)}°F`;
     }
-    return `${Math.round(weather.apparentTemperature)}°C`;
-  };
-
-  // Add a function to map weather codes to descriptions
-  const getWeatherDescription = (code: number) => {
-    if (code >= 0 && code <= 1) return 'Sunny';
-    if (code >= 2 && code <= 3) return 'Cloudy';
-    if (code >= 51 && code <= 67) return 'Rain';
-    if (code >= 71 && code <= 77) return 'Snow';
-    return 'Windy';
+    return `${Math.round(weather.feelsLike)}°C`;
   };
 
   return (
@@ -129,14 +103,20 @@ const ClockWeather: React.FC = () => {
                 <Thermometer className="w-5 h-5 mr-1 text-red-500" />
                 <span className="font-semibold">{getFormattedTemperature()}</span>
               </div>
-              <WeatherIcon code={weather.weathercode} />
+              <WeatherIcon icon={weather.icon} />
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-300">
               Feels like: {getFormattedFeelsLike()}
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-300">
-              {getWeatherDescription(weather.weathercode)}
+              {weather.description}
             </div>
+            {weather.city && weather.city !== 'Current Location' && (
+              <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                <MapPin className="w-3 h-3 mr-1" />
+                {weather.city}
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex items-center text-sm text-gray-500">

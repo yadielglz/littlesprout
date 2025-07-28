@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { WeatherSettings } from '../services/weather'
 
 export interface BabyProfile {
   id: string
@@ -80,6 +81,7 @@ interface AppState {
   measurementUnit: 'oz' | 'ml'
   sidebarOpen: boolean
   appointments: Record<string, Appointment[]>
+  weatherSettings: WeatherSettings
   setProfiles: (profiles: BabyProfile[]) => void
   addProfile: (profile: BabyProfile) => void
   updateProfile: (id: string, updates: Partial<BabyProfile>) => void
@@ -120,6 +122,8 @@ interface AppState {
   getNextAppointment: (profileId: string) => Appointment | null
   syncWithFirebase: () => Promise<void>
   setAppointments: (profileId: string, appointments: Appointment[]) => void
+  setWeatherSettings: (settings: WeatherSettings) => void
+  updateWeatherSettings: (updates: Partial<WeatherSettings>) => void
 }
 
 export const useStore = create<AppState>()(
@@ -138,6 +142,13 @@ export const useStore = create<AppState>()(
       measurementUnit: 'oz',
       sidebarOpen: false,
       appointments: {},
+      weatherSettings: {
+        provider: 'open-meteo' as const,
+        apiKey: undefined,
+        city: undefined,
+        latitude: undefined,
+        longitude: undefined,
+      },
       setProfiles: (profiles) => set({ profiles }),
       addProfile: (profile) => set((state) => ({ 
         profiles: [...state.profiles, profile],
@@ -299,6 +310,10 @@ export const useStore = create<AppState>()(
       },
       setAppointments: (profileId, appointments) => set((state) => ({
         appointments: { ...state.appointments, [profileId]: appointments }
+      })),
+      setWeatherSettings: (settings) => set({ weatherSettings: settings }),
+      updateWeatherSettings: (updates) => set((state) => ({
+        weatherSettings: { ...state.weatherSettings, ...updates }
       }))
     }),
     {
