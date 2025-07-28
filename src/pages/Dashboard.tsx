@@ -77,6 +77,14 @@ const Dashboard = () => {
     return `${minutes}m ago`;
   };
 
+  const formatLastFeedTime = (timestamp: Date) => {
+    return timestamp.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   const sleepToday = logs.filter(l => (l.type === 'sleep' || l.type === 'nap') && isSameDay(new Date(l.timestamp), today)).reduce((acc, l) => acc + (l.rawDuration || 0), 0);
   const diapersToday = logs.filter(l => l.type === 'diaper' && isSameDay(new Date(l.timestamp), today)).length;
 
@@ -175,7 +183,7 @@ const Dashboard = () => {
                   <div>
                     <div className="text-sm font-medium text-blue-800 dark:text-blue-200">Last Feed</div>
                     <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
-                      {formatTime(new Date(lastFeed.timestamp).toLocaleTimeString())}
+                      {formatLastFeedTime(new Date(lastFeed.timestamp))}
                     </div>
                   </div>
                   <div className="text-right">
