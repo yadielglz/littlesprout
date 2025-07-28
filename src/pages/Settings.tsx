@@ -341,7 +341,7 @@ const Settings = () => {
           })
           toast.success('Location updated!')
         },
-        (error) => {
+        () => {
           toast.error('Could not get location. Please enable location services.')
         }
       )

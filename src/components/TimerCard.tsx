@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, Pause } from 'lucide-react';
 import { useTimer } from '../contexts/TimerContext';
 import { useStore } from '../store/store';
 import { DatabaseService } from '../services/firebase';
@@ -10,7 +10,7 @@ import { formatLocalDateTimeInput } from '../utils/datetime';
 import toast from 'react-hot-toast';
 
 const TimerCard: React.FC = () => {
-  const { activeTimers, stopTimer, getTimerElapsed, startTimer } = useTimer();
+  const { activeTimers, stopTimer, getTimerElapsed } = useTimer();
   const { getCurrentProfile, addLog } = useStore();
   const { currentUser } = useAuth();
   const profile = getCurrentProfile();

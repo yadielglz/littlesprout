@@ -170,9 +170,9 @@ export class WeatherService {
           }
         )
       })
-    } catch (error) {
-      console.error('Weather service error:', error)
-      throw error
+    } catch {
+      console.error('Weather service error')
+      throw new Error('Failed to fetch weather data')
     }
   }
 
