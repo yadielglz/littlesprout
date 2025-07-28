@@ -72,15 +72,18 @@ class OpenWeatherMapService {
 // Open-Meteo API service (fallback)
 class OpenMeteoService {
   async getWeather(lat: number, lon: number): Promise<WeatherData> {
-    const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=apparent_temperature&timezone=auto`
-    )
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=apparent_temperature&timezone=auto`
+    console.log('OpenMeteoService: Fetching from URL:', url)
+    
+    const response = await fetch(url)
     
     if (!response.ok) {
-      throw new Error('Failed to fetch weather data from Open-Meteo')
+      console.error('OpenMeteoService: API error:', response.status, response.statusText)
+      throw new Error(`Failed to fetch weather data from Open-Meteo: ${response.status}`)
     }
 
     const data = await response.json()
+    console.log('OpenMeteoService: Received data:', data)
     
     // Find the current hour's apparent temperature
     let apparentTemperature = data.current_weather.temperature
@@ -102,7 +105,7 @@ class OpenMeteoService {
       return 'Cloudy'
     }
 
-    return {
+    const result = {
       temperature: data.current_weather.temperature,
       feelsLike: apparentTemperature,
       humidity: 0, // Open-Meteo doesn't provide humidity in current weather
@@ -111,6 +114,9 @@ class OpenMeteoService {
       icon: this.getWeatherIcon(data.current_weather.weathercode),
       city: 'Current Location'
     }
+    
+    console.log('OpenMeteoService: Returning weather data:', result)
+    return result
   }
 
   private getWeatherIcon(code: number): string {
@@ -139,40 +145,62 @@ export class WeatherService {
 
   async getWeather(): Promise<WeatherData> {
     try {
+      console.log('WeatherService: Starting weather fetch with settings:', this.settings)
+      
       // Try OpenWeatherMap first if configured
       if (this.settings.provider === 'openweathermap' && this.openWeatherMap) {
+        console.log('WeatherService: Trying OpenWeatherMap')
         if (this.settings.city) {
+          console.log('WeatherService: Using city:', this.settings.city)
           return await this.openWeatherMap.getWeatherByCity(this.settings.city)
         } else if (this.settings.latitude && this.settings.longitude) {
+          console.log('WeatherService: Using coordinates:', this.settings.latitude, this.settings.longitude)
           return await this.openWeatherMap.getWeatherByCoords(this.settings.latitude, this.settings.longitude)
         }
       }
 
       // Fallback to Open-Meteo with geolocation
       if (this.settings.latitude && this.settings.longitude) {
+        console.log('WeatherService: Using Open-Meteo with coordinates:', this.settings.latitude, this.settings.longitude)
         return await this.openMeteo.getWeather(this.settings.latitude, this.settings.longitude)
       }
 
       // Final fallback: get location from browser
+      console.log('WeatherService: Requesting browser geolocation')
       return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          console.error('WeatherService: Geolocation not supported')
+          reject(new Error('Geolocation not supported'))
+          return
+        }
+
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             try {
+              console.log('WeatherService: Got position:', position.coords)
               const { latitude, longitude } = position.coords
               const weather = await this.openMeteo.getWeather(latitude, longitude)
+              console.log('WeatherService: Successfully got weather from Open-Meteo')
               resolve(weather)
-            } catch {
+            } catch (error) {
+              console.error('WeatherService: Error fetching weather from Open-Meteo:', error)
               reject(new Error('Failed to fetch weather data'))
             }
           },
-          () => {
-            reject(new Error('Location access denied'))
+          (error) => {
+            console.error('WeatherService: Geolocation error:', error)
+            reject(new Error(`Location access denied: ${error.message}`))
+          },
+          {
+            timeout: 10000,
+            enableHighAccuracy: false,
+            maximumAge: 300000 // 5 minutes
           }
         )
       })
-    } catch {
-      console.error('Weather service error')
-      throw new Error('Failed to fetch weather data')
+    } catch (error) {
+      console.error('WeatherService: General error:', error)
+      throw error
     }
   }
 

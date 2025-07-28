@@ -35,10 +35,16 @@ const ClockWeather: React.FC = () => {
     const interval = setInterval(() => setTime(new Date()), 1000)
 
     const fetchWeather = async () => {
-      if (!weatherService) return
+      if (!weatherService) {
+        console.log('Weather service not initialized')
+        setLoading(false)
+        return
+      }
 
       try {
+        console.log('Fetching weather with settings:', weatherSettings)
         const weatherData = await weatherService.getWeather()
+        console.log('Weather data received:', weatherData)
         setWeather(weatherData)
         
         // Update location in settings if we got coordinates
@@ -47,6 +53,7 @@ const ClockWeather: React.FC = () => {
         }
       } catch (error) {
         console.error('Weather fetch error:', error)
+        setWeather(null)
         toast.error('Could not fetch weather data.')
       } finally {
         setLoading(false)
@@ -62,7 +69,7 @@ const ClockWeather: React.FC = () => {
       clearInterval(interval)
       clearInterval(weatherInterval)
     }
-  }, [weatherService, updateWeatherSettings])
+  }, [weatherService, updateWeatherSettings, weatherSettings])
 
   const getFormattedTemperature = () => {
     if (!weather) return '--';
