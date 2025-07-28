@@ -38,7 +38,7 @@ function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [appInitialized, setAppInitialized] = useState(false)
 
-  const profile = getCurrentProfile()
+
   const hasProfiles = profiles.length > 0
 
   // Splash screen and app initialization

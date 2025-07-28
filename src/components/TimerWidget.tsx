@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play } from 'lucide-react';
+import { X, Pause } from 'lucide-react';
 import { useTimer } from '../contexts/TimerContext';
 import { useStore } from '../store/store';
 import { DatabaseService } from '../services/firebase';
