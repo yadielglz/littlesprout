@@ -88,7 +88,9 @@ export function formatDashboardDate(dateString: string): string {
  */
 export function formatAppointmentDate(dateString: string): string {
   try {
-    const date = new Date(dateString);
+    // Use the safe parsing method to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed in Date constructor
     return date.toLocaleDateString('en-US', { 
       weekday: 'long',
       year: 'numeric',

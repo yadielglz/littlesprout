@@ -70,7 +70,7 @@ const TimerWidget: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 space-y-2"
+        className="fixed top-4 left-4 z-40 space-y-2"
       >
         {activeTimers.map((timer) => (
           <motion.div
@@ -78,14 +78,14 @@ const TimerWidget: React.FC = () => {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
-            className={`${timer.color} text-white rounded-2xl shadow-2xl p-4 backdrop-blur-sm border border-white/20 min-w-[280px] max-w-[320px]`}
+            className={`${timer.color} text-white rounded-2xl shadow-2xl p-3 backdrop-blur-sm border border-white/20 min-w-[240px] max-w-[280px]`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="text-2xl">{timer.icon}</div>
                 <div>
-                  <div className="font-semibold text-sm">{timer.label}</div>
-                  <div className="text-lg font-mono font-bold">
+                  <div className="font-semibold text-xs">{timer.label}</div>
+                  <div className="text-base font-mono font-bold">
                     {formatTime(getTimerElapsed(timer.id))}
                   </div>
                 </div>
