@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import MilestoneTicker from '../components/MilestoneTicker'
 import NotificationSystem from '../components/NotificationSystem'
+import QuickNotesWidget from '../components/QuickNotesWidget'
 import { useModal } from '../contexts/ModalContext'
 import ValueDisplayCard from '../components/ValueDisplayCard'
 import TimerCard from '../components/TimerCard'
@@ -384,6 +385,16 @@ const Dashboard = () => {
               </motion.div>
             </div>
           </div>
+        </motion.div>
+
+        {/* Quick Notes Widget */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50"
+        >
+          <QuickNotesWidget />
         </motion.div>
       </main>
 

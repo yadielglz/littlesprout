@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  BarChart2, 
-  BookOpen, 
-  Settings, 
+import {
+  Home,
+  BarChart2,
+  BookOpen,
+  Settings,
   Calendar,
+  Heart,
+  Sparkles,
 } from 'lucide-react';
 
 const BottomNavigation: React.FC = () => {
@@ -16,8 +18,8 @@ const BottomNavigation: React.FC = () => {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/activity-log', label: 'Activities', icon: BarChart2 },
-    { path: '/appointments', label: 'Appointments', icon: Calendar },
-    { path: '/charts', label: 'Charts', icon: BookOpen },
+    { path: '/health', label: 'Health', icon: Heart },
+    { path: '/features', label: 'Features', icon: Sparkles },
     { path: '/settings', label: 'Settings', icon: Settings },
   ];
 

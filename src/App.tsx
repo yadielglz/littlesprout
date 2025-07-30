@@ -18,6 +18,8 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 const ActivityLog = lazy(() => import('./pages/ActivityLog'))
 const Appointments = lazy(() => import('./pages/Appointments'))
 const Charts = lazy(() => import('./pages/Charts'))
+const HealthDashboard = lazy(() => import('./pages/HealthDashboard'))
+const FeaturesShowcase = lazy(() => import('./pages/FeaturesShowcase'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Welcome = lazy(() => import('./pages/Welcome'))
 const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
@@ -80,7 +82,7 @@ function App() {
       }
       
       // Handle any malformed paths that might occur on mobile
-      const validPaths = ['/dashboard', '/activity-log', '/appointments', '/charts', '/settings', '/firebase-test']
+      const validPaths = ['/dashboard', '/activity-log', '/appointments', '/charts', '/health', '/features', '/settings', '/firebase-test']
       const currentPath = location.pathname
       
       if (!validPaths.includes(currentPath) && currentPath !== '/' && !currentPath.includes('welcome')) {
@@ -167,6 +169,8 @@ function App() {
                   <Route path="/activity-log" element={<ActivityLog />} />
                   <Route path="/appointments" element={<Appointments />} />
                   <Route path="/charts" element={<Charts />} />
+                  <Route path="/health" element={<HealthDashboard />} />
+                  <Route path="/features" element={<FeaturesShowcase />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/firebase-test" element={<FirebaseTest />} />
                   <Route path="*" element={<NotFound />} />
