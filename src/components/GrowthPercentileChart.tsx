@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { useStore } from '../store/store';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Ruler, Scale, Info } from 'lucide-react';
 
 interface GrowthData {

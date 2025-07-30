@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { DatabaseService } from '../services/firebase';
 import { generateId } from '../utils/initialization';
 import { formatLocalDateTimeInput } from '../utils/datetime';
-import { Pill, Clock, AlertCircle, Plus, Edit, Trash2 } from 'lucide-react';
+import { Pill, Clock, AlertCircle, Plus, Edit } from 'lucide-react';
 import Modal from './Modal';
 import toast from 'react-hot-toast';
 
@@ -200,7 +200,7 @@ const MedicationTracker: React.FC = () => {
   };
 
   const activeMedications = medications.filter(med => med.isActive);
-  const inactiveMedications = medications.filter(med => !med.isActive);
+  // const inactiveMedications = medications.filter(med => !med.isActive);
 
   if (!profile) return null;
 

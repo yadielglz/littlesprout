@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../store/store';
 import { 
@@ -7,11 +7,6 @@ import {
   Camera, 
   StickyNote, 
   Trophy, 
-  Pill, 
-  AlertTriangle, 
-  TrendingUp,
-  Star,
-  Gift,
   Sparkles,
   ArrowRight,
   CheckCircle

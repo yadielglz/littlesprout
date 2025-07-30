@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../store/store';
 import { useAuth } from '../contexts/AuthContext';
-import { DatabaseService } from '../services/firebase';
 import { generateId } from '../utils/initialization';
-import { Users, UserPlus, Mail, Shield, Crown, Eye, Edit, Trash2, Copy, Check } from 'lucide-react';
+import { Users, UserPlus, Mail, Crown, Eye, Edit, Trash2, Copy, Check } from 'lucide-react';
 import Modal from './Modal';
 import toast from 'react-hot-toast';
 

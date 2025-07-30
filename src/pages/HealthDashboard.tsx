@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../store/store';
-import { Heart, Pill, AlertTriangle, TrendingUp, Calendar, FileText, Activity } from 'lucide-react';
+import { Heart, Pill, AlertTriangle, TrendingUp, FileText, Activity } from 'lucide-react';
 import MedicationTracker from '../components/MedicationTracker';
 import SymptomTracker from '../components/SymptomTracker';
 import GrowthPercentileChart from '../components/GrowthPercentileChart';
@@ -31,7 +31,7 @@ const HealthDashboard = () => {
     const weeklyLogs = logs.filter(log => new Date(log.timestamp) >= sevenDaysAgo);
 
     const medicationLogs = recentLogs.filter(log => log.type === 'medication');
-    const healthLogs = recentLogs.filter(log => log.type === 'health');
+    // const healthLogs = recentLogs.filter(log => log.type === 'health');
     const temperatureLogs = recentLogs.filter(log => log.type === 'temperature');
     const vaccineLogs = recentLogs.filter(log => log.type === 'vaccine');
     const weightLogs = logs.filter(log => log.type === 'weight').sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());

@@ -3,9 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
   BarChart2,
-  BookOpen,
   Settings,
-  Calendar,
   Heart,
   Sparkles,
 } from 'lucide-react';

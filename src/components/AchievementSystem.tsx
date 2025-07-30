@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../store/store';
-import { Trophy, Star, Target, Award, Gift, Lock, CheckCircle, Calendar, TrendingUp } from 'lucide-react';
+import { Trophy, Star, Target, Award, Gift, Lock, CheckCircle, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export interface Achievement {
