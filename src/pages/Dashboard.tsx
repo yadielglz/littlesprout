@@ -30,7 +30,7 @@ const Dashboard = () => {
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
   const reminders = getCurrentReminders()
-  const appointments = profile ? useStore(state => state.appointments[profile.id] || []) : []
+  const appointments = useStore(state => profile ? state.appointments[profile.id] || [] : [])
   // Find the next upcoming appointment
   const now = new Date();
   const nextAppointment = appointments
@@ -108,7 +108,7 @@ const Dashboard = () => {
         await updateReminderInFirebase(currentUser.uid, profile.id, editReminder.id, { text: editReminderText })
         setEditReminder(null)
         toast.success('Reminder updated successfully!')
-      } catch (error) {
+      } catch {
         toast.error('Failed to update reminder. Please try again.')
       }
     }
@@ -119,7 +119,7 @@ const Dashboard = () => {
       try {
         await deleteReminderFromFirebase(currentUser.uid, profile.id, rem.id)
         toast.success('Reminder deleted successfully!')
-      } catch (error) {
+      } catch {
         toast.error('Failed to delete reminder. Please try again.')
       }
     }

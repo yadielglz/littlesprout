@@ -220,14 +220,14 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
     const timeValue = data.time || formatLocalDateTimeInput();
 
     switch (type) {
-      case 'feed':
+      case 'feed': {
         const feedLog = {
           id: generateId(),
           type: 'feed',
           icon: '🍼',
           color: '',
-          details: `${data.type === 'bottle' ? 'Bottle (Formula)' : 
-                   data.type === 'breast' ? 'Breast Feed' : 'Food (Solids)'} - ${data.amount}${measurementUnit}`,
+          details: `${data.type === 'bottle' ? 'Bottle (Formula)' :
+                    data.type === 'breast' ? 'Breast Feed' : 'Food (Solids)'} - ${data.amount}${measurementUnit}`,
           timestamp: new Date(timeValue),
           rawAmount: parseFloat(data.amount) || 0,
           ...(data.notes && { notes: data.notes })
@@ -237,8 +237,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, feedLog);
         }
         break;
+      }
 
-      case 'diaper':
+      case 'diaper': {
         const diaperLog = {
           id: generateId(),
           type: 'diaper',
@@ -253,8 +254,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, diaperLog);
         }
         break;
+      }
 
-      case 'weight':
+      case 'weight': {
         const weightLog = {
           id: generateId(),
           type: 'weight',
@@ -269,8 +271,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, weightLog);
         }
         break;
+      }
 
-      case 'height':
+      case 'height': {
         const heightLog = {
           id: generateId(),
           type: 'height',
@@ -285,8 +288,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, heightLog);
         }
         break;
+      }
 
-      case 'temperature':
+      case 'temperature': {
         const tempLog = {
           id: generateId(),
           type: 'temperature',
@@ -301,8 +305,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, tempLog);
         }
         break;
+      }
 
-      case 'vaccine':
+      case 'vaccine': {
         const vaccineLog = {
           id: generateId(),
           type: 'vaccine',
@@ -317,8 +322,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, vaccineLog);
         }
         break;
+      }
 
-      case 'health':
+      case 'health': {
         const healthLog = {
           id: generateId(),
           type: 'health',
@@ -333,16 +339,17 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addLog(currentUser.uid, profile.id, healthLog);
         }
         break;
+      }
 
       case 'sleep':
       case 'nap':
-      case 'tummy':
+      case 'tummy': {
         if (!data.useTimer) {
           // Manual entry
           const hours = parseInt(data.hours || '0');
           const minutes = parseInt(data.minutes || '0');
           const duration = (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
-          
+
           const sleepLog = {
             id: generateId(),
             type: type,
@@ -360,8 +367,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         }
         // Timer case is handled in handleSubmit
         break;
+      }
 
-      case 'appointment':
+      case 'appointment': {
         const appointment = {
           id: generateId(),
           date: data.date,
@@ -376,8 +384,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addAppointment(currentUser.uid, profile.id, appointment);
         }
         break;
+      }
 
-      case 'reminder':
+      case 'reminder': {
         const reminder = {
           id: generateId(),
           text: data.text,
@@ -390,6 +399,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           await DatabaseService.addReminder(currentUser.uid, profile.id, reminder);
         }
         break;
+      }
     }
   };
 
@@ -656,7 +666,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           </div>
         );
 
-      case 'height':
+      case 'height': {
         const isCm = formData.heightUnit === 'cm';
         return (
           <div className="space-y-4">
@@ -715,6 +725,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
             </div>
           </div>
         );
+      }
 
       case 'temperature':
         return (

@@ -49,19 +49,22 @@ const ActivityLog = () => {
     if (dateFilter !== 'all') {
       const today = new Date()
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-      
+
       switch (dateFilter) {
-        case 'today':
+        case 'today': {
           filtered = filtered.filter(log => new Date(log.timestamp) >= startOfDay)
           break
-        case 'week':
+        }
+        case 'week': {
           const weekAgo = new Date(startOfDay.getTime() - 7 * 24 * 60 * 60 * 1000)
           filtered = filtered.filter(log => new Date(log.timestamp) >= weekAgo)
           break
-        case 'month':
+        }
+        case 'month': {
           const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())
           filtered = filtered.filter(log => new Date(log.timestamp) >= monthAgo)
           break
+        }
       }
     }
 
