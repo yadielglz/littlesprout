@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Modal from './Modal'
 import { formatLocalDateTimeInput } from '../utils/datetime'
+import { formatTime } from '../utils/timerUtils'
 
 interface TimerProps {
   label: string
@@ -55,14 +56,6 @@ const Timer: React.FC<TimerProps> = ({ label, onSave, onClose, isOpen }) => {
     setStartTime(null)
     setElapsed(0)
     onClose()
-  }
-
-  const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000)
-    const h = Math.floor(totalSeconds / 3600)
-    const m = Math.floor((totalSeconds % 3600) / 60)
-    const s = totalSeconds % 60
-    return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`
   }
 
   return (

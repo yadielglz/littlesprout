@@ -7,6 +7,7 @@ import { DatabaseService } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { generateId } from '../utils/initialization';
 import { formatLocalDateTimeInput } from '../utils/datetime';
+import { formatTime, getTimerConfig, createTimerLog } from '../utils/timerUtils';
 import toast from 'react-hot-toast';
 
 const TimerCard: React.FC = () => {
@@ -19,14 +20,6 @@ const TimerCard: React.FC = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [timerToStop, setTimerToStop] = useState<any>(null);
 
-  const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
-  };
-
   const handleStopTimerClick = (timer: any) => {
     setTimerToStop(timer);
     setShowConfirmDialog(true);
@@ -38,17 +31,8 @@ const TimerCard: React.FC = () => {
     const elapsed = getTimerElapsed(timerToStop.id);
     const duration = elapsed;
     
-    // Create log entry
-    const log = {
-      id: generateId(),
-      type: timerToStop.type,
-      icon: timerToStop.icon,
-      color: '',
-      details: `Duration: ${formatTime(duration)}`,
-      timestamp: new Date(timerToStop.startTime),
-      rawDuration: duration,
-      notes: `Timer stopped at ${formatLocalDateTimeInput()}`
-    };
+    // Create log entry using common utility
+    const log = createTimerLog(timerToStop, duration, formatTime);
 
     try {
       // Add to local store
@@ -80,15 +64,6 @@ const TimerCard: React.FC = () => {
     toast.success(`${timerToStop.label} timer cancelled`);
     setShowConfirmDialog(false);
     setTimerToStop(null);
-  };
-
-  const getTimerConfig = (type: string) => {
-    const configs = {
-      sleep: { label: 'Sleep', icon: '😴', color: 'from-indigo-500 to-indigo-600', bgColor: 'bg-indigo-500' },
-      nap: { label: 'Nap', icon: '🛏️', color: 'from-yellow-500 to-yellow-600', bgColor: 'bg-yellow-500' },
-      tummy: { label: 'Tummy Time', icon: '⏱️', color: 'from-green-500 to-green-600', bgColor: 'bg-green-500' }
-    };
-    return configs[type as keyof typeof configs] || configs.sleep;
   };
 
   if (activeTimers.length === 0) {

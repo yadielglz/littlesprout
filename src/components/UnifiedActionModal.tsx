@@ -7,6 +7,7 @@ import { formatLocalDateTimeInput } from '../utils/datetime';
 import { DatabaseService } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useTimer } from '../contexts/TimerContext';
+import FormInput from './common/FormInput';
 import toast from 'react-hot-toast';
 
 export type ActionType = 

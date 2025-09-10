@@ -19,10 +19,12 @@ import {
   History,
   Cloud,
   MapPin,
-  Key
+  Key,
+  Smartphone
 } from 'lucide-react'
 import Modal from '../components/Modal'
 import OfflineIndicator from '../components/OfflineIndicator'
+import PWAInstallButton from '../components/PWAInstallButton'
 import { generateId } from '../utils/initialization'
 import { 
   createDataBackup, 
@@ -140,6 +142,7 @@ const Settings = () => {
     { id: 'profiles', label: 'Profiles', icon: Users },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'appearance', label: 'Appearance', icon: isDarkMode ? Moon : Sun },
+    { id: 'app', label: 'App', icon: Smartphone },
     { id: 'data', label: 'Data & Backup', icon: Database },
     { id: 'weather', label: 'Weather', icon: Cloud }
   ]
@@ -656,6 +659,81 @@ const Settings = () => {
     </div>
   )
 
+  const renderApp = () => (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white">App Settings</h3>
+      
+      {/* PWA Install Section */}
+      <PWAInstallButton />
+      
+      {/* App Information */}
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl p-4 sm:p-6 border border-white/20 dark:border-gray-700/20">
+        <div className="flex items-center mb-4">
+          <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400 mr-2 sm:mr-3" />
+          <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">LittleSprout App</h3>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <strong>Version:</strong> 6.0.0
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <strong>Platform:</strong> Progressive Web App (PWA)
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <strong>Offline Support:</strong> ✓ Full offline functionality
+            </div>
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div><strong>Features:</strong></div>
+            <ul className="list-disc list-inside mt-1 space-y-1">
+              <li>Baby tracking & logging</li>
+              <li>Family sharing & collaboration</li>
+              <li>Health & medical tracking</li>
+              <li>Photo timeline & milestones</li>
+              <li>Real-time sync & backup</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* App Benefits */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+        <h4 className="font-medium text-gray-800 dark:text-white mb-3">Why Install as PWA?</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Quick access from home screen</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Works offline</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Native app-like experience</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Push notifications</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Automatic updates</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Secure data storage</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   const renderWeather = () => (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Weather Settings</h3>
@@ -828,6 +906,7 @@ const Settings = () => {
               if (activeTab === 'profiles') return renderProfiles();
               if (activeTab === 'notifications') return renderNotifications();
               if (activeTab === 'appearance') return renderAppearance();
+              if (activeTab === 'app') return renderApp();
               if (activeTab === 'data') return renderDataTab();
               if (activeTab === 'weather') return renderWeather();
               return <div className="p-8 text-center text-gray-500">No content available for this tab.</div>;

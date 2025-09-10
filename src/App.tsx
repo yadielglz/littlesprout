@@ -8,6 +8,7 @@ import { useModal } from './contexts/ModalContext'
 import { TimerProvider } from './contexts/TimerContext'
 import Header from './components/Header'
 import UnifiedActionModal from './components/UnifiedActionModal'
+import LoadingSpinner from './components/common/LoadingSpinner'
 
 import BottomNavigation from './components/BottomNavigation'
 import Login from './components/Login'
@@ -156,11 +157,7 @@ function App() {
         {hasProfiles && <Header />}
         
         <main className="pb-20">
-          <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading"></div>
-            </div>
-          }>
+          <Suspense fallback={<LoadingSpinner size="lg" text="Loading..." />}>
             <Routes>
               {hasProfiles ? (
                 <>

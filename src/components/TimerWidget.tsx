@@ -7,6 +7,7 @@ import { DatabaseService } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { generateId } from '../utils/initialization';
 import { formatLocalDateTimeInput } from '../utils/datetime';
+import { formatTime, createTimerLog } from '../utils/timerUtils';
 import toast from 'react-hot-toast';
 
 const TimerWidget: React.FC = () => {
@@ -15,31 +16,14 @@ const TimerWidget: React.FC = () => {
   const { currentUser } = useAuth();
   const profile = getCurrentProfile();
 
-  const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${h > 0 ? h + 'h ' : ''}${m}m ${s}s`;
-  };
-
   const handleStopTimer = async (timer: any) => {
     if (!profile) return;
 
     const elapsed = getTimerElapsed(timer.id);
     const duration = elapsed;
     
-    // Create log entry
-    const log = {
-      id: generateId(),
-      type: timer.type,
-      icon: timer.icon,
-      color: '',
-      details: `Duration: ${formatTime(duration)}`,
-      timestamp: new Date(timer.startTime),
-      rawDuration: duration,
-      notes: `Timer stopped at ${formatLocalDateTimeInput()}`
-    };
+    // Create log entry using common utility
+    const log = createTimerLog(timer, duration, formatTime);
 
     try {
       // Add to local store
