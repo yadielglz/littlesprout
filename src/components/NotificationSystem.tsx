@@ -174,7 +174,7 @@ const NotificationSystem = ({ isOpen, onClose }: NotificationSystemProps) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Notifications & Reminders" size="large">
+      <Modal isOpen={isOpen} onClose={onClose} title="Notifications & Reminders" size="xl">
         <div className="space-y-6">
           {/* Header Actions */}
           <div className="flex justify-between items-center">

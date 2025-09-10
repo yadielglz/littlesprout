@@ -405,7 +405,7 @@ const SymptomTracker: React.FC = () => {
       </div>
 
       {/* Add Symptom Modal */}
-      <Modal isOpen={showAddSymptom} onClose={() => setShowAddSymptom(false)} title="Log New Symptom" size="large">
+      <Modal isOpen={showAddSymptom} onClose={() => setShowAddSymptom(false)} title="Log New Symptom" size="xl">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

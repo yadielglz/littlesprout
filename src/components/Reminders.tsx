@@ -164,7 +164,7 @@ const Reminders = ({ isOpen, onClose }: RemindersProps) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Notifications & Reminders" size="large">
+      <Modal isOpen={isOpen} onClose={onClose} title="Notifications & Reminders" size="xl">
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>

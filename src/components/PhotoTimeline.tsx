@@ -410,7 +410,7 @@ const PhotoTimeline: React.FC = () => {
       )}
 
       {/* Add Photo Modal */}
-      <Modal isOpen={showAddPhoto} onClose={() => setShowAddPhoto(false)} title="Add Photo to Timeline" size="large">
+      <Modal isOpen={showAddPhoto} onClose={() => setShowAddPhoto(false)} title="Add Photo to Timeline" size="xl">
         <div className="space-y-4">
           {newPhoto.imageData && (
             <div className="text-center">
@@ -519,7 +519,7 @@ const PhotoTimeline: React.FC = () => {
       </Modal>
 
       {/* Photo Detail Modal */}
-      <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title="Photo Details" size="large">
+      <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title="Photo Details" size="xl">
         {selectedPhoto && (
           <div className="space-y-4">
             <div className="text-center">

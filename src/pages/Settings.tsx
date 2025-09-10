@@ -916,7 +916,7 @@ const Settings = () => {
       </div>
 
       {/* Backup History Modal */}
-      <Modal isOpen={showBackupHistory} onClose={() => setShowBackupHistory(false)} title="Backup History" size="large">
+      <Modal isOpen={showBackupHistory} onClose={() => setShowBackupHistory(false)} title="Backup History" size="xl">
         <div className="space-y-4">
           {backups.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
