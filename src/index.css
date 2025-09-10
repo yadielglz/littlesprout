@@ -6,7 +6,7 @@
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Google Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;

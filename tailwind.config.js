@@ -9,7 +9,7 @@ export default {
     extend: {
       fontFamily: {
         'nunito': ['Nunito', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Google Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
         primary: {
