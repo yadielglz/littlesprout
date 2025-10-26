@@ -88,8 +88,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ show, onComplete }) => {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-full mx-auto flex items-center justify-center shadow-2xl border border-white/30"
               >
-                {/* Plant Icon */}
-                <motion.div
+                {/* Logo Image */}
+                <motion.img
                   initial={{ scale: 0, y: 20 }}
                   animate={{ 
                     scale: currentStep >= 2 ? 1 : 0,
@@ -101,10 +101,10 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ show, onComplete }) => {
                     type: "spring",
                     stiffness: 300
                   }}
-                  className="text-6xl"
-                >
-                  🌱
-                </motion.div>
+                  src="/logo.png"
+                  alt="LittleSprout"
+                  className="w-24 h-24 object-contain"
+                />
               </motion.div>
 
               {/* Pulse rings */}

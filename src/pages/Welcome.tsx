@@ -63,7 +63,7 @@ const Welcome = () => {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-3xl">🌱</span>
+            <img src="/logo.png" alt="LittleSprout" className="w-16 h-16 object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
             Welcome to LittleSprout
