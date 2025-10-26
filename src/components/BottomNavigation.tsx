@@ -5,7 +5,6 @@ import {
   BarChart2,
   Settings,
   Heart,
-  Sparkles,
 } from 'lucide-react';
 
 const BottomNavigation: React.FC = () => {
@@ -17,7 +16,6 @@ const BottomNavigation: React.FC = () => {
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/activity-log', label: 'Activities', icon: BarChart2 },
     { path: '/health', label: 'Health', icon: Heart },
-    { path: '/features', label: 'Features', icon: Sparkles },
     { path: '/settings', label: 'Settings', icon: Settings },
   ];
 

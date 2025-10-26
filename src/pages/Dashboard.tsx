@@ -9,11 +9,12 @@ import QuickNotesWidget from '../components/QuickNotesWidget'
 import { useModal } from '../contexts/ModalContext'
 import ValueDisplayCard from '../components/ValueDisplayCard'
 import TimerCard from '../components/TimerCard'
-import { Edit, Trash2 } from 'lucide-react'
-import Modal from '../components/Modal'
+import StatCard from '../components/common/StatCard'
+import { Edit, Trash2, BarChart3, Heart, Rocket, FileText, Calendar, Bell, Baby, Moon, Droplet, Scale, Ruler } from 'lucide-react'
+import Modal from '../components/common/Modal'
 import { Reminder } from '../store/store'
 import toast from 'react-hot-toast'
-import { formatDashboardDateTime, formatTime, isToday } from '../utils/datetime'
+import { formatDashboardDateTime, formatTime, isToday, isSameDay } from '../utils/datetime'
 
 const Dashboard = () => {
   const {
@@ -45,10 +46,6 @@ const Dashboard = () => {
 
   // Today's date logic
   const today = new Date();
-  const isSameDay = (d1: Date, d2: Date) =>
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate();
   
   // Enhanced feeds calculation
   const todaysFeeds = logs.filter(l => l.type === 'feed' && isSameDay(new Date(l.timestamp), today));
@@ -156,7 +153,7 @@ const Dashboard = () => {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20"
+      className="min-h-screen bg-gray-50 dark:bg-gray-900"
     >
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-12 pb-4 sm:py-6 lg:py-8 space-y-6 lg:space-y-8">
         {/* Today's Summary */}
@@ -167,14 +164,16 @@ const Dashboard = () => {
           className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
         >
           <motion.div 
-            whileHover={{ scale: 1.02 }}
-            className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
                 Today's Summary
               </h2>
-              <div className="text-xl sm:text-2xl">📊</div>
+              <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
             </div>
             
             {/* Feeding Summary */}
@@ -198,72 +197,32 @@ const Dashboard = () => {
             )}
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4 sm:p-6 shadow-lg cursor-pointer relative overflow-hidden min-h-[120px] sm:min-h-[140px]"
+              <StatCard
+                icon={<Baby className="w-8 h-8" />}
+                label="Feeds"
+                value={feedsToday}
+                color="blue"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-transparent"></div>
-                <div className="text-3xl sm:text-4xl mb-2">🍼</div>
-                <div className="text-center">
-                  <motion.div 
-                    key={feedsToday}
-                    initial={{ scale: 1.2, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-2xl sm:text-3xl font-bold"
-                  >
-                    {feedsToday}
-                  </motion.div>
-                  <div className="text-xs sm:text-sm opacity-90 font-medium mb-1">Feeds</div>
-                  {liquidIntakeToday > 0 && (
-                    <motion.div
-                      key={liquidIntakeToday}
-                      initial={{ scale: 1.1, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="text-sm font-semibold opacity-95"
-                    >
-                      {liquidIntakeToday.toFixed(1)} {measurementUnit}
-                    </motion.div>
-                  )}
-                </div>
-              </motion.div>
+                {liquidIntakeToday > 0 && (
+                  <div className="text-xs mt-1 opacity-90">
+                    {liquidIntakeToday.toFixed(1)} {measurementUnit}
+                  </div>
+                )}
+              </StatCard>
               
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-2xl p-4 sm:p-6 shadow-lg cursor-pointer relative overflow-hidden min-h-[120px] sm:min-h-[140px]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-transparent"></div>
-                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">😴</div>
-                <motion.div 
-                  key={sleepToday}
-                  initial={{ scale: 1.2, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-lg sm:text-2xl font-bold text-center"
-                >
-                  {Math.floor(sleepToday/3600000)}h {Math.round((sleepToday%3600000)/60000)}m
-                </motion.div>
-                <div className="text-xs sm:text-sm opacity-90 font-medium">Sleep</div>
-              </motion.div>
+              <StatCard
+                icon={<Moon className="w-8 h-8" />}
+                label="Sleep"
+                value={`${Math.floor(sleepToday/3600000)}h ${Math.round((sleepToday%3600000)/60000)}m`}
+                color="indigo"
+              />
               
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl p-4 sm:p-6 shadow-lg cursor-pointer relative overflow-hidden min-h-[120px] sm:min-h-[140px]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-transparent"></div>
-                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">👶</div>
-                <motion.div 
-                  key={diapersToday}
-                  initial={{ scale: 1.2, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-2xl sm:text-3xl font-bold"
-                >
-                  {diapersToday}
-                </motion.div>
-                <div className="text-xs sm:text-sm opacity-90 font-medium">Diapers</div>
-              </motion.div>
+              <StatCard
+                icon={<Droplet className="w-8 h-8" />}
+                label="Diapers"
+                value={diapersToday}
+                color="amber"
+              />
             </div>
           </motion.div>
 
@@ -276,36 +235,36 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
         >
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
               Health & Growth
             </h2>
-            <div className="text-xl sm:text-2xl">❤️‍🩹</div>
+            <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ValueDisplayCard
               label="Weight"
               value={lastWeightLog ? lastWeightLog.details : '-'}
-              icon="⚖️"
+              icon={<Scale className="w-10 h-10" />}
               color="from-red-400 to-red-500"
               onClick={() => openModal('weight')}
             />
             <ValueDisplayCard
               label="Height"
               value={lastHeightLog ? lastHeightLog.details : '-'}
-              icon="📏"
+              icon={<Ruler className="w-10 h-10" />}
               color="from-blue-400 to-blue-500"
               onClick={() => openModal('height')}
             />
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => openModal('appointment')}
-              className="flex flex-col items-center justify-center text-center p-4 rounded-2xl text-white shadow-lg bg-gradient-to-br from-blue-400 to-blue-600 min-h-[140px] cursor-pointer"
+              className="flex flex-col items-center justify-center text-center p-6 rounded-xl text-white shadow-sm bg-blue-500 hover:bg-blue-600 min-h-[140px] cursor-pointer transition-colors"
             >
-              <div className="text-3xl mb-2">📅</div>
+              <Calendar className="w-12 h-12 mb-2 text-white" />
               {nextAppointment ? (
                 <>
                   <div className="text-lg font-semibold mb-1">{formatDashboardDateTime(nextAppointment.date, nextAppointment.time)}</div>
@@ -324,7 +283,7 @@ const Dashboard = () => {
           <div className="space-y-4 mb-4">
             {todaysAppointments.map(appt => (
               <div key={appt.id} className="bg-blue-100 dark:bg-blue-900/30 border-l-4 border-blue-500 rounded-xl p-4 flex items-center shadow">
-                <div className="text-3xl mr-4">📅</div>
+                <Calendar className="w-8 h-8 mr-4 text-blue-500" />
                 <div>
                   <div className="font-bold text-blue-800 dark:text-blue-200">Doctor's Appointment</div>
                   <div className="text-sm text-gray-700 dark:text-gray-300">{formatTime(appt.time)} @ {appt.location}</div>
@@ -341,7 +300,7 @@ const Dashboard = () => {
             )}
             {todaysReminders.map(rem => (
               <div key={rem.id} className="bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500 rounded-xl p-4 flex items-center shadow">
-                <div className="text-2xl mr-4">🔔</div>
+                <Bell className="w-6 h-6 mr-4" />
                 <div className="flex-1">
                   <div className="font-bold text-yellow-800 dark:text-yellow-200">Reminder</div>
                   <div className="text-sm text-gray-700 dark:text-gray-300">{rem.text}</div>
@@ -358,14 +317,13 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          whileHover={{ scale: 1.01 }}
-          className="bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-pink-500/10 dark:from-violet-500/20 dark:via-purple-500/20 dark:to-pink-500/20 rounded-2xl p-4 sm:p-6 lg:p-8 border border-violet-200/50 dark:border-violet-700/50 backdrop-blur-sm shadow-lg"
+          className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700"
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="p-1.5 sm:p-2 bg-gradient-to-r from-violet-500 to-purple-500 rounded-lg sm:rounded-xl">
-                  <div className="text-lg sm:text-2xl">🚀</div>
+                <div className="p-2 bg-blue-500 rounded-lg">
+                  <Rocket className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 dark:text-white">
                   Add Activity
@@ -381,7 +339,7 @@ const Dashboard = () => {
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                 className="text-5xl xl:text-6xl opacity-70"
               >
-                📝
+                <FileText className="w-12 h-12 xl:w-16 xl:h-16 opacity-70 text-blue-600 dark:text-blue-400" />
               </motion.div>
             </div>
           </div>
@@ -392,7 +350,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-white/20 dark:border-gray-700/50"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
         >
           <QuickNotesWidget />
         </motion.div>

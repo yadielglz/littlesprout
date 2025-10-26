@@ -22,7 +22,7 @@ import {
   Key,
   Smartphone
 } from 'lucide-react'
-import Modal from '../components/Modal'
+import Modal from '../components/common/Modal'
 import OfflineIndicator from '../components/OfflineIndicator'
 import PWAInstallButton from '../components/PWAInstallButton'
 import { generateId } from '../utils/initialization'

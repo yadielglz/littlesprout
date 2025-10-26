@@ -1,11 +1,28 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { 
+  Baby, 
+  Droplet, 
+  Moon, 
+  Shield,
+  Droplets,
+  Pill,
+  Scale,
+  Ruler,
+  Thermometer,
+  Syringe,
+  FileText,
+  Calendar,
+  Bell 
+} from 'lucide-react'
 import { useStore } from './store/store'
-import { useFirebaseStore } from './store/firebaseStore'
 import { useAuth } from './contexts/AuthContext'
 import { useModal } from './contexts/ModalContext'
 import { TimerProvider } from './contexts/TimerContext'
+import { useAppInitialization } from './hooks/useAppInitialization'
+import { useDarkMode } from './hooks/useDarkMode'
+import { useFirebaseSync } from './hooks/useFirebaseSync'
 import Header from './components/Header'
 import UnifiedActionModal from './components/UnifiedActionModal'
 import LoadingSpinner from './components/common/LoadingSpinner'
@@ -20,56 +37,23 @@ const ActivityLog = lazy(() => import('./pages/ActivityLog'))
 const Appointments = lazy(() => import('./pages/Appointments'))
 const Charts = lazy(() => import('./pages/Charts'))
 const HealthDashboard = lazy(() => import('./pages/HealthDashboard'))
-const FeaturesShowcase = lazy(() => import('./pages/FeaturesShowcase'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Welcome = lazy(() => import('./pages/Welcome'))
 const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
-  const { isDarkMode, profiles } = useStore()
-  const { syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates } = useFirebaseStore()
+  const { profiles } = useStore()
   const { currentUser, loading: authLoading } = useAuth()
   const { isModalOpen, actionType, closeModal, openModal } = useModal()
   const location = useLocation()
   const navigate = useNavigate()
   
-  const [isHydrated, setIsHydrated] = useState(false)
-
-  const [showSplash, setShowSplash] = useState(true)
-  const [appInitialized, setAppInitialized] = useState(false)
-
+  const { showSplash, appInitialized, handleSplashComplete } = useAppInitialization(authLoading)
+  useDarkMode()
+  useFirebaseSync(appInitialized)
 
   const hasProfiles = profiles.length > 0
-
-  // Splash screen and app initialization
-  useEffect(() => {
-    const initializeApp = async () => {
-      // Ensure splash screen shows for at least 2.5 seconds
-      const minSplashTime = new Promise(resolve => setTimeout(resolve, 2500))
-      
-      // Wait for store hydration and auth
-      const appReady = new Promise<void>((resolve) => {
-        const checkReady = () => {
-          if (isHydrated && !authLoading) {
-            resolve()
-          } else {
-            setTimeout(checkReady, 100)
-          }
-        }
-        checkReady()
-      })
-
-      await Promise.all([minSplashTime, appReady])
-      setAppInitialized(true)
-    }
-
-    initializeApp()
-  }, [isHydrated, authLoading])
-
-  const handleSplashComplete = () => {
-    setShowSplash(false)
-  }
 
   // Mobile-specific route fix
   useEffect(() => {
@@ -83,7 +67,7 @@ function App() {
       }
       
       // Handle any malformed paths that might occur on mobile
-      const validPaths = ['/dashboard', '/activity-log', '/appointments', '/charts', '/health', '/features', '/settings', '/firebase-test']
+      const validPaths = ['/dashboard', '/activity-log', '/appointments', '/charts', '/health', '/settings', '/firebase-test']
       const currentPath = location.pathname
       
       if (!validPaths.includes(currentPath) && currentPath !== '/' && !currentPath.includes('welcome')) {
@@ -94,50 +78,20 @@ function App() {
   }, [location.pathname, currentUser, hasProfiles, navigate])
 
   const fabActions: ActionItem[] = [
-    { id: 'feed', label: 'Feeding', icon: '🍼', color: 'bg-blue-600', category: 'care', action: () => openModal('feed') },
-    { id: 'diaper', label: 'Diaper Change', icon: '👶', color: 'bg-yellow-500', category: 'care', action: () => openModal('diaper') },
-    { id: 'sleep', label: 'Sleep', icon: '😴', color: 'bg-purple-600', category: 'care', action: () => openModal('sleep') },
-    { id: 'weight', label: 'Weight', icon: '⚖️', color: 'bg-red-500', category: 'health', action: () => openModal('weight') },
-    { id: 'height', label: 'Height', icon: '📏', color: 'bg-green-600', category: 'health', action: () => openModal('height') },
-    { id: 'temperature', label: 'Temperature', icon: '🌡️', color: 'bg-orange-500', category: 'health', action: () => openModal('temperature') },
-    { id: 'vaccine', label: 'Vaccination', icon: '💉', color: 'bg-teal-600', category: 'health', action: () => openModal('vaccine') },
-    { id: 'milestone', label: 'Milestone', icon: '🎉', color: 'bg-pink-600', category: 'other', action: () => openModal('health') },
-    { id: 'appointment', label: 'Doctor\'s Appointment', icon: '📅', color: 'bg-blue-600', category: 'schedule', action: () => openModal('appointment') },
-    { id: 'reminder', label: 'Add Reminder', icon: '🔔', color: 'bg-orange-500', category: 'schedule', action: () => openModal('reminder') }
+    { id: 'feed', label: 'Feeding', icon: <Baby className="w-5 h-5" />, color: 'bg-blue-600', category: 'care', action: () => openModal('feed') },
+    { id: 'diaper', label: 'Diaper Change', icon: <Droplet className="w-5 h-5" />, color: 'bg-yellow-500', category: 'care', action: () => openModal('diaper') },
+    { id: 'sleep', label: 'Sleep', icon: <Moon className="w-5 h-5" />, color: 'bg-purple-600', category: 'care', action: () => openModal('sleep') },
+    { id: 'helmet', label: 'Helmet', icon: <Shield className="w-5 h-5" />, color: 'bg-slate-600', category: 'care', action: () => openModal('helmet') },
+    { id: 'shower', label: 'Shower/Bath', icon: <Droplets className="w-5 h-5" />, color: 'bg-cyan-500', category: 'care', action: () => openModal('shower') },
+    { id: 'medication', label: 'Medication', icon: <Pill className="w-5 h-5" />, color: 'bg-purple-600', category: 'health', action: () => openModal('medication') },
+    { id: 'weight', label: 'Weight', icon: <Scale className="w-5 h-5" />, color: 'bg-red-500', category: 'health', action: () => openModal('weight') },
+    { id: 'height', label: 'Height', icon: <Ruler className="w-5 h-5" />, color: 'bg-green-600', category: 'health', action: () => openModal('height') },
+    { id: 'temperature', label: 'Temperature', icon: <Thermometer className="w-5 h-5" />, color: 'bg-orange-500', category: 'health', action: () => openModal('temperature') },
+    { id: 'vaccine', label: 'Vaccination', icon: <Syringe className="w-5 h-5" />, color: 'bg-teal-600', category: 'health', action: () => openModal('vaccine') },
+    { id: 'milestone', label: 'Milestone', icon: <FileText className="w-5 h-5" />, color: 'bg-pink-600', category: 'other', action: () => openModal('health') },
+    { id: 'appointment', label: 'Doctor\'s Appointment', icon: <Calendar className="w-5 h-5" />, color: 'bg-blue-600', category: 'schedule', action: () => openModal('appointment') },
+    { id: 'reminder', label: 'Add Reminder', icon: <Bell className="w-5 h-5" />, color: 'bg-orange-500', category: 'schedule', action: () => openModal('reminder') }
   ]
-
-  useEffect(() => {
-    const unsubHydrate = useStore.persist.onHydrate(() => setIsHydrated(false))
-    const unsubFinishHydration = useStore.persist.onFinishHydration(() => setIsHydrated(true))
-
-    setIsHydrated(useStore.persist.hasHydrated())
-
-    return () => {
-      unsubHydrate()
-      unsubFinishHydration()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDarkMode])
-
-  useEffect(() => {
-    if (currentUser && appInitialized) {
-      syncWithFirebase(currentUser.uid).catch(console.error)
-      subscribeToRealTimeUpdates(currentUser.uid)
-      
-      return () => {
-        unsubscribeFromUpdates()
-      }
-    } else {
-      unsubscribeFromUpdates()
-    }
-  }, [currentUser, syncWithFirebase, subscribeToRealTimeUpdates, unsubscribeFromUpdates, appInitialized])
 
 
 
@@ -167,7 +121,6 @@ function App() {
                   <Route path="/appointments" element={<Appointments />} />
                   <Route path="/charts" element={<Charts />} />
                   <Route path="/health" element={<HealthDashboard />} />
-                  <Route path="/features" element={<FeaturesShowcase />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/firebase-test" element={<FirebaseTest />} />
                   <Route path="*" element={<NotFound />} />

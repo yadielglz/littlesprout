@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 export interface ActiveTimer {
   id: string;
-  type: 'sleep' | 'nap' | 'tummy';
+  type: 'sleep' | 'nap' | 'tummy' | 'helmet' | 'shower';
   startTime: number;
   label: string;
   icon: string;
@@ -11,10 +11,10 @@ export interface ActiveTimer {
 
 interface TimerContextType {
   activeTimers: ActiveTimer[];
-  startTimer: (type: 'sleep' | 'nap' | 'tummy') => void;
+  startTimer: (type: 'sleep' | 'nap' | 'tummy' | 'helmet' | 'shower') => void;
   stopTimer: (id: string) => void;
   getTimerElapsed: (id: string) => number;
-  isTimerRunning: (type: 'sleep' | 'nap' | 'tummy') => boolean;
+  isTimerRunning: (type: 'sleep' | 'nap' | 'tummy' | 'helmet' | 'shower') => boolean;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -58,11 +58,13 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('activeTimers', JSON.stringify(activeTimers));
   }, [activeTimers]);
 
-  const startTimer = (type: 'sleep' | 'nap' | 'tummy') => {
+  const startTimer = (type: 'sleep' | 'nap' | 'tummy' | 'helmet' | 'shower') => {
     const timerConfig = {
       sleep: { label: 'Sleep', icon: '😴', color: 'bg-indigo-500' },
       nap: { label: 'Nap', icon: '🛏️', color: 'bg-yellow-500' },
-      tummy: { label: 'Tummy Time', icon: '⏱️', color: 'bg-green-500' }
+      tummy: { label: 'Tummy Time', icon: '⏱️', color: 'bg-green-500' },
+      helmet: { label: 'Helmet Wear', icon: '🪖', color: 'bg-slate-600' },
+      shower: { label: 'Shower/Bath', icon: '🚿', color: 'bg-cyan-500' }
     };
 
     const config = timerConfig[type];
@@ -88,7 +90,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
     return currentTime - timer.startTime;
   };
 
-  const isTimerRunning = (type: 'sleep' | 'nap' | 'tummy'): boolean => {
+  const isTimerRunning = (type: 'sleep' | 'nap' | 'tummy' | 'helmet' | 'shower'): boolean => {
     return activeTimers.some(timer => timer.type === type);
   };
 

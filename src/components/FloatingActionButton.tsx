@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Baby, FileText, Calendar, Bell } from 'lucide-react';
 
 export interface ActionItem {
   id: string;
   label: string;
-  icon: string;
+  icon: string | React.ReactNode;
   color: string;
   category: 'care' | 'health' | 'schedule' | 'other';
   action: () => void;
@@ -50,10 +50,10 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   }, {} as Record<string, ActionItem[]>);
 
   const categories = {
-    care: { label: 'Daily Care', icon: '🍼', color: 'bg-blue-500' },
-    health: { label: 'Health & Growth', icon: '🏥', color: 'bg-green-500' },
-    schedule: { label: 'Schedule', icon: '📅', color: 'bg-purple-500' },
-    other: { label: 'Other', icon: '⚡', color: 'bg-orange-500' }
+    care: { label: 'Daily Care', icon: <Baby className="w-5 h-5" />, color: 'bg-blue-500' },
+    health: { label: 'Health & Growth', icon: <FileText className="w-5 h-5" />, color: 'bg-green-500' },
+    schedule: { label: 'Schedule', icon: <Calendar className="w-5 h-5" />, color: 'bg-purple-500' },
+    other: { label: 'Other', icon: <Bell className="w-5 h-5" />, color: 'bg-orange-500' }
   };
 
   const getPositionClasses = () => {
@@ -121,8 +121,12 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
               onClick={() => handleActionClick(action)}
               className="w-full flex items-center p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[60px] sm:min-h-[64px]"
             >
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${action.color} flex items-center justify-center mr-2 sm:mr-3`}>
-                <span className="text-white text-sm sm:text-lg">{action.icon}</span>
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${action.color} flex items-center justify-center mr-2 sm:mr-3 text-white`}>
+                {typeof action.icon === 'string' ? (
+                  <span className="text-sm sm:text-lg">{action.icon}</span>
+                ) : (
+                  action.icon
+                )}
               </div>
               <div className="flex-1 text-left min-w-0">
                 <p className="font-medium text-sm sm:text-base text-gray-800 dark:text-white truncate">{action.label}</p>
@@ -167,7 +171,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
                   className={`${category.color} text-white p-3 sm:p-4 rounded-lg sm:rounded-xl hover:opacity-90 transition-opacity relative overflow-hidden min-h-[80px] sm:min-h-[90px]`}
                 >
                   <div className="flex flex-col items-center">
-                    <span className="text-xl sm:text-2xl mb-1 sm:mb-2">{category.icon}</span>
+                    <div className="mb-1 sm:mb-2">{category.icon}</div>
                     <span className="font-medium text-xs sm:text-sm">{category.label}</span>
                     <span className="text-xs opacity-80 mt-0.5 sm:mt-1">
                       {actionsInCategory.length} actions

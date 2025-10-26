@@ -14,12 +14,12 @@ const Card: React.FC<CardProps> = ({
   className = '', 
   animated = false,
   padding = 'md',
-  shadow = 'lg'
+  shadow = 'sm'
 }) => {
   const paddingClasses = {
-    sm: 'p-3',
-    md: 'p-4 sm:p-6',
-    lg: 'p-6 sm:p-8 lg:p-10'
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-8'
   };
 
   const shadowClasses = {
@@ -29,13 +29,15 @@ const Card: React.FC<CardProps> = ({
     xl: 'shadow-xl'
   };
 
-  const baseClasses = `bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl border border-white/20 dark:border-gray-700/50 ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`;
+  // Simplified: clean white background, solid borders, no backdrop blur
+  const baseClasses = `bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`;
 
   if (animated) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
         className={baseClasses}
       >
         {children}

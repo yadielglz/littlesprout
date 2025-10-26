@@ -4,7 +4,7 @@ import { useFirebaseStore } from '../store/firebaseStore';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Edit, Trash2, Plus } from 'lucide-react';
-import Modal from '../components/Modal';
+import Modal from '../components/common/Modal';
 import { useModal } from '../contexts/ModalContext';
 import toast from 'react-hot-toast';
 import { formatAppointmentDate, formatTime, isToday, isFuture } from '../utils/datetime';

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { generateId } from '../utils/initialization'
 import { motion } from 'framer-motion'
 import { Edit, Trash2, Bell, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react'
-import Modal from './Modal'
+import Modal from './common/Modal'
 import toast from 'react-hot-toast'
 
 interface RemindersProps {

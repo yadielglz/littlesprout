@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useStore, LogEntry } from '../store/store'
 import { motion } from 'framer-motion'
-import Timer from '../components/Timer'
+import TimerCard from '../components/TimerCard'
 import { 
   Search, 
   Filter, 
@@ -10,7 +10,7 @@ import {
   Calendar,
   Clock
 } from 'lucide-react'
-import Modal from '../components/Modal'
+import Modal from '../components/common/Modal'
 import { generateId } from '../utils/initialization'
 import toast from 'react-hot-toast'
 import { formatLocalDateTimeInput } from '../utils/datetime'
@@ -19,15 +19,11 @@ import { useAuth } from '../contexts/AuthContext'
 // import { useModal } from '../contexts/ModalContext'
 
 const ActivityLog = () => {
-  const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog, setActiveTimer, activeTimer } = useStore()
+  const { getCurrentProfile, getCurrentLogs, addLog, updateLog, deleteLog } = useStore()
   const profile = getCurrentProfile()
   const logs = getCurrentLogs()
   const { currentUser } = useAuth()
   // const { openModal } = useModal()
-
-  // Timer state
-  const [timerOpen, setTimerOpen] = useState(false)
-  const [timerType, setTimerType] = useState<'sleep' | 'nap' | 'tummy' | null>(null)
 
   // State
   const [searchTerm, setSearchTerm] = useState('')
@@ -88,6 +84,8 @@ const ActivityLog = () => {
     { value: 'diaper', label: 'Diaper', icon: '👶' },
     { value: 'nap', label: 'Nap', icon: '🛏️' },
     { value: 'tummy', label: 'Tummy Time', icon: '⏱️' },
+    { value: 'helmet', label: 'Helmet Wear', icon: '🪖' },
+    { value: 'shower', label: 'Shower/Bath', icon: '🚿' },
     { value: 'weight', label: 'Weight & Height', icon: '📏' },
     { value: 'temperature', label: 'Temperature', icon: '🌡️' },
     { value: 'vaccine', label: 'Vaccine', icon: '💉' },
@@ -145,28 +143,6 @@ const ActivityLog = () => {
     })
   }
 
-  // Handle timer actions
-  const handleStopTimer = (duration: number, time: string) => {
-    if (!profile || !timerType) return
-
-    const icon = timerType === 'sleep' ? '😴' : timerType === 'nap' ? '🛏️' : '⏱️'
-    const details = `Duration: ${Math.round(duration/60000)} min`
-
-    addLog(profile.id, {
-      id: generateId(),
-      type: timerType,
-      icon,
-      color: '',
-      details,
-      timestamp: new Date(time),
-      rawDuration: duration
-    })
-
-    setActiveTimer(null)
-    setTimerType(null)
-    setTimerOpen(false)
-    toast.success('Timer logged successfully!')
-  }
 
   if (!profile) {
     return (
@@ -197,17 +173,6 @@ const ActivityLog = () => {
           {/* Removed redundant activity buttons; FAB is now global */}
         </div>
 
-        {/* Active Timer Display */}
-        {activeTimer && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-            <Timer
-              isOpen={timerOpen}
-              onClose={() => setTimerOpen(false)}
-              onSave={handleStopTimer}
-              label={`${timerType?.charAt(0).toUpperCase()}${timerType?.slice(1)} Timer`}
-            />
-          </div>
-        )}
 
         {/* Filters */}
         <div className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 rounded-2xl shadow-xl p-4 sm:p-6 mb-6 border border-white/20 dark:border-gray-700/50">

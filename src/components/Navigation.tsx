@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '../store/store';
+import { BarChart3, FileText, TrendingUp, Settings } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -9,10 +10,10 @@ const Navigation: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/activity-log', label: 'Activity Log', icon: '📝' },
-    { path: '/charts', label: 'Charts', icon: '📈' },
-    { path: '/settings', label: 'Settings', icon: '⚙️' },
+    { path: '/dashboard', label: 'Dashboard', icon: <BarChart3 className="w-6 h-6" /> },
+    { path: '/activity-log', label: 'Activity Log', icon: <FileText className="w-6 h-6" /> },
+    { path: '/charts', label: 'Charts', icon: <TrendingUp className="w-6 h-6" /> },
+    { path: '/settings', label: 'Settings', icon: <Settings className="w-6 h-6" /> },
   ];
 
   return (
@@ -39,7 +40,7 @@ const Navigation: React.FC = () => {
                   : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              <span className="text-xl">{icon}</span>
+              {icon}
               {sidebarOpen && <span className="ml-3">{label}</span>}
             </Link>
           ))}

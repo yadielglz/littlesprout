@@ -11,7 +11,7 @@ import {
   AlertCircle,
   Settings
 } from 'lucide-react'
-import Modal from './Modal'
+import Modal from './common/Modal'
 import { generateId } from '../utils/initialization'
 import toast from 'react-hot-toast'
 

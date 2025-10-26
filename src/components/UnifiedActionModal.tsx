@@ -8,10 +8,11 @@ import { DatabaseService } from '../services/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useTimer } from '../contexts/TimerContext';
 import FormInput from './common/FormInput';
+import { getEmojiIcon } from '../utils/iconMap.tsx';
 import toast from 'react-hot-toast';
 
 export type ActionType = 
-  | 'feed' | 'diaper' | 'sleep' | 'nap' | 'tummy' | 'weight' 
+  | 'feed' | 'diaper' | 'sleep' | 'nap' | 'tummy' | 'helmet' | 'shower' | 'medication' | 'weight' 
   | 'height' | 'temperature' | 'vaccine' | 'health' | 'appointment' | 'reminder';
 
 interface UnifiedActionModalProps {
@@ -54,6 +55,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
       sleep: { useTimer: true },
       nap: { useTimer: true },
       tummy: { useTimer: true },
+      helmet: { useTimer: true },
+      shower: { useTimer: true },
+      medication: { name: '', dosage: '', time: formatLocalDateTimeInput() },
       weight: { weight: '', notes: '', weightUnit: 'kg' },
       height: { height: '', notes: '' },
       temperature: { temperature: '', method: 'oral', notes: '' },
@@ -84,6 +88,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
       sleep: 1,
       nap: 1,
       tummy: 1,
+      helmet: 1,
+      shower: 1,
+      medication: 1,
       weight: 1,
       height: 1,
       temperature: 1,
@@ -97,18 +104,21 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
 
   const getActionConfig = (type: ActionType) => {
     const configs: Record<ActionType, { title: string; icon: string; color: string }> = {
-      feed: { title: 'Log Feeding', icon: '🍼', color: 'bg-blue-500' },
-      diaper: { title: 'Log Diaper Change', icon: '👶', color: 'bg-amber-500' },
-      sleep: { title: 'Log Sleep', icon: '😴', color: 'bg-indigo-500' },
-      nap: { title: 'Log Nap', icon: '🛏️', color: 'bg-yellow-500' },
-      tummy: { title: 'Log Tummy Time', icon: '⏱️', color: 'bg-green-500' },
-      weight: { title: 'Log Weight & Height', icon: '📏', color: 'bg-red-500' },
-      height: { title: 'Log Height', icon: '📏', color: 'bg-purple-500' },
-      temperature: { title: 'Log Temperature', icon: '🌡️', color: 'bg-purple-500' },
-      vaccine: { title: 'Log Vaccine', icon: '💉', color: 'bg-pink-500' },
-      health: { title: 'Add Health Note', icon: '📝', color: 'bg-teal-500' },
-      appointment: { title: 'Schedule Doctor\'s Appointment', icon: '📅', color: 'bg-blue-600' },
-      reminder: { title: 'Add Reminder', icon: '🔔', color: 'bg-orange-500' }
+      feed: { title: 'Log Feeding', icon: getEmojiIcon('feed'), color: 'bg-blue-500' },
+      diaper: { title: 'Log Diaper Change', icon: getEmojiIcon('diaper'), color: 'bg-amber-500' },
+      sleep: { title: 'Log Sleep', icon: getEmojiIcon('sleep'), color: 'bg-indigo-500' },
+      nap: { title: 'Log Nap', icon: getEmojiIcon('nap'), color: 'bg-yellow-500' },
+      tummy: { title: 'Log Tummy Time', icon: getEmojiIcon('tummy'), color: 'bg-green-500' },
+      helmet: { title: 'Log Helmet Wear', icon: getEmojiIcon('helmet'), color: 'bg-slate-600' },
+      shower: { title: 'Log Shower/Bath', icon: getEmojiIcon('shower'), color: 'bg-cyan-500' },
+      medication: { title: 'Log Medication', icon: getEmojiIcon('medication'), color: 'bg-purple-600' },
+      weight: { title: 'Log Weight & Height', icon: getEmojiIcon('weight'), color: 'bg-red-500' },
+      height: { title: 'Log Height', icon: getEmojiIcon('height'), color: 'bg-purple-500' },
+      temperature: { title: 'Log Temperature', icon: getEmojiIcon('temperature'), color: 'bg-purple-500' },
+      vaccine: { title: 'Log Vaccine', icon: getEmojiIcon('vaccine'), color: 'bg-pink-500' },
+      health: { title: 'Add Health Note', icon: getEmojiIcon('health'), color: 'bg-teal-500' },
+      appointment: { title: 'Schedule Doctor\'s Appointment', icon: getEmojiIcon('appointment'), color: 'bg-blue-600' },
+      reminder: { title: 'Add Reminder', icon: getEmojiIcon('reminder'), color: 'bg-orange-500' }
     };
     return configs[type];
   };
@@ -152,9 +162,13 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         return formData.amount && formData.time;
       case 'diaper':
         return formData.time;
+      case 'medication':
+        return formData.name && formData.dosage && formData.time;
       case 'sleep':
       case 'nap':
       case 'tummy':
+      case 'helmet':
+      case 'shower':
         if (formData.useTimer) return true;
         return formData.time && (formData.hours || formData.minutes);
       case 'weight':
@@ -195,9 +209,9 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      if (actionType === 'sleep' || actionType === 'nap' || actionType === 'tummy') {
+      if (actionType === 'sleep' || actionType === 'nap' || actionType === 'tummy' || actionType === 'helmet' || actionType === 'shower') {
         if (formData.useTimer) {
-          startTimer(actionType);
+          startTimer(actionType as any);
           onClose();
           return;
         }
@@ -225,7 +239,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const feedLog = {
           id: generateId(),
           type: 'feed',
-          icon: '🍼',
+          icon: getEmojiIcon('feed'),
           color: '',
           details: `${data.type === 'bottle' ? 'Bottle (Formula)' :
                     data.type === 'breast' ? 'Breast Feed' : 'Food (Solids)'} - ${data.amount}${measurementUnit}`,
@@ -244,7 +258,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const diaperLog = {
           id: generateId(),
           type: 'diaper',
-          icon: '👶',
+          icon: getEmojiIcon('diaper'),
           color: '',
           details: `Type: ${data.type}`,
           timestamp: new Date(timeValue),
@@ -261,7 +275,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const weightLog = {
           id: generateId(),
           type: 'weight',
-          icon: '⚖️',
+          icon: getEmojiIcon('weight'),
           color: '',
           details: `Weight: ${data.weight} ${data.weightUnit || 'kg'}`,
           timestamp: new Date(timeValue),
@@ -278,7 +292,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const heightLog = {
           id: generateId(),
           type: 'height',
-          icon: '📏',
+          icon: getEmojiIcon('height'),
           color: '',
           details: `Height: ${data.height} ${data.heightUnit || 'cm'}`,
           timestamp: new Date(timeValue),
@@ -291,11 +305,28 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         break;
       }
 
+      case 'medication': {
+        const medicationLog = {
+          id: generateId(),
+          type: 'medication',
+          icon: getEmojiIcon('medication'),
+          color: '',
+          details: `${data.name} - ${data.dosage}`,
+          timestamp: new Date(timeValue),
+          ...(data.notes && { notes: data.notes })
+        };
+        addLog(profile.id, medicationLog);
+        if (currentUser) {
+          await DatabaseService.addLog(currentUser.uid, profile.id, medicationLog);
+        }
+        break;
+      }
+
       case 'temperature': {
         const tempLog = {
           id: generateId(),
           type: 'temperature',
-          icon: '🌡️',
+          icon: getEmojiIcon('temperature'),
           color: '',
           details: `Temperature: ${data.temperature}°F (${data.method})`,
           timestamp: new Date(timeValue),
@@ -312,7 +343,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const vaccineLog = {
           id: generateId(),
           type: 'vaccine',
-          icon: '💉',
+          icon: getEmojiIcon('vaccine'),
           color: '',
           details: `${data.vaccine} - Dose ${data.dose} (${data.location})`,
           timestamp: new Date(timeValue),
@@ -329,7 +360,7 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         const healthLog = {
           id: generateId(),
           type: 'health',
-          icon: '📝',
+          icon: getEmojiIcon('health'),
           color: '',
           details: `${data.category} - ${data.symptoms} (${data.severity})`,
           timestamp: new Date(timeValue),
@@ -344,17 +375,27 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
 
       case 'sleep':
       case 'nap':
-      case 'tummy': {
+      case 'tummy':
+      case 'helmet':
+      case 'shower': {
         if (!data.useTimer) {
           // Manual entry
           const hours = parseInt(data.hours || '0');
           const minutes = parseInt(data.minutes || '0');
           const duration = (hours * 60 + minutes) * 60 * 1000; // Convert to milliseconds
 
+          const iconMap = {
+            'sleep': getEmojiIcon('sleep'),
+            'nap': getEmojiIcon('nap'),
+            'tummy': getEmojiIcon('tummy'),
+            'helmet': getEmojiIcon('helmet'),
+            'shower': getEmojiIcon('shower')
+          };
+
           const sleepLog = {
             id: generateId(),
             type: type,
-            icon: type === 'sleep' ? '😴' : type === 'nap' ? '🛏️' : '⏱️',
+            icon: iconMap[type as keyof typeof iconMap],
             color: '',
             details: `Duration: ${hours > 0 ? `${hours}h ` : ''}${minutes}min`,
             timestamp: new Date(timeValue),
@@ -516,6 +557,8 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
       case 'sleep':
       case 'nap':
       case 'tummy':
+      case 'helmet':
+      case 'shower':
         return (
           <div className="space-y-4">
             <div className="text-center">
@@ -727,6 +770,66 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
           </div>
         );
       }
+
+      case 'medication':
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <div className="text-6xl mb-2">{config.icon}</div>
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white">Medication Log</h3>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Medication Name
+              </label>
+              <input
+                type="text"
+                value={formData.name || ''}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Amoxicillin"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Dosage
+              </label>
+              <input
+                type="text"
+                value={formData.dosage || ''}
+                onChange={(e) => handleInputChange('dosage', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 5ml"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Time
+              </label>
+              <input
+                type="datetime-local"
+                value={formData.time || ''}
+                onChange={(e) => handleInputChange('time', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Notes (optional)
+              </label>
+              <textarea
+                value={formData.notes || ''}
+                onChange={(e) => handleInputChange('notes', e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
+                placeholder="Additional notes..."
+              />
+            </div>
+          </div>
+        );
 
       case 'temperature':
         return (
@@ -1130,15 +1233,14 @@ const UnifiedActionModal: React.FC<UnifiedActionModalProps> = ({
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       >
         <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="bg-white/95 backdrop-blur-xl dark:bg-gray-800/95 rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-sm sm:max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-hidden border border-white/20 dark:border-gray-700/50 mx-2 sm:mx-0"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm sm:max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700"
         >
           {/* Header */}
-          <div className={`${config.color} text-white p-4 sm:p-6 lg:p-8 relative overflow-hidden`}>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
+          <div className={`${config.color} text-white p-6`}>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}

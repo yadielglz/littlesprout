@@ -6,7 +6,7 @@ import { DatabaseService } from '../services/firebase';
 import { generateId } from '../utils/initialization';
 import { formatLocalDateTimeInput } from '../utils/datetime';
 import { Thermometer, AlertTriangle, Plus, Edit, Trash2, TrendingUp } from 'lucide-react';
-import Modal from './Modal';
+import Modal from './common/Modal';
 import toast from 'react-hot-toast';
 
 export interface Symptom {

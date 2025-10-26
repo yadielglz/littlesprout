@@ -4,7 +4,7 @@ import { useStore } from '../store/store';
 import { useAuth } from '../contexts/AuthContext';
 import { generateId } from '../utils/initialization';
 import { Users, UserPlus, Mail, Crown, Eye, Edit, Trash2, Copy, Check } from 'lucide-react';
-import Modal from './Modal';
+import Modal from './common/Modal';
 import toast from 'react-hot-toast';
 
 export interface FamilyMember {

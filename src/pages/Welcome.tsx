@@ -158,9 +158,9 @@ const Welcome = () => {
             <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">Weight & height tracking</p>
           </div>
           <div className="text-center p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 dark:border-gray-700/50">
-            <div className="text-xl sm:text-2xl mb-2">🏆</div>
-            <h3 className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-white">Milestones</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">Celebrate achievements</p>
+            <div className="text-xl sm:text-2xl mb-2">📊</div>
+            <h3 className="font-semibold text-xs sm:text-sm text-gray-800 dark:text-white">Analytics</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">View activity reports</p>
           </div>
         </div>
       </div>
