@@ -675,7 +675,7 @@ const Settings = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="space-y-2">
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              <strong>Version:</strong> 6.0.0
+              <strong>Version:</strong> 3.7.0
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               <strong>Platform:</strong> Progressive Web App (PWA)

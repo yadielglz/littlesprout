@@ -71,7 +71,7 @@ const Header = () => {
 
         <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 py-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 py-3">
               <div>
                 {/* Mobile: Single line with child info */}
                 <h1 className="block sm:hidden text-lg font-bold text-gray-800 dark:text-white leading-tight">
@@ -82,10 +82,10 @@ const Header = () => {
                 
                 {/* Desktop: Separate lines */}
                 <div className="hidden sm:block">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white leading-tight">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white leading-tight">
                     Hello, {profile.userName}!
                   </h1>
-                  <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-tight">
                     <span className="font-semibold text-indigo-600 dark:text-indigo-400">{profile.babyName}</span> is {calculateAge(profile.dob)}
                   </p>
                 </div>
@@ -97,8 +97,8 @@ const Header = () => {
           </div>
         </header>
       </div>
-      {/* Spacer for fixed header - increased height for mobile */}
-      <div className="h-44 sm:h-40" />
+      {/* Spacer for fixed header - accounts for status bar + header + clock widget */}
+      <div className="h-56 sm:h-52" />
     </>
   )
 }

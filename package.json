@@ -1,6 +1,6 @@
 {
   "name": "littlesprout-react",
-  "version": "6.0.0",
+  "version": "3.7.0",
   "description": "A modern React baby tracking app with enhanced features and performance",
   "private": true,
   "dependencies": {

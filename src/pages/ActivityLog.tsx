@@ -163,10 +163,10 @@ const ActivityLog = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 lg:mb-8">
-          <div className="mb-4 lg:mb-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">Activity Log</h1>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6">
+          <div className="mb-3 lg:mb-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 dark:text-white mb-1">Activity Log</h1>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
               Track and manage {profile.babyName}'s daily activities
             </p>
           </div>
