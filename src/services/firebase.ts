@@ -1,5 +1,7 @@
 import { useStore, BabyProfile, LogEntry, Inventory, Reminder, Appointment } from '../store/store'
 
+const getState = () => useStore.getState()
+
 export const DatabaseService = {
   async createProfile(_userId: string, profile: BabyProfile) {
     return Promise.resolve(profile)
@@ -85,7 +87,7 @@ export const DatabaseService = {
 
   subscribeToProfile(_userId: string, profileId: string, callback: (profile: BabyProfile | null) => void) {
     const state = getState()
-    callback(state.profiles.find((p) => p.id === profileId) || null)
+    callback(state.profiles.find((p: BabyProfile) => p.id === profileId) || null)
     return () => {}
   },
 
