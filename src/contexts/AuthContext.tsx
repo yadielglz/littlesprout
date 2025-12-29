@@ -1,50 +1,67 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  User, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  UserCredential
-} from 'firebase/auth';
-import { auth } from '../config/firebase';
-import { useStore } from '../store/store';
-import { useFirebaseStore } from '../store/firebaseStore';
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useStore } from '../store/store'
+import { useFirebaseStore } from '../store/firebaseStore'
+import { supabase } from '../lib/supabaseClient'
 
 interface AuthContextType {
-  currentUser: User | null;
-  login: (email: string, password: string) => Promise<UserCredential>;
-  signup: (email: string, password: string) => Promise<UserCredential>;
-  logout: () => Promise<void>;
-  loading: boolean;
+  currentUser: { uid: string; email?: string } | null
+  login: (email: string, password: string) => Promise<{ uid: string; email?: string } | null>
+  signup: (email: string, password: string) => Promise<{ uid: string; email?: string } | null>
+  logout: () => Promise<void>
+  loading: boolean
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null)
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
-};
+  const context = useContext(AuthContext)
+  if (!context) throw new Error('useAuth must be used within AuthProvider')
+  return context
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<{ uid: string; email?: string } | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const signup = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
-  };
+  const signup = async (email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) throw error
+    const user = data.user ? { uid: data.user.id, email: data.user.email || undefined } : null
+    setCurrentUser(user)
+    return user
+  }
 
-  const login = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  };
+  const login = async (email: string, password: string) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    const user = data.user ? { uid: data.user.id, email: data.user.email || undefined } : null
+    setCurrentUser(user)
+    return user
+  }
 
   const logout = async () => {
+    if (!supabase) {
+      setCurrentUser(null)
+      useStore.setState({
+        profiles: [],
+        currentProfileId: null,
+        logs: {},
+        inventories: {},
+        reminders: {},
+        appointments: {},
+        achievedMilestones: {},
+        activeTimer: null,
+        customActivities: []
+      })
+      return Promise.resolve()
+    }
     // Clear all local data before logging out
-    const { unsubscribeFromUpdates } = useFirebaseStore.getState();
+    const { unsubscribeFromUpdates } = useFirebaseStore.getState()
     
     // Unsubscribe from Firebase listeners
-    unsubscribeFromUpdates();
+    unsubscribeFromUpdates()
     
     // Clear the store state (this will also clear localStorage due to persist)
     useStore.setState({
@@ -58,45 +75,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       activeTimer: null,
       customActivities: []
       // Keep user preferences like isDarkMode, temperatureUnit, measurementUnit
-    });
+    })
     
-    // Sign out from Firebase
-    return signOut(auth);
-  };
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+    setCurrentUser(null)
+    return Promise.resolve()
+  }
 
   useEffect(() => {
-    // Add a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      setLoading(false);
-    }, 5000); // 5 second timeout
+    if (!supabase) {
+      console.warn('Supabase not configured; auth disabled')
+      setLoading(false)
+      return
+    }
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setCurrentUser({ uid: session.user.id, email: session.user.email || undefined })
+      } else {
+        setCurrentUser(null)
+      }
+      setLoading(false)
+    })
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-      clearTimeout(timeoutId);
-    }, (error) => {
-      console.error('AuthContext: Auth state error:', error);
-      setLoading(false);
-      clearTimeout(timeoutId);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (data.session?.user) {
+          setCurrentUser({ uid: data.session.user.id, email: data.session.user.email || undefined })
+        }
+      })
+      .finally(() => setLoading(false))
 
     return () => {
-      clearTimeout(timeoutId);
-      unsubscribe();
-    };
-  }, []);
+      listener?.subscription.unsubscribe()
+    }
+  }, [])
 
-  const value = {
-    currentUser,
-    login,
-    signup,
-    logout,
-    loading
-  };
+  const value = { currentUser, login, signup, logout, loading }
 
   return (
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
-  );
-}; 
+  )
+}

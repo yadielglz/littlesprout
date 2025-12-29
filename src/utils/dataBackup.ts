@@ -1,6 +1,6 @@
-import { useStore } from '../store/store';
-// import { DatabaseService } from '../services/firebase';
-import toast from 'react-hot-toast';
+import { useStore } from '../store/store'
+import toast from 'react-hot-toast'
+import { supabase } from '../lib/supabaseClient'
 
 export interface BackupData {
   timestamp: string;
@@ -55,7 +55,7 @@ class DataBackupService {
 
   // Create a complete backup of all data
   async createBackup(userId?: string): Promise<BackupData> {
-    const state = useStore.getState();
+    const state = useStore.getState()
     
     const backup: BackupData = {
       timestamp: new Date().toISOString(),
@@ -74,21 +74,21 @@ class DataBackupService {
           measurementUnit: state.measurementUnit
         }
       }
-    };
+    }
 
     // Store backup locally
-    this.saveBackupLocally(backup);
+    this.saveBackupLocally(backup)
     
-    // Store backup in Firebase if user is logged in
+    // Store backup in Supabase if available
     if (userId) {
       try {
-        await this.saveBackupToFirebase(userId, backup);
+        await this.saveBackupToSupabase(userId, backup)
       } catch (error) {
-        console.warn('Failed to save backup to Firebase:', error);
+        console.warn('Failed to save backup to Supabase:', error)
       }
     }
 
-    return backup;
+    return backup
   }
 
   // Save backup to localStorage
@@ -108,15 +108,17 @@ class DataBackupService {
   }
 
   // Save backup to Firebase
-  private async saveBackupToFirebase(_userId: string, _backup: BackupData) {
-    try {
-      // TODO: Implement backup saving to Firebase when needed
-      // await DatabaseService.saveBackup(userId, backup);
-      console.log('Backup saved locally (Firebase backup not implemented yet)');
-    } catch (error) {
-      console.error('Failed to save backup to Firebase:', error);
-      throw error;
-    }
+  private async saveBackupToSupabase(userId: string, backup: BackupData) {
+    if (!supabase) return
+    const { error } = await supabase
+      .from('backups')
+      .insert({
+        user_id: userId,
+        timestamp: backup.timestamp,
+        version: backup.version,
+        data: backup.data
+      })
+    if (error) throw error
   }
 
   // Clean up old local backups

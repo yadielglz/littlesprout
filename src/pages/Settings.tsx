@@ -39,6 +39,8 @@ import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
 import { formatDateSafe } from '../utils/datetime'
 import { WeatherService } from '../services/weather'
+import PageLayout from '../components/layout/PageLayout'
+import Card from '../components/common/Card'
 
 // Helper Components for Settings
 const SettingsRow = ({ children }: { children: React.ReactNode }) => (
@@ -861,45 +863,36 @@ const Settings = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 transition-all duration-300">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-12 pb-4 sm:py-6 lg:py-8">
-        {/* Header */}
-        <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">Settings</h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            Manage your profiles, preferences, and data
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 lg:mb-8 bg-white/90 dark:bg-gray-800/90 rounded-2xl p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+    <>
+      <PageLayout title="Settings" subtitle="Manage profiles, preferences, and data">
+        <Card className="flex flex-wrap gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon
+            const isActive = activeTab === tab.id
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors text-sm sm:text-base ${
-                  activeTab === tab.id
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
-                <Icon className="w-4 h-4 mr-1 sm:mr-2" />
+                <Icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
               </button>
             )
           })}
-        </div>
+        </Card>
 
-        {/* Tab Content */}
-        <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+        <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             {(() => {
               console.log('[Settings] Rendering tab:', activeTab);
@@ -912,8 +905,8 @@ const Settings = () => {
               return <div className="p-8 text-center text-gray-500">No content available for this tab.</div>;
             })()}
           </motion.div>
-        </div>
-      </div>
+        </Card>
+      </PageLayout>
 
       {/* Backup History Modal */}
       <Modal isOpen={showBackupHistory} onClose={() => setShowBackupHistory(false)} title="Backup History" size="xl">
@@ -1124,7 +1117,7 @@ const Settings = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   )
 }
 

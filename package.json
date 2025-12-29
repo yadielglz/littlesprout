@@ -4,13 +4,13 @@
   "description": "A modern React baby tracking app with enhanced features and performance",
   "private": true,
   "dependencies": {
+    "@supabase/supabase-js": "^2.89.0",
     "@tailwindcss/forms": "^0.5.6",
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.14",
     "chart.js": "^4.4.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
-    "firebase": "^11.9.1",
     "framer-motion": "^10.16.4",
     "html5-qrcode": "^2.3.8",
     "jspdf": "^2.5.1",
@@ -45,9 +45,9 @@
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "gh-pages": "^5.0.0",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5",
-    "gh-pages": "^5.0.0"
+    "vite": "^4.4.5"
   },
   "scripts": {
     "dev": "vite",

@@ -22,7 +22,6 @@ import { useModal } from './contexts/ModalContext'
 import { TimerProvider } from './contexts/TimerContext'
 import { useAppInitialization } from './hooks/useAppInitialization'
 import { useDarkMode } from './hooks/useDarkMode'
-import { useFirebaseSync } from './hooks/useFirebaseSync'
 import Header from './components/Header'
 import UnifiedActionModal from './components/UnifiedActionModal'
 import LoadingSpinner from './components/common/LoadingSpinner'
@@ -39,7 +38,6 @@ const Charts = lazy(() => import('./pages/Charts'))
 const HealthDashboard = lazy(() => import('./pages/HealthDashboard'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Welcome = lazy(() => import('./pages/Welcome'))
-const FirebaseTest = lazy(() => import('./components/FirebaseTest'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function App() {
@@ -51,7 +49,6 @@ function App() {
   
   const { showSplash, appInitialized, handleSplashComplete } = useAppInitialization(authLoading)
   useDarkMode()
-  useFirebaseSync(appInitialized)
 
   const hasProfiles = profiles.length > 0
 
@@ -122,7 +119,6 @@ function App() {
                   <Route path="/charts" element={<Charts />} />
                   <Route path="/health" element={<HealthDashboard />} />
                   <Route path="/settings" element={<Settings />} />
-                  <Route path="/firebase-test" element={<FirebaseTest />} />
                   <Route path="*" element={<NotFound />} />
                 </>
               ) : (
